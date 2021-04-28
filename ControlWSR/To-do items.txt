@@ -1,0 +1,22 @@
+﻿[x] Line or go to line <#>
+[x] Dot Notation Dictation
+[x] New with space
+[x] phonetic alphabet needs to include a space so that it will appear at the end Et cetera
+[x] For most of the dictation commands need to remove the last space
+[x] create a new command window monitor switch
+[x] create a new command Select Line
+[x] Change the icon to something more unique
+[x] test with Visual Studio code.
+[?] Check out how much the Windows Azure Speech SDK will cost
+[x] Mouse Down (So we can move windows around)
+[x] add a space for the symbols command
+[x] Add a command to launch the Default box and the DB 2
+[x] Need a command to restart speech recognition. Maybe kill the process? To be done in Dragon only
+[x] prepare and create a video to show The Windows speech recognition in action
+[x] Add find following commands in Visual Studio and Visual Studio code please
+[x] Incorporate the launcher forms so we can launch directly
+[x] add functionality to open the custom IntelliSense forms
+[x] Incorporate with serenade in Visual Studio code
+[] Look into a local database option for a standalone version
+[] SQLite will only work with the latest version of.net Core at least the migrations part
+[] When the command shutdown or restart Windows is issued need to automatically focus the form
