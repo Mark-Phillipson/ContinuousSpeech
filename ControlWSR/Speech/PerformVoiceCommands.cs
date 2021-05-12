@@ -362,7 +362,10 @@ namespace ControlWSR.Speech
 				string value = "";
 				foreach (var word in words)
 				{
-					value = value + word.Substring(0, 1).ToUpper() + word.Substring(1).ToLower();
+					if (word.Length>0)
+					{
+						value = value + word.Substring(0, 1).ToUpper() + word.Substring(1).ToLower(); 
+					}
 				}
 				rawResult = value;
 			}
@@ -371,7 +374,10 @@ namespace ControlWSR.Speech
 				string value = "";
 				foreach (var word in words)
 				{
-					value = value + word.Substring(0, 1).ToUpper() + word.Substring(1).ToLower() + ".";
+					if (word.Length>0)
+					{
+						value = value + word.Substring(0, 1).ToUpper() + word.Substring(1).ToLower() + "."; 
+					}
 				}
 				rawResult = value.Substring(0, value.Length - 1);
 			}
@@ -380,7 +386,10 @@ namespace ControlWSR.Speech
 				string value = "";
 				foreach (var word in words)
 				{
-					value = value + word.Substring(0, 1).ToUpper() + word.Substring(1).ToLower() + " ";
+					if (word.Length>0)
+					{
+						value = value + word.Substring(0, 1).ToUpper() + word.Substring(1).ToLower() + " "; 
+					}
 				}
 				rawResult = value;
 			}
