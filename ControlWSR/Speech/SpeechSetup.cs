@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ControlWSR.Repositories;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -20,6 +22,12 @@ namespace ControlWSR.Speech
 			{
 				 "Shutdown Windows", "Quit Application", "Restart Windows", "Restart Dragon", "Show Recent", "Fresh Line", "New with Space", "Window Monitor Switch", "Select Line", "Mouse Down","Semi Colon" ,"Studio","Get and Set","Use Dragon","Step Over","Step Into","Reset Code","Toggle Mouse","Centre Mouse"
 			};
+			WindowsVoiceCommand windowsVoiceCommand = new WindowsVoiceCommand();
+			var commands=windowsVoiceCommand.GetCommands();
+			foreach (var command in commands)
+			{
+				simpleCommands.Add(command.SpokenCommand);
+			}
 			var availableCommands = "";
 			foreach (var simpleCommand in simpleCommands)
 			{

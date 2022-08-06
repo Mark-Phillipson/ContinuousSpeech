@@ -1,4 +1,5 @@
-﻿using ControlWSR.Speech.Azure;
+﻿using ControlWSR.Repositories;
+using ControlWSR.Speech.Azure;
 
 using System;
 using System.Collections.Generic;
@@ -72,16 +73,97 @@ namespace ControlWSR.Speech
             {
                 AutoClosingMessageBox.Show(exception.Message, "Error Sending feedback to speech recognition", 3000);
             }
-            if (e.Result.Grammar.Name == "New with Space" && e.Result.Confidence > 0.6)
+            WindowsVoiceCommand windowsVoiceCommand = new WindowsVoiceCommand();
+
+            var command = windowsVoiceCommand.GetCommand(e.Result.Grammar.Name);
+            if (command != null)
             {
-                inputSimulator.Keyboard.TextEntry(" new ");
-                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.ESCAPE);
+                var actions = windowsVoiceCommand.GetChildActions(command.Id);
+                foreach (var action in actions)
+                {
+                    if (!string.IsNullOrWhiteSpace(action.TextToEnter))
+                    {
+                        inputSimulator.Keyboard.TextEntry(action.TextToEnter);
+                    }
+                    if (action.KeyDownValue != VirtualKeyCode.NONAME)
+                    {
+                        inputSimulator.Keyboard.KeyDown(action.KeyDownValue);
+                    }
+                    if (action.ModifierKey != VirtualKeyCode.NONAME && action.KeyPressValue != VirtualKeyCode.NONAME)
+                    {
+                        inputSimulator.Keyboard.ModifiedKeyStroke(action.ModifierKey, action.KeyPressValue);
+                    }
+                    else if (action.KeyPressValue != VirtualKeyCode.NONAME)
+                    {
+                        inputSimulator.Keyboard.KeyPress(action.KeyPressValue);
+                    }
+                    //Mouse commands and process starts to do
+                    if (action.MouseCommand=="LeftButtonDown")
+                    {
+                        inputSimulator.Mouse.LeftButtonDown();
+                    }
+                    else if (action.MouseCommand=="RightButtonDown")
+                    {
+                        inputSimulator.Mouse.RightButtonDown();
+                    }
+                    else if (action.MouseCommand=="LeftButtonDoubleClick")
+                    {
+                        inputSimulator.Mouse.LeftButtonDoubleClick();
+                    }
+                    else if (action.MouseCommand=="RightButtonDoubleClick")
+                    {
+                        inputSimulator.Mouse.RightButtonDoubleClick();
+                    }
+                    else if (action.MouseCommand=="LeftButtonUp")
+                    {
+                        inputSimulator.Mouse.LeftButtonUp();
+                    }
+                    else if (action.MouseCommand=="RightButtonUp")
+                    {
+                        inputSimulator.Mouse.RightButtonUp();
+                    }
+                    else if (action.MouseCommand=="MiddleButtonClick")
+                    {
+                        inputSimulator.Mouse.MiddleButtonClick();
+                    }
+                    else if (action.MouseCommand=="MiddleButtonDoubleClick")
+                    {
+                        inputSimulator.Mouse.MiddleButtonDoubleClick();
+                    }
+                    else if (action.MouseCommand=="HorizontalScroll")
+                    {
+                        inputSimulator.Mouse.HorizontalScroll(10);
+                    }
+                    else if (action.MouseCommand=="VerticalScroll")
+                    {
+                        inputSimulator.Mouse.VerticalScroll(10);
+                    }
+                    else if (action.MouseCommand=="MoveMouseBy")
+                    {
+                        inputSimulator.Mouse.MoveMouseBy(10, 10);
+                    }
+                    else if (action.MouseCommand=="MoveMouseTo")
+                    {
+                        inputSimulator.Mouse.MoveMouseTo(10, 10);
+                    }
+                    if (!string.IsNullOrWhiteSpace(action.ProcessStart))
+                    {
+                        Process.Start(action.ProcessStart ,action?.CommandLineArguments);
+                    }
+                }
             }
-            else if (e.Result.Grammar.Name == "Step Over" && e.Result.Confidence > 0.6)
-            {
-                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.F10);
-            }
-            else if (e.Result.Grammar.Name == "Step Into" && e.Result.Confidence > 0.6)
+
+
+            //if (e.Result.Grammar.Name == "New with Space" && e.Result.Confidence > 0.6)
+            //{
+            //    inputSimulator.Keyboard.TextEntry(" new ");
+            //    inputSimulator.Keyboard.KeyDown(VirtualKeyCode.ESCAPE);
+            //}
+            //if (e.Result.Grammar.Name == "Step Over" && e.Result.Confidence > 0.6)
+            //{
+            //    inputSimulator.Keyboard.KeyDown(VirtualKeyCode.F10);
+            //}
+            if (e.Result.Grammar.Name == "Step Into" && e.Result.Confidence > 0.6)
             {
                 inputSimulator.Keyboard.KeyDown(VirtualKeyCode.F11);
             }
@@ -93,7 +175,7 @@ namespace ControlWSR.Speech
             {
                 inputSimulator.Keyboard.ModifiedKeyStroke(controlAndAlt, VirtualKeyCode.F9);
             }
-            else if (e.Result.Grammar.Name == "Centre Mouse" && e.Result.Confidence > 0.5)
+            else if (Fore.Result.Grammar.Name == "Centre Mouse" && e.Result.Confidence > 0.5)
             {
                 inputSimulator.Keyboard.ModifiedKeyStroke(controlAndAlt, VirtualKeyCode.F12);
             }
@@ -203,7 +285,7 @@ namespace ControlWSR.Speech
                 catch (Exception exception)
                 {
                     //AutoClosingMessageBox.Show(exception.Message, $"Error Running a method {exception.Source}", 3000);
-                    System.Windows.Forms.MessageBox.Show(exception.Message, "Error running a method", MessageBoxButtons.OK);
+                    //System.Windows.Forms.MessageBox.Show(exception.Message, "Error running a method", MessageBoxButtons.OK);
                 }
             }
         }
