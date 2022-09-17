@@ -23,6 +23,7 @@ namespace ControlWSR
 
         [StringLength(1000)]
         public string Description { get; set; }
+        public string ApplicationName { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<CustomWindowsSpeechCommand> CustomWindowsSpeechCommands { get; set; }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ControlWSR.Models;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +15,7 @@ namespace ControlWSR.Repositories
         {
             var result = Model.WindowsSpeechVoiceCommands
                 .AsNoTracking()
+                .Where(v => v.ApplicationName=="Global")
                 .ToList();
             return result;
         }
@@ -31,6 +34,12 @@ namespace ControlWSR.Repositories
                 .Where(v => v.WindowsSpeechVoiceCommandId==windowsSpeechVoiceCommandId)
                 .ToList();
             return actions;
+        }
+        public List<GrammarItem> GetListItems(string grammarName)
+        {
+            var result = Model.GrammarNames.Where(v => v.NameOfGrammar == grammarName).FirstOrDefault();
+            List<GrammarItem> items = Model.GrammarItems.Where(v => v.GrammarNameId == result.Id).ToList();
+            return items;
         }
     }
 }

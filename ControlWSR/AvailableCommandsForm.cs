@@ -174,6 +174,8 @@ namespace ControlWSR
 
         private void AvailableCommandsForm_Load(object sender, EventArgs e)
         {
+           // Console.CursorVisible = true;//Not sure if this works yet 19/08/2022 08:50:09
+
             BackColor = Color.FromArgb(38, 38, 38);
             ForeColor = Color.White;
             FontFamily fontFamily = new FontFamily("Cascadia Code");
@@ -187,7 +189,7 @@ namespace ControlWSR
             var processes = Process.GetProcessesByName("KBPro");
             PerformVoiceCommands performVoiceCommands = new PerformVoiceCommands();
             //System.Windows.Forms.MessageBox.Show("processes: " + processes.Length);
-            if (processes.Length == 0 || true)
+            if (processes.Length == 0)
             {
                 IntPtr hwnd = PerformVoiceCommands.GetForegroundWindow();
                 uint pid;
@@ -198,7 +200,11 @@ namespace ControlWSR
             }
             inputSimulator.Keyboard.KeyPress(VirtualKeyCode.DIVIDE);
             PerformVoiceCommands.ToggleSpeechRecognitionListeningMode(inputSimulator);
-
+            inputSimulator.Mouse.MoveMouseTo(500, 500);
+            inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
+            inputSimulator.Mouse.MoveMouseBy(50, 60);
+            inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
+            inputSimulator.Mouse.MoveMouseBy(50, 60);
         }
     }
 }

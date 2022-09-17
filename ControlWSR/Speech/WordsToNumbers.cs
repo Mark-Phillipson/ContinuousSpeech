@@ -19,7 +19,7 @@ namespace ControlWSR.Speech
 		{"billion",1000000000},{"trillion",1000000000000},{"quadrillion",1000000000000000},
 		{"quintillion",1000000000000000000}
 	};
-
+		////Testing
 		public static long ConvertToNumbers(string numberString)
 		{
 			var numbers = Regex.Matches(numberString, @"\w+").Cast<Match>()

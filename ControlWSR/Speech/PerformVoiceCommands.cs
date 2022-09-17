@@ -78,26 +78,53 @@ namespace ControlWSR.Speech
             var command = windowsVoiceCommand.GetCommand(e.Result.Grammar.Name);
             if (command != null)
             {
-                var actions = windowsVoiceCommand.GetChildActions(command.Id);
+                List<CustomWindowsSpeechCommand> actions = windowsVoiceCommand.GetChildActions(command.Id);
                 foreach (var action in actions)
                 {
-                    if (!string.IsNullOrWhiteSpace(action.TextToEnter))
+                    if (action.WaitTime > 0)
                     {
-                        inputSimulator.Keyboard.TextEntry(action.TextToEnter);
+                        Thread.Sleep(action.WaitTime);
                     }
                     if (action.KeyDownValue != VirtualKeyCode.NONAME)
                     {
                         inputSimulator.Keyboard.KeyDown(action.KeyDownValue);
                     }
-                    if (action.ModifierKey != VirtualKeyCode.NONAME && action.KeyPressValue != VirtualKeyCode.NONAME)
+                    if (!string.IsNullOrWhiteSpace(action.TextToEnter))
                     {
-                        inputSimulator.Keyboard.ModifiedKeyStroke(action.ModifierKey, action.KeyPressValue);
+                        inputSimulator.Keyboard.TextEntry(action.TextToEnter);
+                    }
+                    if ( action.ControlKey||action.AlternateKey||action.ShiftKey||action.WindowsKey)
+                    {
+                        var modifiers= new List<VirtualKeyCode>();
+                        if (action.ControlKey)
+                        {
+                            modifiers.Add(VirtualKeyCode.CONTROL);
+                        }
+                        if (action.AlternateKey)
+                        {
+                            modifiers.Add(VirtualKeyCode.MENU);
+                        }
+                        if (action.ShiftKey)
+                        {
+                            modifiers.Add(VirtualKeyCode.SHIFT);
+                        }
+                        if (action.WindowsKey)
+                        {
+                            modifiers.Add(VirtualKeyCode.LWIN);
+                        }
+                        if (action.KeyPressValue != VirtualKeyCode.NONAME)
+                        {
+                            inputSimulator.Keyboard.ModifiedKeyStroke(modifiers, action.KeyPressValue);
+                        }
                     }
                     else if (action.KeyPressValue != VirtualKeyCode.NONAME)
                     {
-                        inputSimulator.Keyboard.KeyPress(action.KeyPressValue);
+                        inputSimulator.Keyboard.KeyPress( action.KeyPressValue);
                     }
-                    //Mouse commands and process starts to do
+                    if (action.KeyUpValue!=VirtualKeyCode.NONAME)
+                    {
+                        inputSimulator.Keyboard.KeyUp(action.KeyUpValue);
+                    }
                     if (action.MouseCommand=="LeftButtonDown")
                     {
                         inputSimulator.Mouse.LeftButtonDown();
@@ -132,19 +159,19 @@ namespace ControlWSR.Speech
                     }
                     else if (action.MouseCommand=="HorizontalScroll")
                     {
-                        inputSimulator.Mouse.HorizontalScroll(10);
+                        inputSimulator.Mouse.HorizontalScroll(action.ScrollAmount);
                     }
                     else if (action.MouseCommand=="VerticalScroll")
                     {
-                        inputSimulator.Mouse.VerticalScroll(10);
+                        inputSimulator.Mouse.VerticalScroll(action.ScrollAmount);
                     }
                     else if (action.MouseCommand=="MoveMouseBy")
                     {
-                        inputSimulator.Mouse.MoveMouseBy(10, 10);
+                        inputSimulator.Mouse.MoveMouseBy(action.MouseMoveX , action.MouseMoveY);
                     }
                     else if (action.MouseCommand=="MoveMouseTo")
                     {
-                        inputSimulator.Mouse.MoveMouseTo(10, 10);
+                        inputSimulator.Mouse.MoveMouseTo(action.AbsoluteX, action.AbsoluteY);
                     }
                     if (!string.IsNullOrWhiteSpace(action.ProcessStart))
                     {
@@ -163,46 +190,46 @@ namespace ControlWSR.Speech
             //{
             //    inputSimulator.Keyboard.KeyDown(VirtualKeyCode.F10);
             //}
-            if (e.Result.Grammar.Name == "Step Into" && e.Result.Confidence > 0.6)
-            {
-                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.F11);
-            }
-            else if (e.Result.Grammar.Name == "Reset Code" && e.Result.Confidence > 0.6)
-            {
-                inputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.SHIFT, VirtualKeyCode.F5);
-            }
-            else if (e.Result.Grammar.Name == "Toggle Mouse" && e.Result.Confidence > 0.5)
-            {
-                inputSimulator.Keyboard.ModifiedKeyStroke(controlAndAlt, VirtualKeyCode.F9);
-            }
-            else if (Fore.Result.Grammar.Name == "Centre Mouse" && e.Result.Confidence > 0.5)
-            {
-                inputSimulator.Keyboard.ModifiedKeyStroke(controlAndAlt, VirtualKeyCode.F12);
-            }
-            else if (e.Result.Grammar.Name == "Use Dragon" && e.Result.Confidence > 0.6)
+            //if (e.Result.Grammar.Name == "Step Into" && e.Result.Confidence > 0.4)
+            //{
+            //    inputSimulator.Keyboard.KeyDown(VirtualKeyCode.F11);
+            //}
+            //if (e.Result.Grammar.Name == "Reset Code" && e.Result.Confidence > 0.4)
+            //{
+            //    inputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.SHIFT, VirtualKeyCode.F5);
+            //}
+            //else if (e.Result.Grammar.Name == "Toggle Mouse" && e.Result.Confidence > 0.4)
+            //{
+            //    inputSimulator.Keyboard.ModifiedKeyStroke(controlAndAlt, VirtualKeyCode.F9);
+            //}
+            //else if (e.Result.Grammar.Name == "Centre Mouse" && e.Result.Confidence > 0.4)
+            //{
+            //    inputSimulator.Keyboard.ModifiedKeyStroke(controlAndAlt, VirtualKeyCode.F12);
+            //}
+            if (e.Result.Grammar.Name == "Use Dragon" && e.Result.Confidence > 0.4)
             {
                 ToggleSpeechRecognitionListeningMode(inputSimulator);
                 inputSimulator.Keyboard.KeyDown(VirtualKeyCode.ADD);
             }
-            else if (e.Result.Grammar.Name == "Window Monitor Switch" && e.Result.Confidence > 0.6)
-            {
-                inputSimulator.Keyboard.ModifiedKeyStroke(windowAndShift, VirtualKeyCode.RIGHT);
-            }
-            else if (e.Result.Grammar.Name == "Select Line" && e.Result.Confidence > 0.6)
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.HOME);
-                inputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.SHIFT, VirtualKeyCode.END);
-            }
-            else if (e.Result.Grammar.Name == "Mouse Down" && e.Result.Confidence > 0.6)
-            {
-                inputSimulator.Mouse.LeftButtonDown();
-            }
-            else if (e.Result.Grammar.Name == "Shutdown Windows" && e.Result.Confidence > 0.5)
+            //else if (e.Result.Grammar.Name == "Window Monitor Switch" && e.Result.Confidence > 0.4)
+            //{
+            //    inputSimulator.Keyboard.ModifiedKeyStroke(windowAndShift, VirtualKeyCode.RIGHT);
+            //}
+            //else if (e.Result.Grammar.Name == "Select Line" && e.Result.Confidence > 0.4)
+            //{
+            //    inputSimulator.Keyboard.KeyPress(VirtualKeyCode.HOME);
+            //    inputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.SHIFT, VirtualKeyCode.END);
+            //}
+            //else if (e.Result.Grammar.Name == "Mouse Down" && e.Result.Confidence > 0.4)
+            //{
+            //    inputSimulator.Mouse.LeftButtonDown();
+            //}
+            else if (e.Result.Grammar.Name == "Shutdown Windows" && e.Result.Confidence > 0.4)
             {
                 CommandToBeConfirmed = e.Result.Grammar.Name;
                 SetupConfirmationCommands(speechRecogniser, form);
             }
-            else if (e.Result.Grammar.Name == "Restart Windows" && e.Result.Confidence > 0.5)
+            else if (e.Result.Grammar.Name == "Restart Windows" && e.Result.Confidence > 0.4)
             {
                 CommandToBeConfirmed = e.Result.Grammar.Name;
                 SetupConfirmationCommands(speechRecogniser, form);
@@ -233,42 +260,46 @@ namespace ControlWSR.Speech
                 var availableCommands = speechSetup.SetUpMainCommands(speechRecogniser, form.UseAzureSpeech);
                 form.RichTextBoxAvailableCommands = availableCommands;
             }
-            else if (e.Result.Grammar.Name == "Studio" && e.Result.Confidence > 0.5)
+            else if (e.Result.Grammar.Name == "Studio" && e.Result.Confidence > 0.4)
             {
                 RunVisualStudioCommand(speechRecogniser);
             }
-            else if (e.Result.Grammar.Name == "Default Box" && e.Result.Confidence > 0.5)
-            {
-                Process.Start(@"C:\Users\MPhil\Source\Repos\SpeechRecognitionHelpers\DictationBoxMSP\bin\Release\DictationBoxMSP.exe");
-            }
-            else if (e.Result.Grammar.Name == "Dictation Box" && e.Result.Confidence > 0.5)
-            {
-                Process.Start(@"C:\Program Files (x86)\Speech Productivity\dictation box default\dictation box.exe");
-            }
-            else if (e.Result.Grammar.Name == "Get and Set" && e.Result.Confidence > 0.5)
-            {
-                inputSimulator.Keyboard.TextEntry(" { get; set; }");
-            }
+            //else if (e.Result.Grammar.Name == "Default Box" && e.Result.Confidence > 0.5)
+            //{
+            //    Process.Start(@"C:\Users\MPhil\Source\Repos\SpeechRecognitionHelpers\DictationBoxMSP\bin\Release\DictationBoxMSP.exe");
+            //}
+            //else if (e.Result.Grammar.Name == "Dictation Box" && e.Result.Confidence > 0.5)
+            //{
+            //    Process.Start(@"C:\Program Files (x86)\Speech Productivity\dictation box default\dictation box.exe");
+            //}
+            //else if (e.Result.Grammar.Name == "Get and Set" && e.Result.Confidence > 0.5)
+            //{
+            //    inputSimulator.Keyboard.TextEntry(" { get; set; }");
+            //}
             else if (e.Result.Grammar.Name.Contains("Phonetic Alphabet")) // Could be lower, mixed or upper
             {
                 ProcessKeyboardCommand(e);
             }
-            else if (e.Result.Grammar.Name == "Show Recent" && e.Result.Confidence > 0.5)
+            //else if (e.Result.Grammar.Name == "Show Recent" && e.Result.Confidence > 0.5)
+            //{
+            //    inputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.LMENU, VirtualKeyCode.VK_F);
+            //    inputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_J);
+            //}
+            //else if (e.Result.Grammar.Name == "Fresh Line" && e.Result.Confidence > 0.5)
+            //{
+            //    inputSimulator.Keyboard.KeyPress(VirtualKeyCode.END);
+            //    inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
+            //}
+            else if (e.Result.Grammar.Name == "Expand Selection" && e.Result.Confidence > 0.3)
             {
-                inputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.LMENU, VirtualKeyCode.VK_F);
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_J);
+                System.Windows.Forms.SendKeys.Send("%+=");
             }
-            else if (e.Result.Grammar.Name == "Fresh Line" && e.Result.Confidence > 0.5)
+            else if (e.Result.Grammar.Name == "Decrease Selection" && e.Result.Confidence > 0.3)
             {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.END);
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
-            }
-            else if (e.Result.Grammar.Name == "Semi Colon" && e.Result.Confidence > 0.3)
-            {
-                inputSimulator.Keyboard.TextEntry(";");
+                System.Windows.Forms.SendKeys.Send("%+-");
             }
             // where the grammar name is the same as the method Without the perform and command, with the spaces remove use reflection to call it
-            else if (e.Result.Confidence > 0.6)
+            else if (e.Result.Confidence > 0.4)
             {
                 string methodName = $"Perform{e.Result.Grammar.Name.Replace(" ", "")}Command";
                 Type thisType = this.GetType();
@@ -282,7 +313,7 @@ namespace ControlWSR.Speech
                 , null, this, new Object[] { e });
 
                 }
-                catch (Exception exception)
+                catch (Exception)
                 {
                     //AutoClosingMessageBox.Show(exception.Message, $"Error Running a method {exception.Source}", 3000);
                     //System.Windows.Forms.MessageBox.Show(exception.Message, "Error running a method", MessageBoxButtons.OK);
@@ -395,6 +426,37 @@ namespace ControlWSR.Speech
             }
             string arguments = $@"""/ Union "" ""/{searchTerm.Trim()}""";
             Process.Start(VOICE_LAUNCHER, arguments);
+        }
+        private void PerformSearchListCommand(SpeechRecognizedEventArgs e)
+        {
+            var searchTerm = "";
+            var counter = 0;
+            foreach (var word in e.Result.Words)
+            {
+                if (counter >= 2)
+                {
+                    searchTerm = $"{searchTerm} {word.Text}";
+                }
+                counter++;
+            }
+            string arguments = $@"""/ SearchIntelliSense "" ""/{searchTerm.Trim()}""";
+            Process.Start(VOICE_LAUNCHER, arguments);
+        }
+        private void PerformNavigateToCommand(SpeechRecognizedEventArgs e)
+        {
+            var searchTerm = "";
+            var counter = 0;
+            foreach (var word in e.Result.Words)
+            {
+                if (counter >= 2)
+                {
+                    searchTerm = $"{searchTerm} {word.Text}";
+                }
+                counter++;
+            }
+            SendKeys.Send("^,");
+            Thread.Sleep(100);
+            SendKeys.Send(searchTerm);
         }
 
         private void PerformSerenadeCommand(SpeechRecognizer speechRecogniser)
@@ -845,6 +907,45 @@ namespace ControlWSR.Speech
             else if (e.Result.Words[0].Text == "Ribbon" || e.Result.Words[0].Text == "Menu")
             {
                 p.y = 85;
+            }
+            if (e.Result.Words.Count == 3)
+            {
+                if (e.Result.Words[2].Text=="1")
+                {
+                    p.x = p.x + 5;
+                }
+                else if (e.Result.Words[2].Text=="2")
+                {
+                    p.x = p.x + (2*5);
+                }
+                else if (e.Result.Words[2].Text == "3")
+                {
+                    p.x = p.x + (3*5);
+                }
+                else if (e.Result.Words[2].Text == "4")
+                {
+                    p.x = p.x + (4 * 5);
+                }
+                else if (e.Result.Words[2].Text == "5")
+                {
+                    p.x = p.x + (5 * 5);
+                }
+                else if (e.Result.Words[2].Text == "6")
+                {
+                    p.x = p.x + (6 * 5);
+                }
+                else if (e.Result.Words[2].Text == "7")
+                {
+                    p.x = p.x + (7 * 5);
+                }
+                else if (e.Result.Words[2].Text == "8")
+                {
+                    p.x = p.x + (8 * 5);
+                }
+                else if (e.Result.Words[2].Text == "9")
+                {
+                    p.x = p.x + (9 * 5);
+                }
             }
             Win32.SetCursorPos(p.x, p.y);
             SpeechUI.SendTextFeedback(e.Result, $" {e.Result.Text} H{p.x} V{p.y}", true);

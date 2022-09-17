@@ -1,3 +1,5 @@
+using ControlWSR.Models;
+
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
@@ -12,7 +14,9 @@ namespace ControlWSR
         {
         }
 
-        public virtual DbSet<C__EFMigrationsHistory> C__EFMigrationsHistory { get; set; }
+        //public virtual DbSet<C__EFMigrationsHistory> C__EFMigrationsHistory { get; set; }
+         public  virtual DbSet<GrammarName> GrammarNames { get; set; }
+         public  virtual DbSet<GrammarItem> GrammarItems { get; set; }
         public virtual DbSet<AdditionalCommand> AdditionalCommands { get; set; }
         public virtual DbSet<ApplicationsToKill> ApplicationsToKills { get; set; }
         public virtual DbSet<Appointment> Appointments { get; set; }
@@ -38,7 +42,6 @@ namespace ControlWSR
         public virtual DbSet<MultipleLauncher> MultipleLaunchers { get; set; }
         public virtual DbSet<PropertyTabPosition> PropertyTabPositions { get; set; }
         public virtual DbSet<SavedMousePosition> SavedMousePositions { get; set; }
-        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
         public virtual DbSet<tblApplicationCaption> tblApplicationCaptions { get; set; }
         public virtual DbSet<Todo> Todos { get; set; }
         public virtual DbSet<ValuesToInsert> ValuesToInserts { get; set; }
