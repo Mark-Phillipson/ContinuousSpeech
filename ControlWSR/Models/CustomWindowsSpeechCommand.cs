@@ -14,7 +14,7 @@ namespace ControlWSR
 
         [StringLength(100)]
         public string TextToEnter { get; set; }
-
+        public string SendKeysValue { get; set; }
         public VirtualKeyCode KeyDownValue { get; set; }
 
         //Todo be depreciated

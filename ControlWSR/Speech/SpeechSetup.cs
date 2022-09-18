@@ -40,15 +40,14 @@ namespace ControlWSR.Speech
             foreach (var command in commands.OrderBy(v => v.SpokenCommand))
             {
                 simpleCommands.Add(command.SpokenCommand);
-                if (command.ApplicationName == "Global" && !command.SpokenCommand.EndsWith("Click"))
+                if (command.ApplicationName == "Global" && command.AutoCreated==false)
                 {
                     availableCommands = $"{availableCommands}\n{command.SpokenCommand}";
                 }
-                if (command.SpokenCommand.EndsWith("<dictation>") )
+                if (command.SpokenCommand.EndsWith("<dictation>"))
                 {
-                    var initialPhrase = command.SpokenCommand.Substring(0, command.SpokenCommand.IndexOf("<dictation>")-1);
+                    var initialPhrase = command.SpokenCommand.Substring(0, command.SpokenCommand.IndexOf("<dictation>") - 1);
                     CreateDictationGrammar(speechRecogniser, initialPhrase, initialPhrase, true);
-
                 }
                 else
                 {
@@ -113,7 +112,8 @@ namespace ControlWSR.Speech
             SpeechCommandsHelper.CreateItemCommands(speechRecogniser, "Items", "Select Items", 30);
             SetUpSymbolGrammarCommands(speechRecogniser);
             availableCommands = $"{availableCommands}\nSymbols In/Out/Space";
-
+            SetupAddTagHtmlCommands(speechRecogniser);
+            availableCommands = $"{availableCommands}\nAdd Tag <HtmlTag>";
             LoadGrammarMouseCommands(speechRecogniser);
             availableCommands = $"{availableCommands}\nMOUSE COMMANDS";
             availableCommands = $"{availableCommands}\nClick: Say <Click/Double-Click/Right Click/Mouse Click> ";
@@ -395,6 +395,24 @@ namespace ControlWSR.Speech
             System.Speech.Recognition.Grammar grammarSymbols = new System.Speech.Recognition.Grammar(grammarBuilder) { Name = "Symbols" };
             speechRecognizer.LoadGrammarAsync(grammarSymbols);
         }
+        public void SetupAddTagHtmlCommands(System.Speech.Recognition.SpeechRecognizer speechRecognizer)
+        {
+            WindowsVoiceCommand windowsVoiceCommand= new WindowsVoiceCommand ();
+            var results = windowsVoiceCommand.GetHtmlTags();
+            Choices choices = new Choices();
+            if (results!= null )
+            {
+                foreach (var item in results)
+                {
+                    choices.Add(item.SpokenForm);
+                }
+            }
+            GrammarBuilder grammarBuilder = new GrammarBuilder();
+            grammarBuilder.Append(choices);
+            System.Speech.Recognition.Grammar grammarSymbols = new System.Speech.Recognition.Grammar(grammarBuilder) { Name = "Add Html Tags" };
+            speechRecognizer.LoadGrammarAsync(grammarSymbols);
+        }
+
         public GrammarBuilder IncludeChoicesInGrammer(GrammarBuilder grammarBuilder, string grammarName, string wordsBefore)
         {
             List<GrammarItem> items = windowsVoiceCommand.GetListItems(grammarName);
@@ -407,5 +425,6 @@ namespace ControlWSR.Speech
             grammarBuilder.Append(choices);
             return grammarBuilder;
         }
+
     }
 }

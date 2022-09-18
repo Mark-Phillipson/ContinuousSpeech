@@ -177,6 +177,10 @@ namespace ControlWSR.Speech
                     {
                         Process.Start(action.ProcessStart ,action?.CommandLineArguments);
                     }
+                    if (action.SendKeysValue != null)
+                    {
+                        SendKeys.Send(action.SendKeysValue);
+                    }
                 }
             }
 
