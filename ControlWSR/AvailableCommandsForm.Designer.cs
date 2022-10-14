@@ -33,15 +33,17 @@
             this.richTextBoxAvailableCommands = new System.Windows.Forms.RichTextBox();
             this.textBoxResults = new System.Windows.Forms.TextBox();
             this.TestingBtn = new System.Windows.Forms.Button();
+            this.textBoxSearch = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // richTextBoxAvailableCommands
             // 
+            this.richTextBoxAvailableCommands.Dock = System.Windows.Forms.DockStyle.Left;
             this.richTextBoxAvailableCommands.Font = new System.Drawing.Font("Cascadia Code SemiBold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.richTextBoxAvailableCommands.Location = new System.Drawing.Point(1, 21);
+            this.richTextBoxAvailableCommands.Location = new System.Drawing.Point(0, 0);
             this.richTextBoxAvailableCommands.Name = "richTextBoxAvailableCommands";
             this.richTextBoxAvailableCommands.ReadOnly = true;
-            this.richTextBoxAvailableCommands.Size = new System.Drawing.Size(565, 631);
+            this.richTextBoxAvailableCommands.Size = new System.Drawing.Size(565, 782);
             this.richTextBoxAvailableCommands.TabIndex = 0;
             this.richTextBoxAvailableCommands.Text = "";
             // 
@@ -66,18 +68,26 @@
             this.TestingBtn.Visible = false;
             this.TestingBtn.Click += new System.EventHandler(this.TestingBtn_Click);
             // 
+            // textBoxSearch
+            // 
+            this.textBoxSearch.Location = new System.Drawing.Point(572, 417);
+            this.textBoxSearch.Name = "textBoxSearch";
+            this.textBoxSearch.Size = new System.Drawing.Size(392, 20);
+            this.textBoxSearch.TabIndex = 3;
+            this.textBoxSearch.TextChanged += new System.EventHandler(this.textBoxSearch_TextChanged);
+            // 
             // AvailableCommandsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(976, 782);
+            this.Controls.Add(this.textBoxSearch);
             this.Controls.Add(this.TestingBtn);
             this.Controls.Add(this.textBoxResults);
             this.Controls.Add(this.richTextBoxAvailableCommands);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximizeBox = false;
             this.Name = "AvailableCommandsForm";
-            this.Opacity = 0.9D;
+            this.Opacity = 0.8D;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Available Commands";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AvailableCommandsForm_FormClosing);
@@ -92,6 +102,7 @@
 		private System.Windows.Forms.RichTextBox richTextBoxAvailableCommands;
 		private System.Windows.Forms.TextBox textBoxResults;
 		private System.Windows.Forms.Button TestingBtn;
-	}
+        private System.Windows.Forms.TextBox textBoxSearch;
+    }
 }
 

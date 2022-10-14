@@ -16,6 +16,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 
 using WindowsInput;
@@ -86,7 +87,14 @@ namespace ControlWSR
 
         private void AzureRecognizer_Recognizing(object sender, SpeechRecognitionEventArgs e)
         {
-            this.textBoxResults.Text = $"Azure Recognising {e.Result.Text}";
+            try
+            {
+                this.textBoxResults.Text = $"Azure Recognising {e.Result.Text}";
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
         }
 
         private void SpeechRecogniser_StateChanged(object sender, StateChangedEventArgs e)
@@ -122,6 +130,7 @@ namespace ControlWSR
         {
 
             speechRecogniser.PauseRecognizerOnRecognition = true;
+
             if (e.Result.Grammar.Name == "no")
             {
                 _rejected = null;
@@ -205,6 +214,58 @@ namespace ControlWSR
             inputSimulator.Mouse.MoveMouseBy(50, 60);
             inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
             inputSimulator.Mouse.MoveMouseBy(50, 60);
+        }
+
+        private void textBoxSearch_TextChanged(object sender, EventArgs e)
+        {
+            richTextBoxAvailableCommands.SelectAll();
+            richTextBoxAvailableCommands.SelectionBackColor = Color.Black;
+            if (textBoxSearch.Text==  null  ||textBoxSearch.Text.Length<4)
+            {
+                return;
+            }
+            var searchFrom = 0;
+            var position = 0;
+            var successfulFinds = 0;
+            while (position >= 0)
+            {
+                position = FindMyText(textBoxSearch.Text, searchFrom, richTextBoxAvailableCommands.Text.Length);
+                if (position >= 0)
+                {
+                    successfulFinds++;
+                    searchFrom = position + 1;
+                    richTextBoxAvailableCommands.SelectionStart = position;
+                    richTextBoxAvailableCommands.SelectionLength = textBoxSearch.Text.Length;
+                    richTextBoxAvailableCommands.SelectionBackColor = Color.Red;
+                    // scroll it automatically
+                    richTextBoxAvailableCommands.ScrollToCaret();
+                }
+            }
+            richTextBoxAvailableCommands.DeselectAll();
+        }
+        public int FindMyText(string searchText, int searchStart, int searchEnd)
+        {
+            // Initialize the return value to false by default.
+            int returnValue = -1;
+
+            // Ensure that a search string and a valid starting point are specified.
+            if (searchText.Length > 0 && searchStart >= 0)
+            {
+                // Ensure that a valid ending value is provided.
+                if (searchEnd > searchStart || searchEnd == -1)
+                {
+                    // Obtain the location of the search string in richTextBox1.
+                    int indexToText = richTextBoxAvailableCommands.Find(searchText, searchStart, searchEnd, RichTextBoxFinds.MatchCase);
+                    // Determine whether the text was found in richTextBox1.
+                    if (indexToText >= 0)
+                    {
+                        // Return the index to the specified search text.
+                        returnValue = indexToText;
+                    }
+                }
+            }
+
+            return returnValue;
         }
     }
 }

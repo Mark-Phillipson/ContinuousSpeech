@@ -22,6 +22,7 @@ namespace ControlWSR.Speech
 {
     public class PerformVoiceCommands
     {
+        WindowsVoiceCommand windowsVoiceCommand = new WindowsVoiceCommand();
         readonly SpeechCommandsHelper SpeechCommandsHelper = new SpeechCommandsHelper();
         readonly InputSimulator inputSimulator = new InputSimulator();
         //readonly WindowsSpeechVoiceCommandDataService _windowsSpeechVoiceCommandDataService = new WindowsSpeechVoiceCommandDataService();
@@ -73,7 +74,7 @@ namespace ControlWSR.Speech
             {
                 AutoClosingMessageBox.Show(exception.Message, "Error Sending feedback to speech recognition", 3000);
             }
-            WindowsVoiceCommand windowsVoiceCommand = new WindowsVoiceCommand();
+
 
             var command = windowsVoiceCommand.GetCommand(e.Result.Grammar.Name);
             if (command != null)
@@ -93,9 +94,9 @@ namespace ControlWSR.Speech
                     {
                         inputSimulator.Keyboard.TextEntry(action.TextToEnter);
                     }
-                    if ( action.ControlKey||action.AlternateKey||action.ShiftKey||action.WindowsKey)
+                    if (action.ControlKey || action.AlternateKey || action.ShiftKey || action.WindowsKey)
                     {
-                        var modifiers= new List<VirtualKeyCode>();
+                        var modifiers = new List<VirtualKeyCode>();
                         if (action.ControlKey)
                         {
                             modifiers.Add(VirtualKeyCode.CONTROL);
@@ -119,81 +120,110 @@ namespace ControlWSR.Speech
                     }
                     else if (action.KeyPressValue != VirtualKeyCode.NONAME)
                     {
-                        inputSimulator.Keyboard.KeyPress( action.KeyPressValue);
+                        inputSimulator.Keyboard.KeyPress(action.KeyPressValue);
                     }
-                    if (action.KeyUpValue!=VirtualKeyCode.NONAME)
+                    if (action.KeyUpValue != VirtualKeyCode.NONAME)
                     {
                         inputSimulator.Keyboard.KeyUp(action.KeyUpValue);
                     }
-                    if (action.MouseCommand=="LeftButtonDown")
+                    if (action.MouseCommand == "LeftButtonDown")
                     {
                         inputSimulator.Mouse.LeftButtonDown();
                     }
-                    else if (action.MouseCommand=="RightButtonDown")
+                    else if (action.MouseCommand == "RightButtonDown")
                     {
                         inputSimulator.Mouse.RightButtonDown();
                     }
-                    else if (action.MouseCommand=="LeftButtonDoubleClick")
+                    else if (action.MouseCommand == "LeftButtonDoubleClick")
                     {
                         inputSimulator.Mouse.LeftButtonDoubleClick();
                     }
-                    else if (action.MouseCommand=="RightButtonDoubleClick")
+                    else if (action.MouseCommand == "RightButtonDoubleClick")
                     {
                         inputSimulator.Mouse.RightButtonDoubleClick();
                     }
-                    else if (action.MouseCommand=="LeftButtonUp")
+                    else if (action.MouseCommand == "LeftButtonUp")
                     {
                         inputSimulator.Mouse.LeftButtonUp();
                     }
-                    else if (action.MouseCommand=="RightButtonUp")
+                    else if (action.MouseCommand == "RightButtonUp")
                     {
                         inputSimulator.Mouse.RightButtonUp();
                     }
-                    else if (action.MouseCommand=="MiddleButtonClick")
+                    else if (action.MouseCommand == "MiddleButtonClick")
                     {
                         inputSimulator.Mouse.MiddleButtonClick();
                     }
-                    else if (action.MouseCommand=="MiddleButtonDoubleClick")
+                    else if (action.MouseCommand == "MiddleButtonDoubleClick")
                     {
                         inputSimulator.Mouse.MiddleButtonDoubleClick();
                     }
-                    else if (action.MouseCommand=="HorizontalScroll")
+                    else if (action.MouseCommand == "HorizontalScroll")
                     {
                         inputSimulator.Mouse.HorizontalScroll(action.ScrollAmount);
                     }
-                    else if (action.MouseCommand=="VerticalScroll")
+                    else if (action.MouseCommand == "VerticalScroll")
                     {
                         inputSimulator.Mouse.VerticalScroll(action.ScrollAmount);
                     }
-                    else if (action.MouseCommand=="MoveMouseBy")
+                    else if (action.MouseCommand == "MoveMouseBy")
                     {
-                        inputSimulator.Mouse.MoveMouseBy(action.MouseMoveX , action.MouseMoveY);
+                        inputSimulator.Mouse.MoveMouseBy(action.MouseMoveX, action.MouseMoveY);
                     }
-                    else if (action.MouseCommand=="MoveMouseTo")
+                    else if (action.MouseCommand == "MoveMouseTo")
                     {
                         inputSimulator.Mouse.MoveMouseTo(action.AbsoluteX, action.AbsoluteY);
                     }
                     if (!string.IsNullOrWhiteSpace(action.ProcessStart))
                     {
-                        Process.Start(action.ProcessStart ,action?.CommandLineArguments);
+                        Process.Start(action.ProcessStart, action?.CommandLineArguments);
                     }
-                    if (action.SendKeysValue != null)
+                    if (!string.IsNullOrWhiteSpace(action.SendKeysValue))
                     {
                         SendKeys.Send(action.SendKeysValue);
                     }
                 }
+                return;
             }
-
-
-            //if (e.Result.Grammar.Name == "New with Space" && e.Result.Confidence > 0.6)
-            //{
-            //    inputSimulator.Keyboard.TextEntry(" new ");
-            //    inputSimulator.Keyboard.KeyDown(VirtualKeyCode.ESCAPE);
-            //}
-            //if (e.Result.Grammar.Name == "Step Over" && e.Result.Confidence > 0.6)
-            //{
-            //    inputSimulator.Keyboard.KeyDown(VirtualKeyCode.F10);
-            //}
+            if (e.Result.Grammar.Name == "Add Html Tags" && e.Result.Confidence > 0.4)
+            {
+                PerformHtmlTagsInsertion(e);
+            }
+            if (e.Result.Grammar.Name == "Find Code" && e.Result.Confidence > 0.4)
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.HOME);
+                inputSimulator.Keyboard.Sleep(100);
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.SHIFT, VirtualKeyCode.RIGHT);
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_F);
+                inputSimulator.Keyboard.Sleep(100);
+                var searchTerm = "";
+                var counter = 0;
+                foreach (var word in e.Result.Words)
+                {
+                    if (counter >= 2)
+                    {
+                        searchTerm = $"{searchTerm} {word.Text}";
+                    }
+                    counter++;
+                }
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    inputSimulator.Keyboard.TextEntry(searchTerm);
+                }
+                inputSimulator.Keyboard.Sleep(100);
+                if (e.Result.Words[1].Text == "Previous")
+                {
+                    inputSimulator.Keyboard.Sleep(100);
+                    inputSimulator.Keyboard.KeyPress(VirtualKeyCode.SHIFT, VirtualKeyCode.F3);
+                    inputSimulator.Keyboard.Sleep(100);
+                    inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ESCAPE);
+                }
+                else
+                {
+                    inputSimulator.Keyboard.Sleep(100);
+                    inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ESCAPE);
+                }
+            }
             //if (e.Result.Grammar.Name == "Step Into" && e.Result.Confidence > 0.4)
             //{
             //    inputSimulator.Keyboard.KeyDown(VirtualKeyCode.F11);
@@ -294,18 +324,10 @@ namespace ControlWSR.Speech
             //    inputSimulator.Keyboard.KeyPress(VirtualKeyCode.END);
             //    inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
             //}
-            else if (e.Result.Grammar.Name == "Expand Selection" && e.Result.Confidence > 0.3)
-            {
-                System.Windows.Forms.SendKeys.Send("%+=");
-            }
-            else if (e.Result.Grammar.Name == "Decrease Selection" && e.Result.Confidence > 0.3)
-            {
-                System.Windows.Forms.SendKeys.Send("%+-");
-            }
             // where the grammar name is the same as the method Without the perform and command, with the spaces remove use reflection to call it
             else if (e.Result.Confidence > 0.4)
             {
-                string methodName = $"Perform{e.Result.Grammar.Name.Replace(" ", "")}Command";
+              string methodName = $"Perform{e.Result.Grammar.Name.Replace(" ", "")}Command";
                 Type thisType = this.GetType();
                 //MethodInfo theMethod = thisType.GetMethod(methodName,BindingFlags.NonPublic  | BindingFlags.Instance);
                 try
@@ -322,6 +344,43 @@ namespace ControlWSR.Speech
                     //AutoClosingMessageBox.Show(exception.Message, $"Error Running a method {exception.Source}", 3000);
                     //System.Windows.Forms.MessageBox.Show(exception.Message, "Error running a method", MessageBoxButtons.OK);
                 }
+            }
+        }
+
+        private void PerformHtmlTagsInsertion(SpeechRecognizedEventArgs e)
+        {
+            var tag = "";
+            var counter = 0;
+            foreach (var word in e.Result.Words)
+            {
+                if (counter >= 2)
+                {
+                    tag = $"{tag} {word.Text}";
+                }
+                counter++;
+            }
+            var result = windowsVoiceCommand.GetHtmlTag(tag.Trim());
+            string tagReturned = result.ListValue.ToLower();
+            string textToType = ""; int moveLeft = 0;
+            if (tagReturned == "input" || tagReturned == "br" || tagReturned == "hr")
+            {
+                textToType = $"<{tagReturned} />";
+                moveLeft = 3;
+            }
+            else if (tagReturned == "img")
+            {
+                textToType = $"<{tagReturned} src='' />";
+                moveLeft = 4;
+            }
+            else
+            {
+                textToType = $"<{tagReturned}></{tagReturned}>";
+                moveLeft = 4 + tagReturned.Length;
+            }
+            inputSimulator.Keyboard.TextEntry(textToType);
+            for (int i = 1; i < moveLeft; i++)
+            {
+                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.LEFT);
             }
         }
 
@@ -383,7 +442,10 @@ namespace ControlWSR.Speech
                 }
                 counter++;
             }
-            inputSimulator.Keyboard.TextEntry(searchTerm.Trim());
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                inputSimulator.Keyboard.TextEntry(searchTerm.Trim());
+            }
             if (e.Result.Words[1].Text == "Previous")
             {
                 inputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.SHIFT, VirtualKeyCode.F3);
@@ -400,6 +462,112 @@ namespace ControlWSR.Speech
             Process.Start(VOICE_LAUNCHER, arguments);
         }
 
+        private void PerformWordsDictationCommand(SpeechRecognizedEventArgs e)
+        {
+            var searchTerm = "";
+            var counter = 0;
+            foreach (var word in e.Result.Words)
+            {
+                if (counter >= 1)
+                {
+                    searchTerm = $"{searchTerm} {word.Text}";
+                }
+                counter++;
+            }
+            var customIntelliSense = windowsVoiceCommand.GetWord(searchTerm.Trim());
+            if (customIntelliSense == null)
+            {
+                return;
+            }
+            string sendkeysValue = customIntelliSense.SendKeys_Value.Replace("(", "{(}");
+            sendkeysValue = sendkeysValue.Replace(")", "{)}");
+
+            SendKeys.Send(sendkeysValue);
+            var additionalCommands = windowsVoiceCommand.GetAdditionalCommands(customIntelliSense.ID);
+            foreach (var additionalCommand in additionalCommands)
+            {
+                if (additionalCommand.WaitBefore > 0)
+                {
+                    int milliseconds = (int)(additionalCommand.WaitBefore * 1000);
+                    Thread.Sleep(milliseconds);
+                }
+                if (additionalCommand.DeliveryType == "Copy and Paste")
+                {
+                    try
+                    {
+                        string clipboardBackup = Clipboard.GetText();
+                        Clipboard.SetText(additionalCommand.SendKeys_Value);
+                    }
+                    catch (Exception)
+                    {
+                        return;
+                    }
+                    inputSimulator.Keyboard.Sleep(200);
+                    inputSimulator.Keyboard.KeyPress(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+                }
+                else if (additionalCommand.DeliveryType == "Send Keys")
+                {
+                    sendkeysValue = additionalCommand.SendKeys_Value.Replace("(", "{(}");
+                    sendkeysValue = sendkeysValue.Replace(")", "{)}");
+                    SendKeys.Send(sendkeysValue);
+                }
+            }
+        }
+        private void PerformEnterRandomNumbersCommand(SpeechRecognizedEventArgs e)
+        {
+            int numberOfWords = 0;
+            try
+            {
+                numberOfWords = int.Parse(e.Result.Words[1].Text);
+            }
+            catch (Exception  exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
+            for (int i = 0; i <  numberOfWords-1; i++)
+            {
+                Random rnd = new Random();
+                int num = rnd.Next(3000);
+                inputSimulator.Keyboard.TextEntry(num.ToString());
+                inputSimulator.Keyboard.Sleep(100);
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.TAB);
+            }
+        }
+        private void PerformCapCommand(SpeechRecognizedEventArgs e)
+        {
+            var searchTerm = "";
+            var counter = 0;
+            foreach (var word in e.Result.Words)
+            {
+                if (counter >= 1)
+                {
+                    searchTerm = $"{searchTerm} {word.Text}".Trim();
+                }
+                counter++;
+            }
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.Substring(0, 1).ToUpper() + searchTerm.Substring(1);
+                inputSimulator.Keyboard.TextEntry(searchTerm);
+            }
+        }
+        private void PerformDictationCommand(SpeechRecognizedEventArgs e)
+        {
+            var searchTerm = "";
+            var counter = 0;
+            foreach (var word in e.Result.Words)
+            {
+                if (counter >= 1)
+                {
+                    searchTerm = $"{searchTerm} {word.Text}";
+                }
+                counter++;
+            }
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                inputSimulator.Keyboard.TextEntry(searchTerm);
+            }
+        }
         private void PerformListItemsCommand(SpeechRecognizedEventArgs e)
         {
             var searchTerm = "";
@@ -579,9 +747,10 @@ namespace ControlWSR.Speech
             }
             if (rawResult.Length > 0)
             {
-                inputSimulator.Keyboard.TextEntry(rawResult);
+               inputSimulator.Keyboard.TextEntry(rawResult);
+               //SendKeys.Send(rawResult);
             }
-            ToggleSpeechRecognitionListeningMode(inputSimulator);
+           ToggleSpeechRecognitionListeningMode(inputSimulator);
         }
 
         private static string RemovePunctuation(string rawResult)
@@ -672,6 +841,8 @@ namespace ControlWSR.Speech
             inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
             inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LWIN);
             inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
+            inputSimulator.Keyboard.Sleep(200);
+            inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ESCAPE);
         }
 
         void SetupConfirmationCommands(SpeechRecognizer speechRecogniser, AvailableCommandsForm availableCommandsForm)
@@ -914,17 +1085,17 @@ namespace ControlWSR.Speech
             }
             if (e.Result.Words.Count == 3)
             {
-                if (e.Result.Words[2].Text=="1")
+                if (e.Result.Words[2].Text == "1")
                 {
                     p.x = p.x + 5;
                 }
-                else if (e.Result.Words[2].Text=="2")
+                else if (e.Result.Words[2].Text == "2")
                 {
-                    p.x = p.x + (2*5);
+                    p.x = p.x + (2 * 5);
                 }
                 else if (e.Result.Words[2].Text == "3")
                 {
-                    p.x = p.x + (3*5);
+                    p.x = p.x + (3 * 5);
                 }
                 else if (e.Result.Words[2].Text == "4")
                 {
@@ -1543,11 +1714,11 @@ namespace ControlWSR.Speech
             {
                 keys.Add("||");
             }
+            else if (text.Contains("ampersand"))
+            { keys.Add("&&"); }
             SendKeysCustom(null, null, keys, currentProcess.ProcessName);
             if (text.EndsWith("in"))
             {
-                //List<string> keysLeft = new List<string> { "{Left}" };
-                //SendKeysCustom(null, null, keysLeft, currentProcess.ProcessName);
                 inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LEFT);
             }
             else if (text.EndsWith("space"))

@@ -69,9 +69,13 @@ namespace ControlWSR.Speech
                 CreateDictationGrammar(speechRecogniser, "Serenade", "Serenade");
                 availableCommands = $"{availableCommands}\nSerenade";
             }
-            CreateDictationGrammar(speechRecogniser, "Find Following", "Search Code", true);
-            CreateDictationGrammar(speechRecogniser, "Find Previous", "Search Code", true);
+            CreateDictationGrammar(speechRecogniser, "Find Following", "Find Code", true);
+            CreateDictationGrammar(speechRecogniser, "Find Previous", "Find Code", true);
+            CreateDictationGrammar(speechRecogniser, "Words", "Words Dictation", true);
+            availableCommands = $"{availableCommands}\nWords <dictation>";
 
+            CreateDictationGrammar(speechRecogniser, "Dictation", "Dictation", true);
+            CreateDictationGrammar(speechRecogniser, "Cap", "Cap", true);
             if (UseAzureSpeech)
             {
                 CreateDictationGrammar(speechRecogniser, "Dictation", "Short Dictation");
@@ -83,8 +87,10 @@ namespace ControlWSR.Speech
                 CreateDictationGrammar(speechRecogniser, "Variable", "Short Dictation");
                 CreateDictationGrammar(speechRecogniser, "Variable Dictation", "Short Dictation");
                 CreateDictationGrammar(speechRecogniser, "Upper Dictation", "Short Dictation");
+                CreateDictationGrammar(speechRecogniser, "Upper", "Short Dictation");
                 CreateDictationGrammar(speechRecogniser, "Dot Notation", "Short Dictation");
                 CreateDictationGrammar(speechRecogniser, "Lower Dictation", "Short Dictation");
+                CreateDictationGrammar(speechRecogniser, "Lower", "Short Dictation");
 
                 availableCommands = $"{availableCommands}\nAzure: Upper Dictation/Title/Camel/Variable/Dictation/Punctuation or Dot Notation (Pause for sound)";
             }
@@ -94,15 +100,19 @@ namespace ControlWSR.Speech
             CreateDictationGrammar(speechRecogniser, "Right Select", "Selection");
             CreateDictationGrammar(speechRecogniser, "Go To Line", "Go To Line", true);
             CreateDictationGrammar(speechRecogniser, "Line", "Go To Line", true);
+            CreateDictationGrammar(speechRecogniser, "Find Following", "Search Code", true);
+            CreateDictationGrammar(speechRecogniser, "Find Previous", "Search Code", true);
+            availableCommands = $"{availableCommands}\nFind Following/Previous <dictation>";
             BuildPhoneticAlphabetGrammars(speechRecogniser);
-            LoadMoveCommandsGrammar(speechRecogniser);
-
+            //LoadMoveCommandsGrammar(speechRecogniser);
+                                                                                                                          
             SpeechCommandsHelper.CreateRepeatableCommand(speechRecogniser, "Backspace", "Repeat Keys", 30);
             SpeechCommandsHelper.CreateRepeatableCommand(speechRecogniser, "Left", "Repeat Keys", 30);
             SpeechCommandsHelper.CreateRepeatableCommand(speechRecogniser, "Right", "Repeat Keys", 30);
             SpeechCommandsHelper.CreateRepeatableCommand(speechRecogniser, "Down", "Repeat Keys", 30);
             SpeechCommandsHelper.CreateRepeatableCommand(speechRecogniser, "Press Up", "Repeat Keys", 30);
-            SpeechCommandsHelper.CreateRepeatableCommand(speechRecogniser, "Press Tab", "Repeat Keys", 30);
+            SpeechCommandsHelper.CreateRepeatableCommand(speechRecogniser, 
+                "Tabular", "Repeat Keys", 30);
             SpeechCommandsHelper.CreateRepeatableCommand(speechRecogniser, "Delete", "Repeat Keys", 30);
             SpeechCommandsHelper.CreateRepeatableCommand(speechRecogniser, "Enter", "Repeat Keys", 30);
             SpeechCommandsHelper.CreateRepeatableCommand(speechRecogniser, "Press Page Down", "Repeat Keys", 30);
@@ -121,6 +131,9 @@ namespace ControlWSR.Speech
             availableCommands = $"{availableCommands}\nPosition: Say <Left/Right> <Alpha-7> <Alpha-Tango>";
             LoadGrammarMouseHorizontalPositionCommands(speechRecogniser);
             availableCommands = $"{availableCommands}\nPosition / Click: Say <Taskbar/Ribbon/Menu> <Alpha-7> [1-9]";
+            SetupEnterRandomNumbersCommand(speechRecogniser);
+            availableCommands = $"{availableCommands}\nEnter <1to20> Random Numbers";
+
             return availableCommands;
         }
 
@@ -323,23 +336,23 @@ namespace ControlWSR.Speech
             speechRecognizer.LoadGrammarAsync(grammarPhoneticAlphabets);
         }
 
-        public void LoadMoveCommandsGrammar(System.Speech.Recognition.SpeechRecognizer speechRecognizer)
-        {
-            Choices choices = new Choices();
-            choices.Add("Move Down");
-            choices.Add("Move Up");
-            choices.Add("Move Left");
-            choices.Add("Move Right");
-            for (int counter = 1; counter < 50; counter++)
-            {
-                choices.Add($"Move Down {counter}");
-                choices.Add($"Move Up {counter}");
-                choices.Add($"Move Left {counter}");
-                choices.Add($"Move Right {counter}");
-            }
-            System.Speech.Recognition.Grammar grammar = new System.Speech.Recognition.Grammar(choices) { Name = "Move Command" };
-            speechRecognizer.LoadGrammarAsync(grammar);
-        }
+        //public void LoadMoveCommandsGrammar(System.Speech.Recognition.SpeechRecognizer speechRecognizer)
+        //{
+        //    Choices choices = new Choices();
+        //    choices.Add("Move Down");
+        //    choices.Add("Move Up");
+        //    choices.Add("Move Left");
+        //    choices.Add("Move Right");
+        //    for (int counter = 1; counter < 50; counter++)
+        //    {
+        //        choices.Add($"Move Down {counter}");
+        //        choices.Add($"Move Up {counter}");
+        //        choices.Add($"Move Left {counter}");
+        //        choices.Add($"Move Right {counter}");
+        //    }
+        //    System.Speech.Recognition.Grammar grammar = new System.Speech.Recognition.Grammar(choices) { Name = "Move Command" };
+        //    speechRecognizer.LoadGrammarAsync(grammar);
+        //}
         public void CreateMouseMoveAndClickCommandGrammar(System.Speech.Recognition.SpeechRecognizer speechRecognizer)
         {
             Choices choices = new Choices();
@@ -370,6 +383,21 @@ namespace ControlWSR.Speech
             grammarClick.Name = "Mouse Click";
             speechRecognizer.LoadGrammarAsync(grammarClick);
         }
+        public void SetupEnterRandomNumbersCommand(System.Speech.Recognition.SpeechRecognizer speechRecognizer)
+        {
+            Choices choices = new Choices();
+            for (int i = 1; i < 30; i++)
+            {
+                choices.Add(i.ToString());
+            }
+            GrammarBuilder grammarBuilder = new GrammarBuilder();
+            grammarBuilder.Append("Enter");
+            grammarBuilder.Append(choices);
+            grammarBuilder.Append("Random Numbers");
+            System.Speech.Recognition.Grammar grammar = new System.Speech.Recognition.Grammar(grammarBuilder) { Name = "Enter Random Numbers" };
+            speechRecognizer.LoadGrammarAsync(grammar);
+
+        }
         public void SetUpSymbolGrammarCommands(System.Speech.Recognition.SpeechRecognizer speechRecognizer)
         {
             Choices choices = new Choices();
@@ -388,6 +416,8 @@ namespace ControlWSR.Speech
             choices.Add("Hash");
             choices.Add("Pipes");
             choices.Add("Ampersands");
+            choices.Add("Question Marks");
+
             Choices choicesInOut = new Choices("In", "Out", "Space");
             GrammarBuilder grammarBuilder = new GrammarBuilder();
             grammarBuilder.Append(choices);
@@ -397,7 +427,6 @@ namespace ControlWSR.Speech
         }
         public void SetupAddTagHtmlCommands(System.Speech.Recognition.SpeechRecognizer speechRecognizer)
         {
-            WindowsVoiceCommand windowsVoiceCommand= new WindowsVoiceCommand ();
             var results = windowsVoiceCommand.GetHtmlTags();
             Choices choices = new Choices();
             if (results!= null )
@@ -408,11 +437,11 @@ namespace ControlWSR.Speech
                 }
             }
             GrammarBuilder grammarBuilder = new GrammarBuilder();
+            grammarBuilder.Append("Add Tag");
             grammarBuilder.Append(choices);
-            System.Speech.Recognition.Grammar grammarSymbols = new System.Speech.Recognition.Grammar(grammarBuilder) { Name = "Add Html Tags" };
-            speechRecognizer.LoadGrammarAsync(grammarSymbols);
+            System.Speech.Recognition.Grammar addATagHtml = new System.Speech.Recognition.Grammar(grammarBuilder) { Name = "Add Html Tags" };
+            speechRecognizer.LoadGrammarAsync(addATagHtml);
         }
-
         public GrammarBuilder IncludeChoicesInGrammer(GrammarBuilder grammarBuilder, string grammarName, string wordsBefore)
         {
             List<GrammarItem> items = windowsVoiceCommand.GetListItems(grammarName);

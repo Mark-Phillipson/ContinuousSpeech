@@ -51,5 +51,21 @@ namespace ControlWSR.Repositories
             var result = Model.HtmlTags.Where(v => v.SpokenForm != null).OrderBy(v => v.SpokenForm).ToList();
             return result;
         }
+
+        public CustomIntelliSense GetWord(string searchTerm)
+        {
+            var result = Model.CustomIntelliSenses.Where(i => i.LanguageID == 1 && i.CategoryID == 39 && i.Display_Value == searchTerm).OrderBy(v => v.Display_Value).FirstOrDefault();
+            if (result == null)
+            {
+                return null;
+            }
+            return result;
+        }
+
+        public List<AdditionalCommand> GetAdditionalCommands(int id)
+        {
+            var result = Model.AdditionalCommands.Where(v => v.CustomIntelliSenseID == id).ToList();
+            return result;
+        }
     }
 }
