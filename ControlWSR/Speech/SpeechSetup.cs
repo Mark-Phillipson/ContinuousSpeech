@@ -91,8 +91,10 @@ namespace ControlWSR.Speech
                 CreateDictationGrammar(speechRecogniser, "Dot Notation", "Short Dictation");
                 CreateDictationGrammar(speechRecogniser, "Lower Dictation", "Short Dictation");
                 CreateDictationGrammar(speechRecogniser, "Lower", "Short Dictation");
+                CreateDictationGrammar(speechRecogniser, "Continuous", "Continuous Dictation");
 
                 availableCommands = $"{availableCommands}\nAzure: Upper Dictation/Title/Camel/Variable/Dictation/Punctuation or Dot Notation (Pause for sound)";
+                availableCommands = $"{availableCommands}\nContinuous ";
             }
             CreateDictationGrammar(speechRecogniser, "Select Left", "Selection");
             CreateDictationGrammar(speechRecogniser, "Select Right", "Selection");

@@ -1,12 +1,13 @@
-﻿using ControlWSR.Repositories;
-
+﻿
 using Microsoft.CognitiveServices.Speech;
+
+using SpeechContinuousRecognition.Models;
+using SpeechContinuousRecognition.Repositories;
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Speech.Recognition;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,85 +17,12 @@ using System.Windows.Forms;
 using WindowsInput;
 using WindowsInput.Native;
 
-namespace ControlWSR.Speech
+namespace SpeechContinuousRecognition
 {
     public partial class SpeechCommandsHelper
     {
         WindowsVoiceCommand windowsVoiceCommand = new WindowsVoiceCommand();
-        public void CreateRepeatableCommand(System.Speech.Recognition.SpeechRecognizer speechRecognizer, string spokenCommand, string grammarName = null, int maximumRepeat = 10)
-        {
-            Choices choices = new Choices();
-            for (int counter = 1; counter < maximumRepeat; counter++)
-            {
-                choices.Add($"{spokenCommand} {counter}");
-            }
-            System.Speech.Recognition.Grammar grammar = new System.Speech.Recognition.Grammar(choices);
-            if (grammarName == null)
-            {
-                grammarName = spokenCommand;
-            }
-            grammar.Name = grammarName;
-            speechRecognizer.LoadGrammarAsync(grammar);
-        }
-        public void CreateItemCommands(System.Speech.Recognition.SpeechRecognizer speechRecognizer, string spokenCommand, string grammarName = null, int maximumRepeat = 10)
-        {
-            Choices choices = new Choices();
-            for (int counter = 1; counter < maximumRepeat; counter++)
-            {
-                choices.Add($"{counter} {spokenCommand}");
-            }
-            System.Speech.Recognition.Grammar grammar = new System.Speech.Recognition.Grammar(choices);
-            if (grammarName == null)
-            {
-                grammarName = spokenCommand;
-            }
-            grammar.Name = grammarName;
-            speechRecognizer.LoadGrammarAsync(grammar);
-        }
 
-        public static void BuildRepeatSendkeys(SpeechRecognizedEventArgs e, List<string> keys)
-        {
-            int numberIndexPosition = 1; int counter = 0;
-            if (e.Result.Text.ToUpper().Contains("STEP OVER") || e.Result.Text.Contains("Press Tab") || e.Result.Text.Contains("Press Up"))
-            {
-                numberIndexPosition = 2;
-            }
-            try
-            {
-                counter = int.Parse(e.Result.Words[numberIndexPosition].Text);
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-            }
-            var sendkeysCommand = $"{{{e.Result.Words[0].Text.ToUpper()}}}";
-            if (sendkeysCommand == "{PRESS}")
-            {
-                sendkeysCommand = $"{{{e.Result.Words[1].Text.ToUpper()}}}";
-            }
-
-            if (e.Result.Text.ToUpper().Contains("PAGE UP"))
-            {
-                sendkeysCommand = "{PGUP}";
-            }
-            else if (e.Result.Text.ToUpper().Contains("PAGE DOWN"))
-            {
-                sendkeysCommand = "{PGDN}";
-            }
-            else if (e.Result.Text.ToUpper().Contains("STEP OVER"))
-            {
-                sendkeysCommand = "{F10}";
-            }
-            else if (e.Result.Text.Contains("Tabular"))
-            {
-                sendkeysCommand = "{TAB}";
-            }
-
-            for (int i = 0; i < counter; i++)
-            {
-                keys.Add(sendkeysCommand);
-            }
-        }
         public string ConvertTextToNumber(string lineNumber)
         {
             var possible2 = new List<string> { "two", "to", "too" };
@@ -254,12 +182,13 @@ namespace ControlWSR.Speech
             }
             return value;
         }
-        public string ConvertWordsToSymbols(string resultRaw, IInputSimulator inputSimulator, AvailableCommandsForm form, SpeechRecognitionResult result)
+        public string ConvertWordsToSymbols(string resultRaw, ContinuousSpeech form, SpeechRecognitionResult result)
         {
-            bool finish = PerformDatabaseCommands(result, resultRaw, inputSimulator, form);
+            IInputSimulator inputSimulator = new InputSimulator();
+            (bool finish, string? commandName) = PerformDatabaseCommands(result, resultRaw, inputSimulator, form);
             if (finish)
             {
-                return "{Database command Performed}"; 
+                return "{Database command Performed" + $" {commandName}" +"}";
             }
             if (resultRaw.Trim().ToLower().StartsWith("press"))
             {
@@ -272,22 +201,27 @@ namespace ControlWSR.Speech
             if (resultRaw.Trim().ToLower() == "toggle uppercase" || resultRaw.Trim().ToLower() == "toggle upper case")
             {
                 form.OutputUppercase = !form.OutputUppercase;
+                return "";
             }
             if (resultRaw.Trim().ToLower() == "toggle lowercase" || resultRaw.Trim().ToLower() == "toggle lower case")
             {
                 form.OutputLowercase = !form.OutputLowercase;
+                return "";
             }
             if (resultRaw.Trim().ToLower() == "toggle treat as command" || resultRaw.Trim().ToLower() == "toggle treat command")
             {
                 form.TreatAsCommand = !form.TreatAsCommand;
+                return "";
             }
             if (resultRaw.Trim().ToLower() == "toggle convert words to symbols" || resultRaw.Trim().ToLower() == "toggle convert words")
             {
                 form.ConvertWordsToSymbols = !form.ConvertWordsToSymbols;
+                return "";
             }
             if (resultRaw.Trim().ToLower() == "toggle remove punctuation" || resultRaw.Trim().ToLower() == "toggle punctuation")
             {
                 form.RemovePunctuation = !form.RemovePunctuation;
+                return "";
             }
 
             if (resultRaw.Trim().ToLower() == "if")
@@ -330,7 +264,7 @@ namespace ControlWSR.Speech
                 SendKeys.SendWait("%^+m");
                 return "{next method}";
             }
-            if (resultRaw.Trim().ToLower()=="search code")
+            if (resultRaw.Trim().ToLower() == "search code")
             {
                 inputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_F);
             }
@@ -503,7 +437,7 @@ namespace ControlWSR.Speech
             }
             if (resultRaw.ToLower() == "equals out")
             {
-                inputSimulator.Keyboard.TextEntry( "==" );
+                inputSimulator.Keyboard.TextEntry("==");
                 return "{==}";
             }
             if (resultRaw.ToLower() == "backspace")
@@ -513,10 +447,10 @@ namespace ControlWSR.Speech
             }
             if (resultRaw.ToLower().Contains("backspace"))
             {
-                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.BACK,words);
+                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.BACK, words);
                 return "{Backspace}";
             }
-            if (resultRaw.ToLower().EndsWith("items") && resultRaw.ToLower()!="items")
+            if (resultRaw.ToLower().EndsWith("items") && resultRaw.ToLower() != "items")
             {
                 var repeatCount = GetNumber(words[0]);
                 inputSimulator.Keyboard.KeyDown(VirtualKeyCode.SHIFT);
@@ -566,7 +500,7 @@ namespace ControlWSR.Speech
             }
             if (resultRaw.ToLower().StartsWith("delete"))
             {
-                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.DELETE,words);
+                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.DELETE, words);
                 return "{Del}";
             }
             if (resultRaw.ToLower() == "up")
@@ -698,13 +632,15 @@ namespace ControlWSR.Speech
             return resultRaw;
         }
 
-        private bool PerformDatabaseCommands(SpeechRecognitionResult result, string resultRaw, IInputSimulator inputSimulator, AvailableCommandsForm form)
+        public (bool commandRun, string? commandName) PerformDatabaseCommands(SpeechRecognitionResult result, string resultRaw, IInputSimulator inputSimulator, ContinuousSpeech form)
         {
             bool commandRun = false;
+             string? commandName = null;
             var command = windowsVoiceCommand.GetCommand(resultRaw);
             if (command != null)
             {
-                List<CustomWindowsSpeechCommand> actions = windowsVoiceCommand.GetChildActions(command.Id);
+                List<CustomWindowsSpeechCommand>? actions = windowsVoiceCommand.GetChildActions(command.Id);
+                if (actions == null) { return (commandRun,"Nothing"); }
                 foreach (var action in actions)
                 {
                     if (action.WaitTime > 0)
@@ -777,11 +713,11 @@ namespace ControlWSR.Speech
                     }
                     else if (action.MouseCommand == "MiddleButtonClick")
                     {
-                        inputSimulator.Mouse.MiddleButtonClick();
+                        //inputSimulator.Mouse.MiddleButtonClick();
                     }
                     else if (action.MouseCommand == "MiddleButtonDoubleClick")
                     {
-                        inputSimulator.Mouse.MiddleButtonDoubleClick();
+                        //inputSimulator.Mouse.MiddleButtonDoubleClick();
                     }
                     else if (action.MouseCommand == "HorizontalScroll")
                     {
@@ -805,16 +741,18 @@ namespace ControlWSR.Speech
                     }
                     if (!string.IsNullOrWhiteSpace(action.SendKeysValue))
                     {
-                        SendKeys.Send(action.SendKeysValue);
+                        SendKeys.SendWait(action.SendKeysValue);
                     }
                     commandRun = true;
+                    commandName = command.SpokenCommand;
                 }
             }
 
             if (result.Text.ToLower().StartsWith("add tag"))
             {
-                PerformHtmlTagsInsertion(result, inputSimulator);
+                PerformHtmlTagsInsertion(result, inputSimulator,resultRaw);
                 commandRun = true;
+                commandName = "Add Tag";
             }
             if (result.Text.ToLower().StartsWith("find code") || result.Text.ToLower().StartsWith("control f"))
             {
@@ -854,8 +792,9 @@ namespace ControlWSR.Speech
                     inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ESCAPE);
                 }
                 commandRun = true;
+                commandName = "Find Code";
             }
-            return commandRun;
+            return (commandRun,commandName);
             //if (result.Text.ToLower() == "use dragon")
             //{
             //    //ToggleSpeechRecognitionListeningMode(inputSimulator);
@@ -868,7 +807,7 @@ namespace ControlWSR.Speech
 
         }
 
-        private void PerformMultipleCommand(string resultRaw, IInputSimulator inputSimulator, VirtualKeyCode virtualKeyCode,List<string > words)
+        private void PerformMultipleCommand(string resultRaw, IInputSimulator inputSimulator, VirtualKeyCode virtualKeyCode, List<string> words)
         {
             int number = 0;
             number = GetNumber(words[1]);
@@ -912,7 +851,7 @@ namespace ControlWSR.Speech
                 default: return 0;
             }
         }
-        private void PerformHtmlTagsInsertion(SpeechRecognitionResult e, IInputSimulator inputSimulator)
+        private void PerformHtmlTagsInsertion(SpeechRecognitionResult e, IInputSimulator inputSimulator,  string resultRaw)
         {
             string[] stringSeparators = new string[] { " " };
             List<string> words = e.Text.Split(stringSeparators, StringSplitOptions.None).ToList();
@@ -927,7 +866,12 @@ namespace ControlWSR.Speech
                 }
                 counter++;
             }
+            tag = SpeechCommandsHelper.RemovePunctuation(tag);
             var result = windowsVoiceCommand.GetHtmlTag(tag.Trim());
+            if (result== null )
+            {
+                return;
+            }
             string tagReturned = result.ListValue.ToLower();
             string textToType = ""; int moveLeft = 0;
             if (tagReturned == "input" || tagReturned == "br" || tagReturned == "hr")
@@ -948,7 +892,8 @@ namespace ControlWSR.Speech
             inputSimulator.Keyboard.TextEntry(textToType);
             for (int i = 1; i < moveLeft; i++)
             {
-                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.LEFT);
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LEFT);
+                inputSimulator.Keyboard.Sleep(100);
             }
         }
     }

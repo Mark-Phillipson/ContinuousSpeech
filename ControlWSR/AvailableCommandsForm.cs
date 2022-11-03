@@ -42,6 +42,49 @@ namespace ControlWSR
         {
             get => textBoxResultsLocal; set { textBoxResultsLocal = value; textBoxResults.Text = value; }
         }
+        public string LabelStatus
+        {
+            get => labelStatus.Text; set { labelStatus.Text = value; }
+        }
+        public bool OutputUppercase
+        {
+            get => checkBoxUppercase.Checked;
+            set
+            {
+                checkBoxUppercase.Checked = value;
+                if (value)
+                {
+                    checkBoxLowercase.Checked = false;
+                }
+            }
+        }
+        public bool OutputLowercase
+        {
+            get => checkBoxLowercase.Checked;
+            set
+            {
+                checkBoxLowercase.Checked = value;
+                if (value)
+                {
+                    checkBoxUppercase.Checked = false;
+                }
+            }
+        }
+        public bool TreatAsCommand
+        {
+            get => checkBoxTreatAsCommand.Checked;
+            set => checkBoxTreatAsCommand.Checked = value;
+        }
+        public bool ConvertWordsToSymbols
+        {
+            get => checkBoxConvertWordsToSymbols.Checked;
+            set => checkBoxConvertWordsToSymbols.Checked = value;
+        }
+        public bool RemovePunctuation
+        {
+            get => checkBoxRemovePunctuation.Checked;
+            set => checkBoxRemovePunctuation.Checked = value;
+        }
         public string AvailableCommands
         { get => availableCommands; set { availableCommands = value; richTextBoxAvailableCommands.Text = value; } }
         public string RichTextBoxAvailableCommands
@@ -99,7 +142,7 @@ namespace ControlWSR
 
         private void SpeechRecogniser_StateChanged(object sender, StateChangedEventArgs e)
         {
-            this.textBoxResults.Text = "State has changed to:" + e.RecognizerState.ToString();
+            this.textBoxResults.Text = "State has changed to: " + e.RecognizerState.ToString();
         }
 
         private void SpeechRecogniser_SpeechHypothesized(object sender, SpeechHypothesizedEventArgs e)
@@ -163,7 +206,9 @@ namespace ControlWSR
 
         private void TestingBtn_Click(object sender, EventArgs e)
         {
-            AutoClosingMessageBox.Show("Testing", "This should close in three seconds", 3000);
+            //AutoClosingMessageBox.Show("Testing", "This should close in three seconds", 3000);
+            //performVoiceCommands.PerformContinuousDictation(this, speechRecogniser);
+            //var result = speechRecogniser.EmulateRecognize("continuous");
         }
 
         private void AvailableCommandsForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -180,10 +225,9 @@ namespace ControlWSR
                 // Just ignore
             }
         }
-
         private void AvailableCommandsForm_Load(object sender, EventArgs e)
         {
-           // Console.CursorVisible = true;//Not sure if this works yet 19/08/2022 08:50:09
+            // Console.CursorVisible = true;//Not sure if this works yet 19/08/2022 08:50:09
 
             BackColor = Color.FromArgb(38, 38, 38);
             ForeColor = Color.White;
@@ -207,20 +251,25 @@ namespace ControlWSR
                 List<string> keysKB = new List<string>(new string[] { "^+k" });
                 performVoiceCommands.SendKeysCustom(null, null, keysKB, currentProcess.ProcessName);
             }
+            //send Dragon to sleep
             inputSimulator.Keyboard.KeyPress(VirtualKeyCode.DIVIDE);
+
             PerformVoiceCommands.ToggleSpeechRecognitionListeningMode(inputSimulator);
             inputSimulator.Mouse.MoveMouseTo(500, 500);
             inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
             inputSimulator.Mouse.MoveMouseBy(50, 60);
             inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
             inputSimulator.Mouse.MoveMouseBy(50, 60);
+            //var result = speechRecogniser.EmulateRecognize("Continuous");
+
+            //performVoiceCommands.PerformContinuousDictation(this, speechRecogniser);
         }
 
         private void textBoxSearch_TextChanged(object sender, EventArgs e)
         {
             richTextBoxAvailableCommands.SelectAll();
             richTextBoxAvailableCommands.SelectionBackColor = Color.Black;
-            if (textBoxSearch.Text==  null  ||textBoxSearch.Text.Length<4)
+            if (textBoxSearch.Text == null || textBoxSearch.Text.Length < 4)
             {
                 return;
             }
@@ -266,6 +315,16 @@ namespace ControlWSR
             }
 
             return returnValue;
+        }
+
+        private void checkBoxUppercase_Click(object sender, EventArgs e)
+        {
+            if (checkBoxUppercase.Checked) { checkBoxLowercase.Checked = false; }
+        }
+
+        private void checkBoxLowercase_Click(object sender, EventArgs e)
+        {
+            if (checkBoxLowercase.Checked) { checkBoxUppercase.Checked = false; }
         }
     }
 }

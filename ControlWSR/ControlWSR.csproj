@@ -380,7 +380,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdditionalCommand.cs" />
+    <Compile Include="Models\AdditionalCommand.cs" />
     <Compile Include="Models\ApplicationsToKill.cs" />
     <Compile Include="Models\Appointment.cs" />
     <Compile Include="Models\AspNetRole.cs" />
@@ -419,6 +419,7 @@
     <Compile Include="Models\PropertyTabPosition.cs" />
     <Compile Include="Repositories\WindowsVoiceCommand.cs" />
     <Compile Include="Models\SavedMousePosition.cs" />
+    <Compile Include="Speech\Azure\ContinuousSpeech.cs" />
     <Compile Include="Speech\Azure\DictateSpeech.cs" />
     <Compile Include="Speech\PerformVoiceCommands.cs" />
     <Compile Include="Speech\SpeechCommandsHelper.cs" />
@@ -427,7 +428,7 @@
     <Compile Include="Speech\WordsToNumbers.cs" />
     <Compile Include="Models\tblApplicationCaption.cs" />
     <Compile Include="Testing.cs" />
-    <Compile Include="Todo.cs" />
+    <Compile Include="Models\Todo.cs" />
     <Compile Include="Models\ValuesToInsert.cs" />
     <Compile Include="Models\VisualStudioCommand.cs" />
     <Compile Include="Models\WindowsSpeechVoiceCommand.cs" />

@@ -1,8 +1,11 @@
 ﻿using ControlWSR.Repositories;
 using ControlWSR.Speech.Azure;
 
+using Microsoft.CognitiveServices.Speech;
+
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -63,7 +66,7 @@ namespace ControlWSR.Speech
         {
             UpdateCurrentProcess();
         }
-        public async void PerformCommand(SpeechRecognizedEventArgs e, AvailableCommandsForm form, SpeechRecognizer speechRecogniser, DictateSpeech dictateSpeech, Microsoft.CognitiveServices.Speech.SpeechRecognizer speechRecognizer)
+        public async void PerformCommand(SpeechRecognizedEventArgs e, AvailableCommandsForm form, System.Speech.Recognition.SpeechRecognizer speechRecogniser, DictateSpeech dictateSpeech, Microsoft.CognitiveServices.Speech.SpeechRecognizer speechRecognizer)
         {
             UpdateCurrentProcess();
             try
@@ -188,6 +191,10 @@ namespace ControlWSR.Speech
             if (e.Result.Grammar.Name == "Add Html Tags" && e.Result.Confidence > 0.4)
             {
                 PerformHtmlTagsInsertion(e);
+            }
+            if (e.Result.Grammar.Name == "Continuous Dictation" && e.Result.Confidence > 0.2)
+            {
+                await PerformContinuousDictation(form, speechRecogniser);
             }
             if (e.Result.Grammar.Name == "Find Code" && e.Result.Confidence > 0.4)
             {
@@ -327,7 +334,7 @@ namespace ControlWSR.Speech
             // where the grammar name is the same as the method Without the perform and command, with the spaces remove use reflection to call it
             else if (e.Result.Confidence > 0.4)
             {
-              string methodName = $"Perform{e.Result.Grammar.Name.Replace(" ", "")}Command";
+                string methodName = $"Perform{e.Result.Grammar.Name.Replace(" ", "")}Command";
                 Type thisType = this.GetType();
                 //MethodInfo theMethod = thisType.GetMethod(methodName,BindingFlags.NonPublic  | BindingFlags.Instance);
                 try
@@ -343,6 +350,26 @@ namespace ControlWSR.Speech
                 {
                     //AutoClosingMessageBox.Show(exception.Message, $"Error Running a method {exception.Source}", 3000);
                     //System.Windows.Forms.MessageBox.Show(exception.Message, "Error running a method", MessageBoxButtons.OK);
+                }
+            }
+        }
+
+        public async Task PerformContinuousDictation(AvailableCommandsForm form, System.Speech.Recognition.SpeechRecognizer speechRecogniser)
+        {
+            ToggleSpeechRecognitionListeningMode(inputSimulator);
+            //ContinuousSpeech continuousSpeech = new ContinuousSpeech();
+            form.LabelStatus = "Continuous Dictation STARTED";
+            var result = await SpeechContinuousRecognitionAsync(form, inputSimulator, speechRecogniser);
+            if (result != null)
+            {
+                form.TextBoxResults = result;
+                var rawResult = result.Replace("Stop continuous.", "").Trim();
+                //rawResult = RemovePunctuation(rawResult);
+                if (rawResult.Length > 0)
+                {
+                    //inputSimulator.Keyboard.TextEntry(rawResult);
+                    Clipboard.SetText(rawResult);
+                    ToggleSpeechRecognitionListeningMode(inputSimulator);
                 }
             }
         }
@@ -520,11 +547,11 @@ namespace ControlWSR.Speech
             {
                 numberOfWords = int.Parse(e.Result.Words[1].Text);
             }
-            catch (Exception  exception)
+            catch (Exception exception)
             {
                 Console.WriteLine(exception.Message);
             }
-            for (int i = 0; i <  numberOfWords-1; i++)
+            for (int i = 0; i < numberOfWords - 1; i++)
             {
                 Random rnd = new Random();
                 int num = rnd.Next(3000);
@@ -631,7 +658,7 @@ namespace ControlWSR.Speech
             SendKeys.Send(searchTerm);
         }
 
-        private void PerformSerenadeCommand(SpeechRecognizer speechRecogniser)
+        private void PerformSerenadeCommand(System.Speech.Recognition.SpeechRecognizer speechRecogniser)
         {
             Process.Start(@"C:\Users\MPhil\AppData\Local\Programs\Serenade\Serenade.exe");
             speechRecogniser.EmulateRecognize("minimise speech recognition");
@@ -640,7 +667,7 @@ namespace ControlWSR.Speech
             SendKeysCustom(null, null, keys, currentProcess.ProcessName);
         }
 
-        private void RunVisualStudioCommand(SpeechRecognizer speechRecogniser)
+        private void RunVisualStudioCommand(System.Speech.Recognition.SpeechRecognizer speechRecogniser)
         {
             if (currentProcess.ProcessName == "devenv")
             {
@@ -666,7 +693,7 @@ namespace ControlWSR.Speech
 
             if (!e.Result.Text.ToLower().Contains("punctuation"))
             {
-                rawResult = RemovePunctuation(rawResult);
+                rawResult = SpeechCommandsHelper.RemovePunctuation(rawResult);
             }
             string[] stringSeparators = new string[] { " " };
             List<string> words = rawResult.Split(stringSeparators, StringSplitOptions.None).ToList();
@@ -747,21 +774,13 @@ namespace ControlWSR.Speech
             }
             if (rawResult.Length > 0)
             {
-               inputSimulator.Keyboard.TextEntry(rawResult);
-               //SendKeys.Send(rawResult);
+                inputSimulator.Keyboard.TextEntry(rawResult);
+                //SendKeys.Send(rawResult);
             }
-           ToggleSpeechRecognitionListeningMode(inputSimulator);
+            ToggleSpeechRecognitionListeningMode(inputSimulator);
         }
 
-        private static string RemovePunctuation(string rawResult)
-        {
-            rawResult = rawResult.Replace(",", "");
-            rawResult = rawResult.Replace(";", "");
-            rawResult = rawResult.Replace(":", "");
-            rawResult = rawResult.Replace("?", "");
-            rawResult = rawResult.Replace(".", "");
-            return rawResult;
-        }
+
 
         private void PerformSelectItemsCommand(SpeechRecognizedEventArgs e)
         {
@@ -845,7 +864,7 @@ namespace ControlWSR.Speech
             inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ESCAPE);
         }
 
-        void SetupConfirmationCommands(SpeechRecognizer speechRecogniser, AvailableCommandsForm availableCommandsForm)
+        void SetupConfirmationCommands(System.Speech.Recognition.SpeechRecognizer speechRecogniser, AvailableCommandsForm availableCommandsForm)
         {
             var availableCommands = speechSetup.SetupConfirmationCommands(CommandToBeConfirmed, speechRecogniser, availableCommandsForm);
             availableCommandsForm.AvailableCommands = availableCommands;
@@ -1726,5 +1745,129 @@ namespace ControlWSR.Speech
                 inputSimulator.Keyboard.KeyPress(VirtualKeyCode.SPACE);
             }
         }
+        public async Task<string> SpeechContinuousRecognitionAsync(AvailableCommandsForm form, InputSimulator inputSimulator, System.Speech.Recognition.SpeechRecognizer speechRecognizer)
+        {
+            // Creates an instance of a speech config with specified subscription key and region.
+            // Replace with your own subscription key and service region (e.g., "westus").
+            string SPEECH__SERVICE__KEY;
+            string SPEECH__SERVICE__REGION;
+            SPEECH__SERVICE__KEY = ConfigurationManager.AppSettings.Get("SpeechAzureKey");
+            SPEECH__SERVICE__REGION = ConfigurationManager.AppSettings.Get("SpeechAzureRegion");
+            var config = SpeechConfig.FromSubscription(SPEECH__SERVICE__KEY, SPEECH__SERVICE__REGION);
+            string resultMain = null;
+
+            // Creates a speech recognizer from microphone.
+            using (var recognizer = new Microsoft.CognitiveServices.Speech.SpeechRecognizer(config))
+            {
+                // Subscribes to events.
+                recognizer.Recognizing += (s, e) =>
+                {
+                    //Console.WriteLine($"RECOGNIZING: Text={e.Result.Text}");
+                     form.TextBoxResults = $" RECOGNISING: Text= {e.Result.Text}";
+                };
+
+                recognizer.Recognized += (s, e) =>
+                {
+                    SpeechRecognitionResult result = e.Result;
+                    //form.LabelStatus = ($"Reason: {result.Reason.ToString()}");
+                    if (result.Reason == ResultReason.RecognizedSpeech)
+                    {
+                        form.TextBoxResults=($"Final result: Text: {result.Text}");
+                        string resultRaw = result.Text;
+                        if (form.OutputUppercase)
+                        {
+                            resultRaw = resultRaw.ToUpper();
+                        }
+                        if (form.OutputLowercase)
+                        {
+                            resultRaw = resultRaw.ToLower();
+                        }
+                        if (form.RemovePunctuation)
+                        {
+                            resultRaw = SpeechCommandsHelper.RemovePunctuation(resultRaw);
+                        }
+                        if (form.ConvertWordsToSymbols)
+                        {
+                            resultRaw = SpeechCommandsHelper.ConvertWordsToSymbols(resultRaw, inputSimulator,form,result);
+                        }
+                        resultRaw = SpeechCommandsHelper.PerformCodeFunctions(resultRaw);
+
+                        
+                        resultMain = resultRaw;
+
+
+                        if (resultMain.Trim().ToLower().StartsWith("command") || form.TreatAsCommand)
+                        {
+                            resultMain = SpeechCommandsHelper.RemovePunctuation(resultMain);
+
+                            resultMain = resultMain.Replace("Command", "").Trim();
+                            resultMain = SpeechCommandsHelper.ConvertToTitle(resultMain);
+                            inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
+                            inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LWIN);
+                            inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
+                            //inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ESCAPE);
+                            form.TextBoxResults = resultMain;
+                            inputSimulator.Keyboard.Sleep(400);
+                            var resultEmulated = speechRecognizer.EmulateRecognize(resultMain);
+                            //Thread.Sleep(300);
+                            inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
+                            inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LWIN);
+                            inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
+                            //inputSimulator.Keyboard.Sleep(200);
+                            //inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ESCAPE);
+
+                        }
+                        else
+                        {
+                            if (resultMain.Contains("{") || resultMain.Contains("^") || resultMain.Contains("%") || resultMain.Contains("+"))
+                            {
+                                form.TextBoxResults = $"Send Keys Value: {resultMain}";
+                                //SendKeys.Send(resultMain);
+                            }
+                            else
+                            {
+                                form.TextBoxResults = $"Text Entry Value: {resultMain}";
+                                if (!resultMain.ToLower().Contains("stop continuous"))
+                                {
+                                    inputSimulator.Keyboard.TextEntry($"{resultMain}");
+                                }
+                            }
+                        }
+                    }
+                };
+
+                recognizer.Canceled += (s, e) =>
+                {
+                    //form.LabelStatus = $"\n    Canceled. Reason: {e.Reason.ToString()}, CanceledReason: {e.Reason}";
+                };
+
+                recognizer.SessionStarted += (s, e) =>
+                {
+                    form.LabelStatus = "Continuous Dictation STARTED";
+                };
+
+                recognizer.SessionStopped += (s, e) =>
+                {
+                    //form.LabelStatus = "STOPPED";
+                };
+
+                // Starts continuous recognition. 
+                // Uses StopContinuousRecognitionAsync() to stop recognition.
+                await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
+
+                do
+                {
+                    //Console.WriteLine("Press Enter to stop");
+
+                } while (resultMain == null || !resultMain.ToLower().Contains("stop continuous"));
+
+                // Stops recognition.
+                form.TextBoxResults = resultMain;
+                form.LabelStatus = "Continuous Stopped";
+                await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false);
+                return resultMain;
+            }
+        }
+
     }
 }
