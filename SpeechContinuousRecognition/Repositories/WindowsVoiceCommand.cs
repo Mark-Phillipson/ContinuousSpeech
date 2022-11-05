@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.CognitiveServices.Speech;
+using Microsoft.EntityFrameworkCore;
 
 using SpeechContinuousRecognition.Models;
 
@@ -21,11 +22,41 @@ namespace SpeechContinuousRecognition.Repositories
                 .ToList();
             return result;
         }
-        public WindowsSpeechVoiceCommand? GetCommand(string spokenCommand)
+        public List<WindowsSpeechVoiceCommand> GetDictationCommands(string? applicationName)
         {
+            if (applicationName == null)
+            {
+                var result = Model.WindowsSpeechVoiceCommands
+                    .AsNoTracking()
+                    .Where(v => v.ApplicationName == "Global" && v.SpokenCommand.EndsWith("<dictation>"))
+                    .ToList();
+                return result;
+            }
+            else
+            {
+                var result = Model.WindowsSpeechVoiceCommands
+                    .AsNoTracking()
+                    .Where(v => (v.ApplicationName == "Global" || v.ApplicationName == applicationName) && v.SpokenCommand.EndsWith("<dictation>"))
+                    .ToList();
+                return result;
+            }
+        }
+        public WindowsSpeechVoiceCommand? GetCommand(string spokenCommand,string? applicationName)
+        {
+            if (applicationName!= null )
+            {
+                WindowsSpeechVoiceCommand? applicationCommand = Model.WindowsSpeechVoiceCommands
+                    .AsNoTracking()
+                    .Where(v => v.SpokenCommand.ToLower() == spokenCommand.ToLower() && v.ApplicationName==applicationName)
+                    .FirstOrDefault();
+                if (applicationCommand!= null )
+                {
+                    return applicationCommand;
+                }
+            }
             WindowsSpeechVoiceCommand? command = Model.WindowsSpeechVoiceCommands
                 .AsNoTracking()
-                .Where(v => v.SpokenCommand.ToLower() == spokenCommand.ToLower())
+                .Where(v => v.SpokenCommand.ToLower() == spokenCommand.ToLower() && v.ApplicationName=="Global")
                 .FirstOrDefault();
             return command;
         }
@@ -62,9 +93,9 @@ namespace SpeechContinuousRecognition.Repositories
             return result;
         }
 
-        public CustomIntelliSense GetWord(string searchTerm)
+        public CustomIntelliSense? GetWord(string searchTerm)
         {
-            var result = Model.CustomIntelliSenses.Where(i => i.LanguageID == 1 && i.CategoryID == 39 && i.Display_Value == searchTerm).OrderBy(v => v.Display_Value).FirstOrDefault();
+            var result = Model.CustomIntelliSenses.Where(i => i.LanguageID == 1 && i.CategoryID == 39 && i.Display_Value.ToLower() == searchTerm.ToLower()).OrderBy(v => v.Display_Value).FirstOrDefault();
             if (result == null)
             {
                 return null;

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ContinuousSpeech));
             this.checkBoxUppercase = new System.Windows.Forms.CheckBox();
             this.checkBoxLowercase = new System.Windows.Forms.CheckBox();
             this.textBoxResultsLocal = new System.Windows.Forms.TextBox();
@@ -37,7 +38,8 @@
             this.checkBoxRemovePunctuation = new System.Windows.Forms.CheckBox();
             this.buttonStop = new System.Windows.Forms.Button();
             this.buttonStart = new System.Windows.Forms.Button();
-            this.buttonTest = new System.Windows.Forms.Button();
+            this.buttonCloseApplication = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // checkBoxUppercase
@@ -64,11 +66,13 @@
             // 
             // textBoxResultsLocal
             // 
+            this.textBoxResultsLocal.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxResultsLocal.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.textBoxResultsLocal.Location = new System.Drawing.Point(461, 168);
+            this.textBoxResultsLocal.Location = new System.Drawing.Point(407, 39);
             this.textBoxResultsLocal.Multiline = true;
             this.textBoxResultsLocal.Name = "textBoxResultsLocal";
-            this.textBoxResultsLocal.Size = new System.Drawing.Size(312, 270);
+            this.textBoxResultsLocal.Size = new System.Drawing.Size(535, 583);
             this.textBoxResultsLocal.TabIndex = 2;
             // 
             // labelStatus
@@ -92,6 +96,7 @@
             this.checkBoxTreatAsCommand.TabIndex = 4;
             this.checkBoxTreatAsCommand.Text = "Treat as Command";
             this.checkBoxTreatAsCommand.UseVisualStyleBackColor = true;
+            this.checkBoxTreatAsCommand.Visible = false;
             // 
             // checkBoxConvertWordsToSymbols
             // 
@@ -99,7 +104,7 @@
             this.checkBoxConvertWordsToSymbols.Checked = true;
             this.checkBoxConvertWordsToSymbols.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxConvertWordsToSymbols.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.checkBoxConvertWordsToSymbols.Location = new System.Drawing.Point(222, 71);
+            this.checkBoxConvertWordsToSymbols.Location = new System.Drawing.Point(68, 98);
             this.checkBoxConvertWordsToSymbols.Name = "checkBoxConvertWordsToSymbols";
             this.checkBoxConvertWordsToSymbols.Size = new System.Drawing.Size(231, 25);
             this.checkBoxConvertWordsToSymbols.TabIndex = 5;
@@ -112,7 +117,7 @@
             this.checkBoxRemovePunctuation.Checked = true;
             this.checkBoxRemovePunctuation.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxRemovePunctuation.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.checkBoxRemovePunctuation.Location = new System.Drawing.Point(461, 44);
+            this.checkBoxRemovePunctuation.Location = new System.Drawing.Point(68, 129);
             this.checkBoxRemovePunctuation.Name = "checkBoxRemovePunctuation";
             this.checkBoxRemovePunctuation.Size = new System.Drawing.Size(189, 25);
             this.checkBoxRemovePunctuation.TabIndex = 6;
@@ -141,23 +146,34 @@
             this.buttonStart.UseVisualStyleBackColor = true;
             this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
             // 
-            // buttonTest
+            // buttonCloseApplication
             // 
-            this.buttonTest.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.buttonTest.Location = new System.Drawing.Point(78, 345);
-            this.buttonTest.Name = "buttonTest";
-            this.buttonTest.Size = new System.Drawing.Size(156, 36);
-            this.buttonTest.TabIndex = 9;
-            this.buttonTest.Text = "Testing";
-            this.buttonTest.UseVisualStyleBackColor = true;
-            this.buttonTest.Click += new System.EventHandler(this.buttonTest_Click);
+            this.buttonCloseApplication.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.buttonCloseApplication.Location = new System.Drawing.Point(78, 345);
+            this.buttonCloseApplication.Name = "buttonCloseApplication";
+            this.buttonCloseApplication.Size = new System.Drawing.Size(156, 36);
+            this.buttonCloseApplication.TabIndex = 9;
+            this.buttonCloseApplication.Text = "Close Application";
+            this.buttonCloseApplication.UseVisualStyleBackColor = true;
+            this.buttonCloseApplication.Click += new System.EventHandler(this.buttonCloseApplication_Click);
+            // 
+            // button1
+            // 
+            this.button1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.button1.Location = new System.Drawing.Point(79, 397);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(156, 36);
+            this.button1.TabIndex = 10;
+            this.button1.Text = "Testing";
+            this.button1.UseVisualStyleBackColor = true;
             // 
             // ContinuousSpeech
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.buttonTest);
+            this.ClientSize = new System.Drawing.Size(968, 644);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.buttonCloseApplication);
             this.Controls.Add(this.buttonStart);
             this.Controls.Add(this.buttonStop);
             this.Controls.Add(this.checkBoxRemovePunctuation);
@@ -167,7 +183,9 @@
             this.Controls.Add(this.textBoxResultsLocal);
             this.Controls.Add(this.checkBoxLowercase);
             this.Controls.Add(this.checkBoxUppercase);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ContinuousSpeech";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ContinuousSpeech_FormClosing);
             this.Load += new System.EventHandler(this.ContinuousSpeech_Load);
@@ -187,6 +205,7 @@
         private CheckBox checkBoxRemovePunctuation;
         private Button buttonStop;
         private Button buttonStart;
-        private Button buttonTest;
+        private Button buttonCloseApplication;
+        private Button button1;
     }
 }

@@ -12,17 +12,17 @@ namespace SpeechContinuousRecognition.Models
 
         [Required]
         [StringLength(30)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Required]
         [StringLength(255)]
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
         [StringLength(255)]
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         [StringLength(255)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public DateTimeOffset? Created { get; set; }
     }

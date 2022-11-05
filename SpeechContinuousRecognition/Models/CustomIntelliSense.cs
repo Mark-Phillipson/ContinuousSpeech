@@ -26,14 +26,14 @@ namespace SpeechContinuousRecognition.Models
         public string SendKeys_Value { get; set; }
 
         [StringLength(255)]
-        public string Command_Type { get; set; }
+        public string? Command_Type { get; set; }
 
         public int CategoryID { get; set; }
 
         [StringLength(255)]
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
 
-        public string Search { get; set; }
+        public string? Search { get; set; }
 
         public int? ComputerID { get; set; }
 
@@ -42,7 +42,7 @@ namespace SpeechContinuousRecognition.Models
         public string DeliveryType { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AdditionalCommand> AdditionalCommands { get; set; }
+        public virtual ICollection<AdditionalCommand>? AdditionalCommands { get; set; }
 
         public virtual Category Category { get; set; }
 

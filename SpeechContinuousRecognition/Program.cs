@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace SpeechContinuousRecognition
 {
     internal static class Program
@@ -8,10 +10,17 @@ namespace SpeechContinuousRecognition
         [STAThread]
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
+            var processes = Process.GetProcesses();
+            if (processes.Count(p => p.ProcessName == "SpeechContinuousRecognition")>1)
+            {
+                //MessageBox.Show("Instance already running");
+                return;
+            }
+
             ApplicationConfiguration.Initialize();
             Application.Run(new ContinuousSpeech());
+
+
         }
     }
 }

@@ -194,7 +194,7 @@ namespace ControlWSR.Speech
             }
             if (e.Result.Grammar.Name == "Continuous Dictation" && e.Result.Confidence > 0.2)
             {
-                await PerformContinuousDictation(form, speechRecogniser);
+                //await PerformContinuousDictation(form, speechRecogniser);
             }
             if (e.Result.Grammar.Name == "Find Code" && e.Result.Confidence > 0.4)
             {
@@ -509,7 +509,7 @@ namespace ControlWSR.Speech
             string sendkeysValue = customIntelliSense.SendKeys_Value.Replace("(", "{(}");
             sendkeysValue = sendkeysValue.Replace(")", "{)}");
 
-            SendKeys.Send(sendkeysValue);
+            SendKeys.SendWait(sendkeysValue);
             var additionalCommands = windowsVoiceCommand.GetAdditionalCommands(customIntelliSense.ID);
             foreach (var additionalCommand in additionalCommands)
             {
@@ -536,7 +536,7 @@ namespace ControlWSR.Speech
                 {
                     sendkeysValue = additionalCommand.SendKeys_Value.Replace("(", "{(}");
                     sendkeysValue = sendkeysValue.Replace(")", "{)}");
-                    SendKeys.Send(sendkeysValue);
+                    SendKeys.SendWait(sendkeysValue);
                 }
             }
         }
@@ -1865,6 +1865,7 @@ namespace ControlWSR.Speech
                 form.TextBoxResults = resultMain;
                 form.LabelStatus = "Continuous Stopped";
                 await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false);
+
                 return resultMain;
             }
         }

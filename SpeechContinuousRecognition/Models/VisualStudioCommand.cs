@@ -4,7 +4,7 @@ namespace SpeechContinuousRecognition.Models
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    
+
 
     public partial class VisualStudioCommand
     {
@@ -12,10 +12,10 @@ namespace SpeechContinuousRecognition.Models
 
         [Required]
         [StringLength(255)]
-        public string Caption { get; set; }
+        public string Caption { get; set; } = null!;
 
         [Required]
         [StringLength(255)]
-        public string Command { get; set; }
+        public string Command { get; set; } = null!;
     }
 }
