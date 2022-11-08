@@ -12,12 +12,10 @@ namespace SpeechContinuousRecognition.Models
 
         public int NumberValue { get; set; }
 
-        [Required]
-        [StringLength(255)]
-        public string Text { get; set; }
+        [Required][StringLength(255)] public string Text { get; set; } = null!;
 
         [Required]
-        public string LargeText { get; set; }
+        public string LargeText { get; set; }=null!;
 
         public bool Boolean { get; set; }
 

@@ -12,7 +12,7 @@ namespace SpeechContinuousRecognition.Models
     {
         public int Id { get; set; }
 
-        [StringLength(100)]
+        [StringLength(255)]
         public string? TextToEnter { get; set; }
         public string? SendKeysValue { get; set; }
         public VirtualKeyCode KeyDownValue { get; set; }
@@ -35,14 +35,16 @@ namespace SpeechContinuousRecognition.Models
         public double AbsoluteY { get; set; } = 0;
         public int ScrollAmount { get; set; } = 0;
 
-        [StringLength(100)]
+        [StringLength(255)]
         public string? ProcessStart { get; set; }
 
-        [StringLength(100)]
+        [StringLength(255)]
         public string? CommandLineArguments { get; set; } = "";
 
         public int WindowsSpeechVoiceCommandId { get; set; }
         public int WaitTime { get; set; }
+
+        public string HowToFormatDictation { get; set; } = "Do Nothing";
 
         public virtual WindowsSpeechVoiceCommand? WindowsSpeechVoiceCommand { get; set; }
     }

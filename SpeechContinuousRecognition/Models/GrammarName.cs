@@ -17,7 +17,7 @@ namespace SpeechContinuousRecognition.Models
         public int Id { get; set; }
         [Required]
         [StringLength(40)]
-        public string NameOfGrammar { get; set; }
+        public string NameOfGrammar { get; set; } = null!;
         public ICollection<GrammarItem> GrammarItems { get; }
     }
 }

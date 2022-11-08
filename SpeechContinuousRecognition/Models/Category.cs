@@ -4,7 +4,7 @@ namespace SpeechContinuousRecognition.Models
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    
+    using System.Security.Cryptography.X509Certificates;
 
     public partial class Category
     {
@@ -19,17 +19,17 @@ namespace SpeechContinuousRecognition.Models
 
         [Column("Category")]
         [StringLength(30)]
-        public string Category1 { get; set; }
+        public string? Category1 { get; set; }
 
         [StringLength(255)]
-        public string Category_Type { get; set; }
+        public string? Category_Type { get; set; }
 
         public bool Sensitive { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<CustomIntelliSense> CustomIntelliSenses { get; set; }
+        public virtual ICollection<CustomIntelliSense>? CustomIntelliSenses { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Launcher> Launchers { get; set; }
+        public virtual ICollection<Launcher>? Launchers { get; set; }
     }
 }

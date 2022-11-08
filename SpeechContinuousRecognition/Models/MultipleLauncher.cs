@@ -19,7 +19,7 @@ namespace SpeechContinuousRecognition.Models
 
         [Required]
         [StringLength(70)]
-        public string Description { get; set; }
+        public string Description { get; set; } = null!;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<LauncherMultipleLauncherBridge> LauncherMultipleLauncherBridges { get; set; }

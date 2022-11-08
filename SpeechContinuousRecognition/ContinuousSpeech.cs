@@ -16,6 +16,7 @@ namespace SpeechContinuousRecognition
 {
     public partial class ContinuousSpeech : Form
     {
+        private int _counter = 0;
         private readonly IEnumerable<VirtualKeyCode> all3Modifiers = new List<VirtualKeyCode>()
         { VirtualKeyCode.CONTROL, VirtualKeyCode.SHIFT, VirtualKeyCode.MENU };
         private readonly IEnumerable<VirtualKeyCode> controlAndShift = new List<VirtualKeyCode>()
@@ -27,7 +28,7 @@ namespace SpeechContinuousRecognition
         { VirtualKeyCode.LWIN, VirtualKeyCode.SHIFT };
         private readonly IEnumerable<VirtualKeyCode> altAndShift = new List<VirtualKeyCode>()
         { VirtualKeyCode.MENU, VirtualKeyCode.SHIFT };
-        
+
         private const int MOUSEEVENTF_LEFTDOWN = 0x02;
         private const int MOUSEEVENTF_LEFTUP = 0x04;
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
@@ -47,10 +48,32 @@ namespace SpeechContinuousRecognition
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
 
-        public Process currentProcess { get; set; }
+        static uint MOUSEEVENTF_WHEEL = 0x800;
+
+
+        [DllImport("user32.dll")]
+        static extern void mouse_event(uint dwFlags, int dx, int dy, uint dwData, int dwExtraInfo);
+        static void PerformMouseWheelDirection(string direction, int increment = 1)
+        {
+            unchecked
+            {
+                if (direction == "Up")
+                {
+                    var incrementUInt = (uint)(120 * increment);
+                    mouse_event(MOUSEEVENTF_WHEEL, 0, 0, incrementUInt, 0);
+                }
+                else if (direction == "Down")
+                {
+                    var incrementUInt = (uint)-(120 * increment);
+                    mouse_event(MOUSEEVENTF_WHEEL, 0, 0, incrementUInt, 0);
+                }
+            }
+        }
+
+        public Process? currentProcess { get; set; }
 
         private IInputSimulator _inputSimulator = new InputSimulator();
-        SpeechRecognizer recognizer;
+        SpeechRecognizer? recognizer= null ;
         private string resultMain = "";
         public ContinuousSpeech()
         {
@@ -147,7 +170,7 @@ namespace SpeechContinuousRecognition
             }
             UpdateTheCurrentProcess();
 
-            Text = "Continuous Speech";
+            Text = "Microsoft Azure - Continuous Speech";
             await SpeechSetupAsync();
             buttonStart.Enabled = false;
             buttonStop.Enabled = true;
@@ -175,19 +198,19 @@ namespace SpeechContinuousRecognition
             recognizer = new Microsoft.CognitiveServices.Speech.SpeechRecognizer(config);
             {
                 // Subscribes to events.
-                recognizer.Recognizing +=
+                //recognizer.Recognizing +=
 
-                (s, e) =>
-                {
-                    try
-                    {
-                        TextBoxResults = $"RECOGNISING: Text= {e.Result.Text}{Environment.NewLine}{TextBoxResults}";
-                    }
-                    catch (Exception exception)
-                    {
-                        global::System.Console.WriteLine(exception.Message);
-                    }
-                };
+                //(s, e) =>
+                //{
+                //    try
+                //    {
+                //        TextBoxResults = $"RECOGNISING: Text= {e.Result.Text}{Environment.NewLine}{TextBoxResults}";
+                //    }
+                //    catch (Exception exception)
+                //    {
+                //        global::System.Console.WriteLine(exception.Message);
+                //    }
+                //};
 
                 recognizer.Recognized += new EventHandler<SpeechRecognitionEventArgs>(SpeechRecognizer_SpeechRecognised);
 
@@ -195,8 +218,8 @@ namespace SpeechContinuousRecognition
                 {
                     try
                     {
-                        TextBoxResults= $"\n    Canceled. Reason: {e.Reason.ToString()}, CanceledReason: {e.ErrorDetails}";
-                        
+                        TextBoxResults = $"\n    Canceled. Reason: {e.Reason.ToString()}, CanceledReason: {e.ErrorDetails}";
+
                     }
                     catch (Exception exception)
                     {
@@ -241,6 +264,8 @@ namespace SpeechContinuousRecognition
                 phraseListGrammar.AddPhrase("Save All");
                 phraseListGrammar.AddPhrase("To Lower");
                 phraseListGrammar.AddPhrase("Starts With");
+                phraseListGrammar.AddPhrase("Mouse Wheel Down");
+                phraseListGrammar.AddPhrase("Mouse Wheel Up");
 
 
 
@@ -267,11 +292,12 @@ namespace SpeechContinuousRecognition
 
         private async Task StopContinuous()
         {
+            if (recognizer == null) { return; }
             try
             {
                 await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false);
                 Icon? icon = Icon.ExtractAssociatedIcon($"{Application.StartupPath}Mic-04.ico");
-                if (icon!= null )
+                if (icon != null)
                 {
                     this.Invoke(new MethodInvoker(delegate { this.Icon = icon; }));
                 }
@@ -284,21 +310,24 @@ namespace SpeechContinuousRecognition
 
         private void ContinuousSpeech_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Text = " Closing please wait ..";
-            recognizer.Dispose();
+            this.Invoke(new MethodInvoker(delegate { this.Text= "Closing please wait.."; }));
+
+
+            recognizer?.Dispose();
         }
 
         private async void buttonStart_Click(object sender, EventArgs e)
         {
             // Starts continuous recognition. 
             // Uses StopContinuousRecognitionAsync() to stop recognition.
-            try 
+            if (recognizer == null) { return; }
+            try
             {
                 await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
                 Icon? icon = Icon.ExtractAssociatedIcon($"{Application.StartupPath}Mic-03.ico");
                 if (icon != null)
                 {
-                    this.Invoke(new MethodInvoker(delegate { this.Icon = icon;  }));
+                    this.Invoke(new MethodInvoker(delegate { this.Icon = icon; }));
                 }
 
             }
@@ -312,6 +341,20 @@ namespace SpeechContinuousRecognition
         {
             {
                 SpeechRecognitionResult result = e.Result;
+                if (result.Text == "")
+                {
+                    _counter++;
+                }
+                else
+                {
+                    _counter = 0;
+                }
+                if (_counter >= 10)
+                {
+                    await StopContinuous().ConfigureAwait(false);
+                    TextBoxResults = $"Stopped after 10 empty results: {result.Text}{Environment.NewLine}{TextBoxResults}";
+                    _counter = 0;
+                }
                 //form.LabelStatus = ($"Reason: {result.Reason.ToString()}");
                 if (result.Reason == ResultReason.RecognizedSpeech)
                 {
@@ -334,9 +377,20 @@ namespace SpeechContinuousRecognition
                     if (this.ConvertWordsToSymbols)
                     {
                         UpdateTheCurrentProcess();
-                        resultRaw = _speechCommandsHelper.ConvertWordsToSymbols(resultRaw, this, result,currentProcess);
+                        if (resultRaw.ToLower().Contains(" split "))
+                        {
+                            var commands = resultRaw.Split(" split ", StringSplitOptions.TrimEntries);
+                            resultRaw = "";
+                            foreach (var item in commands)
+                            {
+                                resultRaw = $"{resultRaw}{_speechCommandsHelper.IdentifyAndRunCommand(item, this, result, currentProcess)}";
+                            }
+                        }
+                        else
+                        {
+                            resultRaw = _speechCommandsHelper.IdentifyAndRunCommand(resultRaw, this, result, currentProcess);
+                        }
                     }
-
                     resultRaw = SpeechCommandsHelper.PerformCodeFunctions(resultRaw);
 
                     resultMain = resultRaw;
@@ -347,6 +401,26 @@ namespace SpeechContinuousRecognition
                         buttonStart.Invoke(new MethodInvoker(delegate { buttonStart.Enabled = true; }));
                         _inputSimulator.Keyboard.KeyDown(VirtualKeyCode.ADD);
                         resultMain = "{Use Dragon}";
+                    }
+                    if (resultRaw.ToLower() == "mouse wheel up")
+                    {
+                        PerformMouseWheelDirection("Up");
+                        resultMain = "{ Wheel Up}";
+                    }
+                    else if (resultRaw.ToLower() == "mouse wheel down")
+                    {
+                        PerformMouseWheelDirection("Down");
+                        resultMain = "{Wheel Down}";
+                    }
+                    if (resultRaw.ToLower() == "mouse wheel up lots")
+                    {
+                        PerformMouseWheelDirection("Up", 5);
+                        resultMain = "{ Wheel Up}";
+                    }
+                    else if (resultRaw.ToLower() == "mouse wheel down lots")
+                    {
+                        PerformMouseWheelDirection("Down", 5);
+                        resultMain = "{Wheel Down}";
                     }
 
 
@@ -379,8 +453,8 @@ namespace SpeechContinuousRecognition
                         else
                         {
                             await StopContinuous().ConfigureAwait(false);
-                            buttonStop.Invoke(new MethodInvoker(delegate { buttonStop.Enabled = false;  }));
-                            buttonStart.Invoke(new MethodInvoker(delegate { buttonStart.Enabled = true;  }));
+                            buttonStop.Invoke(new MethodInvoker(delegate { buttonStop.Enabled = false; }));
+                            buttonStart.Invoke(new MethodInvoker(delegate { buttonStart.Enabled = true; }));
                         }
                     }
                 }
@@ -394,13 +468,14 @@ namespace SpeechContinuousRecognition
             currentProcess = Process.GetProcessById((int)pid);
         }
 
-        private void buttonCloseApplication_Click(object sender, EventArgs e)
+        private async void buttonCloseApplication_Click(object sender, EventArgs e)
         {
             Text = " Disposing of recogniser please wait! ";
-            recognizer.Dispose();
+            await StopContinuous().ConfigureAwait(false);
+            recognizer?.Dispose();
             Application.Exit();
         }
 
-    
-}
+
+    }
 }

@@ -12,11 +12,11 @@ namespace SpeechContinuousRecognition.Models
 
         [Required]
         [StringLength(60)]
-        public string ObjectName { get; set; }
+        public string ObjectName { get; set; } = null!;
 
         [Required]
         [StringLength(60)]
-        public string PropertyName { get; set; }
+        public string? PropertyName { get; set; }
 
         public int NumberOfTabs { get; set; }
     }

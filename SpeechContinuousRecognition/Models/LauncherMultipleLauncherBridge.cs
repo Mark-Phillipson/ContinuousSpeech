@@ -15,8 +15,8 @@ namespace SpeechContinuousRecognition.Models
 
         public int MultipleLauncherID { get; set; }
 
-        public virtual Launcher Launcher { get; set; }
+        public virtual Launcher Launcher { get; set; } = null!;
 
-        public virtual MultipleLauncher MultipleLauncher { get; set; }
+        public virtual MultipleLauncher MultipleLauncher { get; set; }= null!;
     }
 }

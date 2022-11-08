@@ -13,7 +13,7 @@ namespace SpeechContinuousRecognition.Models
 
         [Required]
         [StringLength(255)]
-        public string NamedLocation { get; set; }
+        public string NamedLocation { get; set; } = null!;
 
         public int X { get; set; }
 

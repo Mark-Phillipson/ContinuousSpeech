@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -186,13 +187,15 @@ namespace SpeechContinuousRecognition
             }
             return value;
         }
-        public string ConvertWordsToSymbols(string resultRaw, ContinuousSpeech form, SpeechRecognitionResult result, Process currentProcess)
+        public string IdentifyAndRunCommand(string resultRaw, ContinuousSpeech form, SpeechRecognitionResult result, Process? currentProcess)
         {
-            string? applicationName = null;
-            if (currentProcess.ProcessName == "devenv")
+           string? applicationName = null;
+            if (currentProcess?.ProcessName == "devenv")
             {
                 applicationName = "Visual Studio";
             }
+            resultRaw = resultRaw.Replace("Sable", "Save All");
+            resultRaw = resultRaw.ToLower().Replace("hondo", "undo");
 
             IInputSimulator inputSimulator = new InputSimulator();
             (bool finish, string? commandName) = PerformDatabaseCommands(result, resultRaw, inputSimulator, form, applicationName);
@@ -205,102 +208,47 @@ namespace SpeechContinuousRecognition
             {
                 resultRaw = resultRaw.Replace("Press", "").Trim();
                 resultRaw = resultRaw.Replace("press", "").Trim();
+                List<string> phoneticAlphabet = new List<string>() { "Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliet", "Kilo", "Lima", "Mike", "November", "Oscar", "Papa", "Qubec", "Romeo", "Sierra", "Tango", "Uniform", "Victor", "Whiskey", "X-ray", "Yankee", "Zulu" };
+                if (phoneticAlphabet.Any(f => f.ToLower().Equals(resultRaw.ToLower())))
+                {
+                    inputSimulator.Keyboard.TextEntry(resultRaw.ToLower().Substring(0, 1));
+                    return $"{{Press {resultRaw}}}";
+                }
             }
+            if (resultRaw.Trim().ToLower().StartsWith("numeral"))
+            {
+                resultRaw = resultRaw.ToLower().Replace("numeral", "");
+                var number = GetNumber(resultRaw);
+                if (number >= 0)
+                {
+                    inputSimulator.Keyboard.TextEntry(number.ToString());
+                    return $"{{Numeral {resultRaw}}}";
+
+                }
+            }
+
             string[] stringSeparators = new string[] { " " };
             List<string> words = resultRaw.Split(stringSeparators, StringSplitOptions.None).ToList();
 
-            if (resultRaw.Trim().ToLower() == "toggle uppercase" || resultRaw.Trim().ToLower() == "toggle upper case")
+            resultRaw = ToggleSetting(resultRaw, form);
+            if (resultRaw == "")
             {
-                form.OutputUppercase = !form.OutputUppercase;
-                return "";
-            }
-            if (resultRaw.Trim().ToLower() == "toggle lowercase" || resultRaw.Trim().ToLower() == "toggle lower case")
-            {
-                form.OutputLowercase = !form.OutputLowercase;
-                return "";
-            }
-            if (resultRaw.Trim().ToLower() == "toggle treat as command" || resultRaw.Trim().ToLower() == "toggle treat command")
-            {
-                form.TreatAsCommand = !form.TreatAsCommand;
-                return "";
-            }
-            if (resultRaw.Trim().ToLower() == "toggle convert words to symbols" || resultRaw.Trim().ToLower() == "toggle convert words")
-            {
-                form.ConvertWordsToSymbols = !form.ConvertWordsToSymbols;
-                return "";
-            }
-            if (resultRaw.Trim().ToLower() == "toggle remove punctuation" || resultRaw.Trim().ToLower() == "toggle punctuation")
-            {
-                form.RemovePunctuation = !form.RemovePunctuation;
                 return "";
             }
             if (applicationName == "Visual Studio")
             {
-                string? visualStudioCommandResult= PerformVisualStudioCommand(resultRaw, words, inputSimulator);
-                if (visualStudioCommandResult!= null)
+                string? visualStudioCommandResult = PerformVisualStudioCommand(resultRaw, words, inputSimulator);
+                if (visualStudioCommandResult != null)
                 {
                     return visualStudioCommandResult;
                 }
             }
-            //if (resultRaw.Trim().ToLower() == "drop marker")
-            //{
-            //    SendKeys.Flush();
-            //    SendKeys.SendWait("%{Home}");
-            //    return "{drop marker}";
-            //}
-            //if (resultRaw.Trim().ToLower() == "collect marker")
-            //{
-            //    SendKeys.Flush();
-            //    SendKeys.SendWait("%{End}");
-            //    return "{Collect marker}";
-            //}
-            if (resultRaw.Trim().ToLower() == "dot")
+            resultRaw = PerformSymbolCommand(resultRaw, inputSimulator, words);
+            if (resultRaw.StartsWith("{") && resultRaw.EndsWith("}"))
             {
-                inputSimulator.Keyboard.TextEntry(".");
-                return "{dot}";
+                return resultRaw;
             }
-            if (resultRaw.Trim().ToLower() == "brackets in")
-            {
-                inputSimulator.Keyboard.TextEntry("()");
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LEFT);
-                return "{brackets in}";
-            }
-            if (resultRaw.Trim().ToLower() == "brackets out")
-            {
-                inputSimulator.Keyboard.TextEntry("()");
-                return "{brackets out}";
-            }
-            if (resultRaw.Trim().ToLower() == "curly brackets in")
-            {
-                inputSimulator.Keyboard.TextEntry("{}");
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LEFT);
-                return "{Curly brackets in}";
-            }
-            if (resultRaw.Trim().ToLower() == "curly brackets out")
-            {
-                inputSimulator.Keyboard.TextEntry("{}");
-                return "{Curly brackets out}";
-            }
-            if (resultRaw.Trim().ToLower() == "control a" || resultRaw.Trim().ToLower() == "select all")
-            {
-                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_A);
 
-                inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
-
-                return "{Select All}";
-            }
-            if (resultRaw.Trim().ToLower() == "quotes in")
-            {
-                inputSimulator.Keyboard.TextEntry("\"\"");
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LEFT);
-                return "{Quotes In}";
-            }
-            if (resultRaw.Trim().ToLower() == "quotes out")
-            {
-                inputSimulator.Keyboard.TextEntry("\"\"");
-                return "{Quotes Out}";
-            }
             if (resultRaw.Trim().ToLower() == "left select")
             {
                 inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
@@ -348,237 +296,26 @@ namespace SpeechContinuousRecognition
                 }
                 return $"{{Right Select {number.ToString()} }}";
             }
-            if (resultRaw.ToLower() == "close bracket")
+            else if (resultRaw.ToLower().Contains("select matching") && resultRaw.ToLower() != "select matching")
             {
-                inputSimulator.Keyboard.TextEntry(")");
-                return "{Close Bracket}";
-            }
-            if (resultRaw.ToLower() == "open bracket")
-            {
-                inputSimulator.Keyboard.TextEntry("(");
-                return "{Open Bracket}";
-            }
-            if (resultRaw.ToLower() == "close curly bracket")
-            {
-                inputSimulator.Keyboard.TextEntry("}");
-                return "{Close Curly Bracket}";
-            }
-            if (resultRaw.ToLower() == "open curly bracket")
-            {
-                inputSimulator.Keyboard.TextEntry("{");
-                return "{Open Curley Bracket}";
-            }
-            if (resultRaw.ToLower() == "semi colon")
-            {
-                inputSimulator.Keyboard.TextEntry(";");
-                return "{Semi Colon}";
-            }
-            if (resultRaw.ToLower() == "words semi colon")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.END);
-                inputSimulator.Keyboard.TextEntry(";");
-                return "{Semi Colon}";
-            }
-            if (resultRaw.ToLower() == "enter")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
-                return "{Enter}";
-            }
-            if (resultRaw.ToLower() == "return")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
-                return "{Return}";
-            }
-            if (resultRaw.ToLower() == "tab")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.TAB);
-                return "{Tab}";
-            }
-            if (resultRaw.ToLower() == "new paragraph")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
-                return "{Return}{Return}";
-            }
-            if (resultRaw.ToLower() == "new line")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
-                return "{Return}";
-            }
-            if (resultRaw.ToLower() == "dollar")
-            {
-                inputSimulator.Keyboard.TextEntry("$");
-                return "{$}";
-            }
-            if (resultRaw.ToLower() == "equals" || resultRaw.ToLower() == "equal")
-            {
-                inputSimulator.Keyboard.TextEntry("=");
-                return "{=}";
-            }
-            if (resultRaw.ToLower() == "equal to" || resultRaw.ToLower() == "equals to")
-            {
-                inputSimulator.Keyboard.TextEntry("==");
-                return "{==}";
-            }
-            if (resultRaw.ToLower() == "not equal to" || resultRaw.ToLower() == "not equals to")
-            {
-                inputSimulator.Keyboard.TextEntry("!=");
-                return "{!=}";
-            }
-            if (resultRaw.ToLower() == "greater than")
-            {
-                inputSimulator.Keyboard.TextEntry(">");
-                return "{>}";
-            }
-            if (resultRaw.ToLower() == "less than")
-            {
-                inputSimulator.Keyboard.TextEntry("<");
-                return "{<}";
-            }
-            if (resultRaw.ToLower() == "home")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.HOME);
-                return "{Home}";
-            }
-            if (resultRaw.ToLower() == "end")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.END);
-                return "{End}";
-            }
-            if (resultRaw.ToLower() == "space")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.SPACE);
-                return "{Space}";
-            }
-            if (resultRaw.ToLower() == "backspace")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.BACK);
-                return "{Backspace}";
-            }
-            if (resultRaw.ToLower().Contains("backspace"))
-            {
-                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.BACK, words);
-                return "{Backspace}";
-            }
-            if (resultRaw.ToLower().Contains(" space "))
-            {
-                resultRaw = resultRaw.Replace(" space ", " ");
-            }
-            else if (resultRaw.ToLower().Contains("space "))
-            {
-                resultRaw = resultRaw.Replace("space ", " ");
-            }
-            else if (resultRaw.ToLower().Contains(" space"))
-            {
-                resultRaw = resultRaw.Replace(" space", " ");
-            }
-            if (resultRaw.ToLower() == "equals out")
-            {
-                inputSimulator.Keyboard.TextEntry("==");
-                return "{==}";
-            }
-            if (resultRaw.ToLower().EndsWith("items") && resultRaw.ToLower() != "items")
-            {
-                var repeatCount = GetNumber(words[0]);
-                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.SHIFT);
-                for (int i = 0; i < repeatCount; i++)
+                int number = 0;
+                number = GetNumber(words[2]);
+                for (int i = 0; i < number; i++)
                 {
-                    inputSimulator.Keyboard.KeyPress(VirtualKeyCode.DOWN);
+                    SendKeys.SendWait("%+.");
                 }
-                inputSimulator.Keyboard.KeyUp(VirtualKeyCode.SHIFT);
-                return "{Select # Item}";
+                return $"{{Select Matching {number.ToString()} }}";
             }
-            if (resultRaw.ToLower() == "undo")
-            {
-                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_Z);
-                inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
-                return "{Ctrl+z}";
-            }
-            if (resultRaw.ToLower() == "redo")
-            {
-                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_Y);
-                inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
-                return "{Ctrl+y}";
-            }
-            if (resultRaw.ToLower() == "control home")
-            {
-                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.HOME);
-                inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
 
-                return "{Ctrl+Home}";
-            }
-            if (resultRaw.ToLower() == "page down")
+
+            if (resultRaw.ToLower().StartsWith("control ") || resultRaw.ToLower().StartsWith("alt ") || resultRaw.ToLower().StartsWith("shift "))
             {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.NEXT);
-                return "{PgDn}";
-            }
-            if (resultRaw.ToLower() == "page up")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.PRIOR);
-                return "{PgUp}";
-            }
-            if (resultRaw.ToLower() == "delete")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.DELETE);
-                return "{Del}";
-            }
-            if (resultRaw.ToLower().StartsWith("delete"))
-            {
-                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.DELETE, words);
-                return "{Del}";
-            }
-            if (resultRaw.ToLower() == "up")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.UP);
-                return "{Up}";
-            }
-            if (resultRaw.ToLower().StartsWith("up"))
-            {
-                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.UP, words);
-                return "{Up #}";
-            }
-            if (resultRaw.ToLower() == "down")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.DOWN);
-                return "{Down}";
-            }
-            if (resultRaw.ToLower().StartsWith("down"))
-            {
-                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.DOWN, words);
-                return "{Down #}";
-            }
-            if (resultRaw.ToLower() == "right")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RIGHT);
-                return "{Right}";
-            }
-            if (resultRaw.ToLower().StartsWith("right"))
-            {
-                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.RIGHT, words);
-                return "{Right #}";
-            }
-            if (resultRaw.ToLower() == "left")
-            {
-                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LEFT);
-                return "{Left}";
-            }
-            if (resultRaw.ToLower() == "comma")
-            {
-                inputSimulator.Keyboard.TextEntry(",");
-                return "{Comma}";
-            }
-            if (resultRaw.ToLower().StartsWith("left"))
-            {
-                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.LEFT, words);
-                return "{Left #}";
-            }
-            if (resultRaw.ToLower().StartsWith("control "))
-            {
-                string possibleKeys = resultRaw.ToLower().Replace("control ", "");
-                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
+                string possibleKeys = resultRaw;
+                if (resultRaw.ToLower().Contains("control "))
+                {
+                    inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
+                    possibleKeys = resultRaw.ToLower().Replace("control ", "");
+                }
                 if (possibleKeys.ToLower().Contains("alt "))
                 {
                     inputSimulator.Keyboard.KeyDown(VirtualKeyCode.MENU);
@@ -707,6 +444,18 @@ namespace SpeechContinuousRecognition
                 inputSimulator.Keyboard.KeyUp(VirtualKeyCode.SHIFT);
                 return "{+{Home}}";
             }
+            if (resultRaw.ToLower() == "copy" || resultRaw.ToLower() == "copy that")
+            {
+                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_C);
+                inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
+                return "{^c}";
+            }
+            if (resultRaw.ToLower() == "escape")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ESCAPE);
+                return "{Escape}";
+            }
             if (resultRaw.ToLower() == "shift end")
             {
                 inputSimulator.Keyboard.KeyDown(VirtualKeyCode.SHIFT);
@@ -759,13 +508,13 @@ namespace SpeechContinuousRecognition
                 inputSimulator.Keyboard.KeyPress(VirtualKeyCode.DELETE);
                 return "{Clear Line}";
             }
-            if (resultRaw.ToLower() == "fresh line")
+            if (resultRaw.ToLower() == "fresh line" || resultRaw.ToLower() == "freshline")
             {
                 inputSimulator.Keyboard.KeyPress(VirtualKeyCode.END);
                 inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
                 return "{Moving to fresh line below}";
             }
-            if (resultRaw.ToLower() == "fresh line above")
+            if (resultRaw.ToLower() == "fresh line above" || resultRaw.ToLower() == "freshline above")
             {
                 inputSimulator.Keyboard.KeyPress(VirtualKeyCode.UP);
                 inputSimulator.Keyboard.KeyPress(VirtualKeyCode.END);
@@ -881,7 +630,7 @@ namespace SpeechContinuousRecognition
                 int numberOfWords = 0;
                 try
                 {
-                    numberOfWords = int.Parse(words[1]);
+                    numberOfWords = GetNumber(words[1]);
                 }
                 catch (Exception exception)
                 {
@@ -898,13 +647,17 @@ namespace SpeechContinuousRecognition
 
                 return $"{{{resultRaw}}}";
             }
-            
+
             resultRaw = resultRaw.ToLower().Replace("equals", "=");
             resultRaw = resultRaw.ToLower().Replace("equal", "=");
             resultRaw = resultRaw.ToLower().Replace("not equal to", "!=");
             resultRaw = resultRaw.ToLower().Replace("equal to", "==");
             resultRaw = resultRaw.ToLower().Replace("greater than", ">");
             resultRaw = resultRaw.ToLower().Replace("less than", "<");
+            resultRaw = resultRaw.ToLower().Replace("hyphen", "-");
+            resultRaw = resultRaw.ToLower().Replace("at sign", "@");
+            resultRaw = resultRaw.ToLower().Replace("apostrophe", "'");
+
             resultRaw = resultRaw.ToLower().Replace(" dot ", ".");
 
 
@@ -919,6 +672,354 @@ namespace SpeechContinuousRecognition
             //resultRaw = resultRaw.ToLower().Replace(" end ", "{End}");
             //resultRaw = resultRaw.ToLower().Replace(" space ", "{Space}");
 
+            return resultRaw;
+        }
+
+        private static string PerformSymbolCommand(string resultRaw, IInputSimulator inputSimulator, List<string> words)
+        {
+            if (resultRaw.ToLower().StartsWith("type"))
+            {
+                resultRaw = resultRaw.ToLower().Replace("type", "");
+            }
+            if (resultRaw.Trim().ToLower() == "dot")
+            {
+                inputSimulator.Keyboard.TextEntry(".");
+                return "{dot}";
+            }
+            if (resultRaw.Trim().ToLower() == "brackets in")
+            {
+                inputSimulator.Keyboard.TextEntry("()");
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LEFT);
+                return "{brackets in}";
+            }
+            if (resultRaw.Trim().ToLower() == "brackets out")
+            {
+                inputSimulator.Keyboard.TextEntry("()");
+                return "{brackets out}";
+            }
+            if (resultRaw.Trim().ToLower() == "curly brackets in")
+            {
+                inputSimulator.Keyboard.TextEntry("{}");
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LEFT);
+                return "{Curly brackets in}";
+            }
+            if (resultRaw.Trim().ToLower() == "curly brackets out")
+            {
+                inputSimulator.Keyboard.TextEntry("{}");
+                return "{Curly brackets out}";
+            }
+            if (resultRaw.Trim().ToLower() == "apostrophes in")
+            {
+                inputSimulator.Keyboard.TextEntry("''");
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LEFT);
+                return "{Apostrophes In}";
+            }
+            if (resultRaw.Trim().ToLower() == "apostrophes out")
+            {
+                inputSimulator.Keyboard.TextEntry("''");
+                return "{Apostrophes out}";
+            }
+            if (resultRaw.Trim().ToLower() == "chevrons in")
+            {
+                inputSimulator.Keyboard.TextEntry("<>");
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LEFT);
+                return "{Chevrons In}";
+            }
+            if (resultRaw.Trim().ToLower() == "chevrons out")
+            {
+                inputSimulator.Keyboard.TextEntry("''");
+                return "{Chevrons out}";
+            }
+            if (resultRaw.Trim().ToLower() == "control a" || resultRaw.Trim().ToLower() == "select all")
+            {
+                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_A);
+
+                inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
+
+                return "{Select All}";
+            }
+            if (resultRaw.Trim().ToLower() == "quotes in")
+            {
+                inputSimulator.Keyboard.TextEntry("\"\"");
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LEFT);
+                return "{Quotes In}";
+            }
+            if (resultRaw.Trim().ToLower() == "quotes out")
+            {
+                inputSimulator.Keyboard.TextEntry("\"\"");
+                return "{Quotes Out}";
+            }
+            if (resultRaw.ToLower() == "close bracket")
+            {
+                inputSimulator.Keyboard.TextEntry(")");
+                return "{Close Bracket}";
+            }
+            if (resultRaw.ToLower() == "open bracket")
+            {
+                inputSimulator.Keyboard.TextEntry("(");
+                return "{Open Bracket}";
+            }
+            if (resultRaw.ToLower() == "close curly bracket")
+            {
+                inputSimulator.Keyboard.TextEntry("}");
+                return "{Close Curly Bracket}";
+            }
+            if (resultRaw.ToLower() == "open curly bracket")
+            {
+                inputSimulator.Keyboard.TextEntry("{");
+                return "{Open Curley Bracket}";
+            }
+            if (resultRaw.ToLower() == "semi colon")
+            {
+                inputSimulator.Keyboard.TextEntry(";");
+                return "{Semi Colon}";
+            }
+            if (resultRaw.ToLower() == "words semi colon")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.END);
+                inputSimulator.Keyboard.TextEntry(";");
+                return "{Semi Colon}";
+            }
+            if (resultRaw.ToLower() == "enter")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
+                return "{Enter}";
+            }
+            if (resultRaw.ToLower() == "return")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
+                return "{Return}";
+            }
+            if (resultRaw.ToLower() == "tab")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.TAB);
+                return "{Tab}";
+            }
+            if (resultRaw.ToLower() == "new paragraph")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
+                return "{Return}{Return}";
+            }
+            if (resultRaw.ToLower() == "new line")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
+                return "{Return}";
+            }
+            if (resultRaw.ToLower() == "dollar")
+            {
+                inputSimulator.Keyboard.TextEntry("$");
+                return "{$}";
+            }
+            if (resultRaw.ToLower() == "exclamation" || resultRaw.ToLower() == "exclamation mark" || resultRaw.ToLower() == "bang")
+            {
+                inputSimulator.Keyboard.TextEntry("!");
+                return "{!}";
+            }
+            if (resultRaw.ToLower() == "equals" || resultRaw.ToLower() == "equal")
+            {
+                inputSimulator.Keyboard.TextEntry("=");
+                return "{=}";
+            }
+            if (resultRaw.ToLower() == "equal to" || resultRaw.ToLower() == "equals to")
+            {
+                inputSimulator.Keyboard.TextEntry("==");
+                return "{==}";
+            }
+            if (resultRaw.ToLower() == "not equal to" || resultRaw.ToLower() == "not equals to")
+            {
+                inputSimulator.Keyboard.TextEntry("!=");
+                return "{!=}";
+            }
+            if (resultRaw.ToLower() == "greater than")
+            {
+                inputSimulator.Keyboard.TextEntry(">");
+                return "{>}";
+            }
+            if (resultRaw.ToLower() == "less than")
+            {
+                inputSimulator.Keyboard.TextEntry("<");
+                return "{<}";
+            }
+            if (resultRaw.ToLower() == "home")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.HOME);
+                return "{Home}";
+            }
+            if (resultRaw.ToLower() == "shift home")
+            {
+                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.SHIFT);
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.HOME);
+                inputSimulator.Keyboard.KeyUp(VirtualKeyCode.SHIFT);
+                return "{Home}";
+            }
+            if (resultRaw.ToLower() == "end")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.END);
+                return "{End}";
+            }
+            if (resultRaw.ToLower() == "space")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.SPACE);
+                return "{Space}";
+            }
+            if (resultRaw.ToLower() == "backspace")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.BACK);
+                return "{Backspace}";
+            }
+            if (resultRaw.ToLower().Contains("backspace"))
+            {
+                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.BACK, words);
+                return "{Backspace}";
+            }
+            if (resultRaw.ToLower().Contains(" space "))
+            {
+                resultRaw = resultRaw.Replace(" space ", " ");
+            }
+            else if (resultRaw.ToLower().Contains("space "))
+            {
+                resultRaw = resultRaw.Replace("space ", " ");
+            }
+            else if (resultRaw.ToLower().Contains(" space"))
+            {
+                resultRaw = resultRaw.Replace(" space", " ");
+            }
+            if (resultRaw.ToLower() == "equals out")
+            {
+                inputSimulator.Keyboard.TextEntry("==");
+                return "{==}";
+            }
+            if (resultRaw.ToLower().EndsWith("items") && resultRaw.ToLower() != "items")
+            {
+                var repeatCount = GetNumber(words[0]);
+                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.SHIFT);
+                for (int i = 0; i < repeatCount; i++)
+                {
+                    inputSimulator.Keyboard.KeyPress(VirtualKeyCode.DOWN);
+                }
+                inputSimulator.Keyboard.KeyUp(VirtualKeyCode.SHIFT);
+                return "{Select # Item}";
+            }
+            if (resultRaw.ToLower() == "undo")
+            {
+                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_Z);
+                inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
+                return "{Ctrl+z}";
+            }
+            if (resultRaw.ToLower() == "redo")
+            {
+                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.VK_Y);
+                inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
+                return "{Ctrl+y}";
+            }
+            if (resultRaw.ToLower() == "control home")
+            {
+                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.HOME);
+                inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
+
+                return "{Ctrl+Home}";
+            }
+            if (resultRaw.ToLower() == "page down")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.NEXT);
+                return "{PgDn}";
+            }
+            if (resultRaw.ToLower() == "page up")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.PRIOR);
+                return "{PgUp}";
+            }
+            if (resultRaw.ToLower() == "delete")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.DELETE);
+                return "{Del}";
+            }
+            if (resultRaw.ToLower().StartsWith("delete"))
+            {
+                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.DELETE, words);
+                return "{Del}";
+            }
+            if (resultRaw.ToLower() == "up")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.UP);
+                return "{Up}";
+            }
+            if (resultRaw.ToLower().StartsWith("up "))
+            {
+                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.UP, words);
+                return "{Up #}";
+            }
+            if (resultRaw.ToLower() == "down")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.DOWN);
+                return "{Down}";
+            }
+            if (resultRaw.ToLower().StartsWith("down"))
+            {
+                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.DOWN, words);
+                return "{Down #}";
+            }
+            if (resultRaw.ToLower() == "right")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RIGHT);
+                return "{Right}";
+            }
+            if (resultRaw.ToLower().StartsWith("right") && !resultRaw.ToLower().Contains("select"))
+            {
+                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.RIGHT, words);
+                return "{Right #}";
+            }
+            if (resultRaw.ToLower() == "left")
+            {
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LEFT);
+                return "{Left}";
+            }
+            if (resultRaw.ToLower().StartsWith("left") && !resultRaw.ToLower().Contains("select"))
+            {
+                PerformMultipleCommand(resultRaw, inputSimulator, VirtualKeyCode.LEFT, words);
+                return "{Left #}";
+            }
+            if (resultRaw.ToLower() == "comma")
+            {
+                inputSimulator.Keyboard.TextEntry(",");
+                return "{Comma}";
+            }
+
+            return resultRaw;
+        }
+
+        private static string ToggleSetting(string resultRaw, ContinuousSpeech form)
+        {
+            if (resultRaw.Trim().ToLower() == "toggle uppercase" || resultRaw.Trim().ToLower() == "toggle upper case")
+            {
+                form.OutputUppercase = !form.OutputUppercase;
+                return "";
+            }
+            if (resultRaw.Trim().ToLower() == "toggle lowercase" || resultRaw.Trim().ToLower() == "toggle lower case")
+            {
+                form.OutputLowercase = !form.OutputLowercase;
+                return "";
+            }
+            if (resultRaw.Trim().ToLower() == "toggle treat as command" || resultRaw.Trim().ToLower() == "toggle treat command")
+            {
+                form.TreatAsCommand = !form.TreatAsCommand;
+                return "";
+            }
+            if (resultRaw.Trim().ToLower() == "toggle convert words to symbols" || resultRaw.Trim().ToLower() == "toggle convert words")
+            {
+                form.ConvertWordsToSymbols = !form.ConvertWordsToSymbols;
+                return "";
+            }
+            if (resultRaw.Trim().ToLower() == "toggle remove punctuation" || resultRaw.Trim().ToLower() == "toggle punctuation")
+            {
+                form.RemovePunctuation = !form.RemovePunctuation;
+                return "";
+            }
             return resultRaw;
         }
 
@@ -939,6 +1040,13 @@ namespace SpeechContinuousRecognition
                 inputSimulator.Keyboard.KeyPress(VirtualKeyCode.TAB);
                 inputSimulator.Keyboard.KeyPress(VirtualKeyCode.TAB);
                 return "{if}";
+            }
+            if (resultRaw.Trim().ToLower() == "if statement razor")
+            {
+                inputSimulator.Keyboard.TextEntry("@if");
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.TAB);
+                inputSimulator.Keyboard.KeyPress(VirtualKeyCode.TAB);
+                return "{@if}";
             }
             if (resultRaw.Trim().ToLower() == "new block curly brackets")
             {
@@ -990,7 +1098,7 @@ namespace SpeechContinuousRecognition
         {
             bool commandRun = false;
             string? commandName = null;
-            string dictation = "";
+            string? dictation = null;
             WindowsSpeechVoiceCommand? command = null;
             var dictationCommands = windowsVoiceCommand.GetDictationCommands(applicationName);
             foreach (var dictationCommand in dictationCommands)
@@ -1013,6 +1121,10 @@ namespace SpeechContinuousRecognition
                 if (actions == null) { return (commandRun, "Nothing"); }
                 foreach (var action in actions)
                 {
+                    if (dictation != null)
+                    {
+                        dictation = FormatDictation(dictation, action.HowToFormatDictation);
+                    }
                     if (action.WaitTime > 0)
                     {
                         Thread.Sleep(action.WaitTime);
@@ -1115,7 +1227,16 @@ namespace SpeechContinuousRecognition
                     }
                     if (!string.IsNullOrWhiteSpace(action.SendKeysValue))
                     {
-                        SendKeys.SendWait(action.SendKeysValue);
+                        try
+                        {
+                            SendKeys.SendWait(action.SendKeysValue);
+                        }
+                        catch (Exception exception)
+                        {
+                            commandName = $"Exception has occurred: ({exception.Message})";
+                            commandRun = true;
+                            return (commandRun, commandName);
+                        }
                     }
                     commandRun = true;
                     commandName = command.SpokenCommand;
@@ -1169,19 +1290,89 @@ namespace SpeechContinuousRecognition
                 commandName = "Find Code";
             }
             return (commandRun, commandName);
-            //if (result.Text.ToLower() == "use dragon")
-            //{
-            //    //ToggleSpeechRecognitionListeningMode(inputSimulator);
-            //    inputSimulator.Keyboard.KeyDown(VirtualKeyCode.ADD);
-            //}
-            //else if (e.Result.Grammar.Name.Contains("Phonetic Alphabet")) // Could be lower, mixed or upper
-            //{
-            //    ProcessKeyboardCommand(e);
-            //}
 
         }
 
-        private void PerformMultipleCommand(string resultRaw, IInputSimulator inputSimulator, VirtualKeyCode virtualKeyCode, List<string> words)
+        private string FormatDictation(string dictation, string howToFormatDictation)
+        {
+            string[] stringSeparators = new string[] { " " };
+            string result = "";
+            List<string> words = dictation.Split(stringSeparators, StringSplitOptions.None).ToList();
+            if (howToFormatDictation == "Camel")
+            {
+                var counter = 0; string value = "";
+                foreach (var word in words)
+                {
+                    counter++;
+                    if (counter != 1)
+                    {
+                        value = value + word.Substring(0, 1).ToUpper() + word.Substring(1).ToLower();
+                    }
+                    else
+                    {
+                        value += word.ToLower();
+                    }
+                    result = value;
+                }
+            }
+            else if (howToFormatDictation == "Variable")
+            {
+                string value = "";
+                foreach (var word in words)
+                {
+                    if (word.Length > 0)
+                    {
+                        value = value + word.Substring(0, 1).ToUpper() + word.Substring(1).ToLower();
+                    }
+                }
+                result = value;
+            }
+            else if (howToFormatDictation == "dot notation")
+            {
+                string value = "";
+                foreach (var word in words)
+                {
+                    if (word.Length > 0)
+                    {
+                        value = value + word.Substring(0, 1).ToUpper() + word.Substring(1).ToLower() + ".";
+                    }
+                }
+                result = value.Substring(0, value.Length - 1);
+            }
+            else if (howToFormatDictation == "Title")
+            {
+                string value = "";
+                foreach (var word in words)
+                {
+                    if (word.Length > 0)
+                    {
+                        value = value + word.Substring(0, 1).ToUpper() + word.Substring(1).ToLower() + " ";
+                    }
+                }
+                result = value;
+            }
+            else if (howToFormatDictation == "Upper")
+            {
+                string value = "";
+                foreach (var word in words)
+                {
+                    value = value + word.ToUpper() + " ";
+                }
+                result = value;
+            }
+            else if (howToFormatDictation == "Lower")
+            {
+                string value = "";
+                foreach (var word in words)
+                {
+                    value = value + word.ToLower() + " ";
+                }
+                result = value;
+            }
+            return result;
+        }
+
+        private static void PerformMultipleCommand(string resultRaw, IInputSimulator inputSimulator, VirtualKeyCode virtualKeyCode, List<string> words)
         {
             int number = 0;
             number = GetNumber(words[1]);
@@ -1191,7 +1382,7 @@ namespace SpeechContinuousRecognition
             }
         }
 
-        private int GetNumber(string word)
+        private static int GetNumber(string word)
         {
             int number;
             bool allCharactersInStringAreDigits = word.All(char.IsDigit);
@@ -1207,7 +1398,7 @@ namespace SpeechContinuousRecognition
             return number;
         }
 
-        private int ConvertWordToNumber(string word)
+        private static int ConvertWordToNumber(string word)
         {
             switch (word.ToLower())
             {
@@ -1246,7 +1437,7 @@ namespace SpeechContinuousRecognition
             {
                 return;
             }
-            string tagReturned = result.ListValue.ToLower();
+            string? tagReturned = result.ListValue?.ToLower();
             string textToType = ""; int moveLeft = 0;
             if (tagReturned == "input" || tagReturned == "br" || tagReturned == "hr")
             {
@@ -1261,7 +1452,7 @@ namespace SpeechContinuousRecognition
             else
             {
                 textToType = $"<{tagReturned}></{tagReturned}>";
-                moveLeft = 4 + tagReturned.Length;
+                moveLeft = 4 + tagReturned!.Length;
             }
             inputSimulator.Keyboard.TextEntry(textToType);
             for (int i = 1; i < moveLeft; i++)
