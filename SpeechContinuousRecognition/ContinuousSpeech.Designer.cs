@@ -52,6 +52,7 @@
             this.checkBoxUppercase.TabIndex = 0;
             this.checkBoxUppercase.Text = "UPPERCASE";
             this.checkBoxUppercase.UseVisualStyleBackColor = true;
+            this.checkBoxUppercase.Click += new System.EventHandler(this.checkBoxUppercase_Click);
             // 
             // checkBoxLowercase
             // 
@@ -63,16 +64,17 @@
             this.checkBoxLowercase.TabIndex = 1;
             this.checkBoxLowercase.Text = "lowercase";
             this.checkBoxLowercase.UseVisualStyleBackColor = true;
+            this.checkBoxLowercase.Click += new System.EventHandler(this.checkBoxLowercase_Click);
             // 
             // textBoxResultsLocal
             // 
             this.textBoxResultsLocal.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxResultsLocal.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.textBoxResultsLocal.Location = new System.Drawing.Point(407, 39);
+            this.textBoxResultsLocal.Font = new System.Drawing.Font("Cascadia Code SemiBold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.textBoxResultsLocal.Location = new System.Drawing.Point(407, 7);
             this.textBoxResultsLocal.Multiline = true;
             this.textBoxResultsLocal.Name = "textBoxResultsLocal";
-            this.textBoxResultsLocal.Size = new System.Drawing.Size(535, 583);
+            this.textBoxResultsLocal.Size = new System.Drawing.Size(555, 628);
             this.textBoxResultsLocal.TabIndex = 2;
             // 
             // labelStatus
@@ -160,7 +162,7 @@
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.button1.Location = new System.Drawing.Point(79, 397);
+            this.button1.Location = new System.Drawing.Point(77, 515);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(156, 36);
             this.button1.TabIndex = 10;

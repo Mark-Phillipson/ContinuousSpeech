@@ -45,6 +45,8 @@ namespace SpeechContinuousRecognition.Models
         public int WaitTime { get; set; }
 
         public string HowToFormatDictation { get; set; } = "Do Nothing";
+        [StringLength(255)]
+        public string? MethodToCall { get; set; }
 
         public virtual WindowsSpeechVoiceCommand? WindowsSpeechVoiceCommand { get; set; }
     }

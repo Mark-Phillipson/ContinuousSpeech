@@ -17,6 +17,7 @@ namespace SpeechContinuousRecognition
     public partial class ContinuousSpeech : Form
     {
         private int _counter = 0;
+        private string? lastCommand = null;
         private readonly IEnumerable<VirtualKeyCode> all3Modifiers = new List<VirtualKeyCode>()
         { VirtualKeyCode.CONTROL, VirtualKeyCode.SHIFT, VirtualKeyCode.MENU };
         private readonly IEnumerable<VirtualKeyCode> controlAndShift = new List<VirtualKeyCode>()
@@ -73,7 +74,7 @@ namespace SpeechContinuousRecognition
         public Process? currentProcess { get; set; }
 
         private IInputSimulator _inputSimulator = new InputSimulator();
-        SpeechRecognizer? recognizer= null ;
+        SpeechRecognizer? recognizer = null;
         private string resultMain = "";
         public ContinuousSpeech()
         {
@@ -94,7 +95,6 @@ namespace SpeechContinuousRecognition
             {
                 try
                 {
-
                     labelStatus.Invoke(new MethodInvoker(delegate { labelStatus.Text = value; }));
                 }
                 catch (Exception exception)
@@ -111,7 +111,6 @@ namespace SpeechContinuousRecognition
                 try
                 {
                     checkBoxUppercase.Invoke(new MethodInvoker(delegate { checkBoxUppercase.Checked = value; }));
-
                 }
                 catch (Exception exception)
                 {
@@ -119,7 +118,7 @@ namespace SpeechContinuousRecognition
                 }
                 if (value)
                 {
-                    checkBoxLowercase.Checked = false;
+                    OutputLowercase = false;
                 }
             }
         }
@@ -130,13 +129,12 @@ namespace SpeechContinuousRecognition
             {
                 try
                 {
-
                     checkBoxLowercase.Invoke(new MethodInvoker(delegate { checkBoxLowercase.Checked = value; }));
                 }
                 catch (Exception exception) { global::System.Console.WriteLine(exception.Message); }
                 if (value)
                 {
-                    checkBoxUppercase.Invoke(new MethodInvoker(delegate { checkBoxUppercase.Checked = value; }));
+                    OutputUppercase = false;
                 }
             }
         }
@@ -266,6 +264,7 @@ namespace SpeechContinuousRecognition
                 phraseListGrammar.AddPhrase("Starts With");
                 phraseListGrammar.AddPhrase("Mouse Wheel Down");
                 phraseListGrammar.AddPhrase("Mouse Wheel Up");
+                phraseListGrammar.AddPhrase("Var with Space");
 
 
 
@@ -310,7 +309,7 @@ namespace SpeechContinuousRecognition
 
         private void ContinuousSpeech_FormClosing(object sender, FormClosingEventArgs e)
         {
-            this.Invoke(new MethodInvoker(delegate { this.Text= "Closing please wait.."; }));
+            this.Invoke(new MethodInvoker(delegate { this.Text = "Closing please wait.."; }));
 
 
             recognizer?.Dispose();
@@ -360,7 +359,7 @@ namespace SpeechContinuousRecognition
                 {
                     //textBoxResultsLocal.Text=($"Final result: Text: {result.Text}.");
                     TextBoxResults = $"Final Recognised result: {result.Text}{Environment.NewLine}{TextBoxResults}";
-                    string resultRaw = result.Text;//.Replace("Stop continuous.", "").Trim();
+                    string resultRaw = result.Text;
                     if (this.OutputUppercase)
                     {
                         resultRaw = resultRaw.ToUpper();
@@ -373,7 +372,7 @@ namespace SpeechContinuousRecognition
                     {
                         resultRaw = SpeechCommandsHelper.RemovePunctuation(resultRaw);
                     }
-                    //resultRaw = SpeechCommandsHelper.ConvertNatoPhoneticAlphabetToLetter(resultRaw);
+                    var temporary = resultRaw;
                     if (this.ConvertWordsToSymbols)
                     {
                         UpdateTheCurrentProcess();
@@ -386,11 +385,29 @@ namespace SpeechContinuousRecognition
                                 resultRaw = $"{resultRaw}{_speechCommandsHelper.IdentifyAndRunCommand(item, this, result, currentProcess)}";
                             }
                         }
+                        else if (resultRaw.ToLower() == "repeat" && lastCommand != null && lastCommand.ToLower() != "repeat")
+                        {
+                            resultRaw = _speechCommandsHelper.IdentifyAndRunCommand(lastCommand, this, result, currentProcess);
+                        }
+                        else if (resultRaw.ToLower().StartsWith("repeat ") && lastCommand != null)
+                        {
+                            var number = SpeechCommandsHelper.GetNumber(resultRaw.Substring(startIndex: 7));
+                            for (int i = 0; i < number - 1; i++)
+                            {
+                                resultRaw = _speechCommandsHelper.IdentifyAndRunCommand(lastCommand, this, result, currentProcess);
+                                await PerformTextEntryOrLog().ConfigureAwait(false);
+                            }
+                        }
                         else
                         {
                             resultRaw = _speechCommandsHelper.IdentifyAndRunCommand(resultRaw, this, result, currentProcess);
                         }
                     }
+                    if (!temporary.ToLower().Contains("repeat"))
+                    {
+                        lastCommand = temporary;
+                    }
+
                     resultRaw = SpeechCommandsHelper.PerformCodeFunctions(resultRaw);
 
                     resultMain = resultRaw;
@@ -422,44 +439,33 @@ namespace SpeechContinuousRecognition
                         PerformMouseWheelDirection("Down", 5);
                         resultMain = "{Wheel Down}";
                     }
-
-
-                    //form.TextBoxResults = resultMain;
-                    if (resultMain.Trim().ToLower().StartsWith("command"))
-                    {
-                        //resultMain = resultMain.Replace("Command", "").Trim();
-                        //resultMain = SpeechCommandsHelper.ConvertToTitle(resultMain);
-                        //_inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
-                        //_inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LWIN);
-                        //_inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
-                        //TextBoxResults = resultMain;
-                        //_inputSimulator.Keyboard.Sleep(400);
-                        //var resultEmulated = speechRecognizer.EmulateRecognize(resultMain);
-                        //_inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
-                        //_inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LWIN);
-                        //_inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
-                    }
-                    else if (resultMain != null && resultMain.Length > 0)
-                    {
-                        TextBoxResults = $"Text Entry Value: {resultMain}{Environment.NewLine}{TextBoxResults}";
-                        if (resultMain.StartsWith("{") && resultMain.EndsWith("}"))
-                        {
-                            return;
-                        }
-                        if (!resultMain.ToLower().Contains("stop continuous"))
-                        {
-                            _inputSimulator.Keyboard.TextEntry($"{resultMain}".Trim());
-                        }
-                        else
-                        {
-                            await StopContinuous().ConfigureAwait(false);
-                            buttonStop.Invoke(new MethodInvoker(delegate { buttonStop.Enabled = false; }));
-                            buttonStart.Invoke(new MethodInvoker(delegate { buttonStart.Enabled = true; }));
-                        }
-                    }
+                    await PerformTextEntryOrLog().ConfigureAwait(false);
                 }
             }
         }
+
+        private async Task PerformTextEntryOrLog()
+        {
+            if (resultMain != null && resultMain.Length > 0)
+            {
+                if (resultMain.StartsWith("{") && resultMain.EndsWith("}"))
+                {
+                    TextBoxResults = $"Command run: {resultMain}{Environment.NewLine}{TextBoxResults}";
+                }
+                else if (!resultMain.ToLower().Contains("stop continuous"))
+                {
+                    TextBoxResults = $"Text entry: {resultMain}{Environment.NewLine}{TextBoxResults}";
+                    _inputSimulator.Keyboard.TextEntry($"{resultMain}".Trim());
+                }
+                else
+                {
+                    await StopContinuous().ConfigureAwait(false);
+                    buttonStop.Invoke(new MethodInvoker(delegate { buttonStop.Enabled = false; }));
+                    buttonStart.Invoke(new MethodInvoker(delegate { buttonStart.Enabled = true; }));
+                }
+            }
+        }
+
         private void UpdateCurrentProcess()
         {
             IntPtr hwnd = GetForegroundWindow();
@@ -476,6 +482,21 @@ namespace SpeechContinuousRecognition
             Application.Exit();
         }
 
+        private void checkBoxUppercase_Click(object sender, EventArgs e)
+        {
+            if (checkBoxUppercase.Checked)
+            {
+                OutputLowercase = false;
+            }
+        }
+
+        private void checkBoxLowercase_Click(object sender, EventArgs e)
+        {
+            if (checkBoxLowercase.Checked)
+            {
+                OutputUppercase = false;
+            }
+        }
 
     }
 }
