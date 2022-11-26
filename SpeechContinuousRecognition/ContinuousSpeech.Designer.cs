@@ -40,6 +40,11 @@
             this.buttonStart = new System.Windows.Forms.Button();
             this.buttonCloseApplication = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.labelCurrentProcess = new System.Windows.Forms.Label();
+            this.buttonRestartDragon = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.buttonVoiceAdministration = new System.Windows.Forms.Button();
+            this.buttonDatabaseCommands = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // checkBoxUppercase
@@ -131,7 +136,7 @@
             this.buttonStop.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonStop.Location = new System.Drawing.Point(79, 303);
             this.buttonStop.Name = "buttonStop";
-            this.buttonStop.Size = new System.Drawing.Size(156, 36);
+            this.buttonStop.Size = new System.Drawing.Size(199, 36);
             this.buttonStop.TabIndex = 7;
             this.buttonStop.Text = "Stop";
             this.buttonStop.UseVisualStyleBackColor = true;
@@ -142,7 +147,7 @@
             this.buttonStart.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonStart.Location = new System.Drawing.Point(79, 261);
             this.buttonStart.Name = "buttonStart";
-            this.buttonStart.Size = new System.Drawing.Size(156, 36);
+            this.buttonStart.Size = new System.Drawing.Size(199, 36);
             this.buttonStart.TabIndex = 8;
             this.buttonStart.Text = "Start";
             this.buttonStart.UseVisualStyleBackColor = true;
@@ -153,7 +158,7 @@
             this.buttonCloseApplication.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonCloseApplication.Location = new System.Drawing.Point(78, 345);
             this.buttonCloseApplication.Name = "buttonCloseApplication";
-            this.buttonCloseApplication.Size = new System.Drawing.Size(156, 36);
+            this.buttonCloseApplication.Size = new System.Drawing.Size(199, 36);
             this.buttonCloseApplication.TabIndex = 9;
             this.buttonCloseApplication.Text = "Close Application";
             this.buttonCloseApplication.UseVisualStyleBackColor = true;
@@ -164,16 +169,76 @@
             this.button1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.button1.Location = new System.Drawing.Point(77, 515);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(156, 36);
+            this.button1.Size = new System.Drawing.Size(199, 36);
             this.button1.TabIndex = 10;
             this.button1.Text = "Testing";
             this.button1.UseVisualStyleBackColor = true;
+            // 
+            // labelCurrentProcess
+            // 
+            this.labelCurrentProcess.AutoSize = true;
+            this.labelCurrentProcess.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.labelCurrentProcess.ForeColor = System.Drawing.Color.Red;
+            this.labelCurrentProcess.Location = new System.Drawing.Point(171, 7);
+            this.labelCurrentProcess.Name = "labelCurrentProcess";
+            this.labelCurrentProcess.Size = new System.Drawing.Size(100, 17);
+            this.labelCurrentProcess.TabIndex = 11;
+            this.labelCurrentProcess.Text = "CurrentProcess";
+            // 
+            // buttonRestartDragon
+            // 
+            this.buttonRestartDragon.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.buttonRestartDragon.Location = new System.Drawing.Point(78, 557);
+            this.buttonRestartDragon.Name = "buttonRestartDragon";
+            this.buttonRestartDragon.Size = new System.Drawing.Size(199, 36);
+            this.buttonRestartDragon.TabIndex = 12;
+            this.buttonRestartDragon.Text = "Restart Dragon";
+            this.buttonRestartDragon.UseVisualStyleBackColor = true;
+            this.buttonRestartDragon.Click += new System.EventHandler(this.buttonRestartDragon_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label1.ForeColor = System.Drawing.Color.Black;
+            this.label1.Location = new System.Drawing.Point(70, 8);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(104, 17);
+            this.label1.TabIndex = 13;
+            this.label1.Text = "Current Process";
+            // 
+            // buttonVoiceAdministration
+            // 
+            this.buttonVoiceAdministration.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.buttonVoiceAdministration.Location = new System.Drawing.Point(79, 387);
+            this.buttonVoiceAdministration.Name = "buttonVoiceAdministration";
+            this.buttonVoiceAdministration.Size = new System.Drawing.Size(199, 36);
+            this.buttonVoiceAdministration.TabIndex = 14;
+            this.buttonVoiceAdministration.Text = "Voice Administration";
+            this.buttonVoiceAdministration.UseVisualStyleBackColor = true;
+            this.buttonVoiceAdministration.Click += new System.EventHandler(this.buttonVoiceAdministration_Click);
+            // 
+            // buttonDatabaseCommands
+            // 
+            this.buttonDatabaseCommands.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.buttonDatabaseCommands.Location = new System.Drawing.Point(79, 429);
+            this.buttonDatabaseCommands.Name = "buttonDatabaseCommands";
+            this.buttonDatabaseCommands.Size = new System.Drawing.Size(199, 36);
+            this.buttonDatabaseCommands.TabIndex = 15;
+            this.buttonDatabaseCommands.Text = "Database Commands";
+            this.buttonDatabaseCommands.UseVisualStyleBackColor = true;
+            this.buttonDatabaseCommands.Click += new System.EventHandler(this.buttonDatabaseCommands_Click);
             // 
             // ContinuousSpeech
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(968, 644);
+            this.Controls.Add(this.buttonDatabaseCommands);
+            this.Controls.Add(this.buttonVoiceAdministration);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.buttonRestartDragon);
+            this.Controls.Add(this.labelCurrentProcess);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.buttonCloseApplication);
             this.Controls.Add(this.buttonStart);
@@ -209,5 +274,10 @@
         private Button buttonStart;
         private Button buttonCloseApplication;
         private Button button1;
-    }
+        private Label labelCurrentProcess;
+        private Button buttonRestartDragon;
+        private Label label1;
+        private Button buttonVoiceAdministration;
+		private Button buttonDatabaseCommands;
+	}
 }

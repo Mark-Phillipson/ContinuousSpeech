@@ -1,4 +1,6 @@
 
+using DataAccessLibrary.Models;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -10,11 +12,11 @@ using System.Windows.Forms;
 
 namespace SpeechContinuousRecognition.Models
 {
-    public partial class Model : DbContext
+    public partial class VoiceAdminDbContext : DbContext
     {
         private readonly string _connectionString;
 
-        public Model( string connectionString)
+        public VoiceAdminDbContext( string connectionString)
         {
             _connectionString = connectionString;
         }
@@ -22,11 +24,10 @@ namespace SpeechContinuousRecognition.Models
         {
             optionsBuilder.UseSqlServer(_connectionString);
         }
+        public virtual DbSet<ApplicationDetail> ApplicationDetails { get; set; }
+        public virtual DbSet<Idiosyncrasy> Idiosyncrasies { get; set; }
+        public virtual DbSet<PhraseListGrammarStorage> PhraseListGrammars { get; set; }
 
-
-
-
-        //public virtual DbSet<C__EFMigrationsHistory> C__EFMigrationsHistory { get; set; }
         public virtual DbSet<GrammarName> GrammarNames { get; set; } = null!;
          public virtual DbSet<GrammarItem> GrammarItems { get; set; } = null!;
         public virtual DbSet<AdditionalCommand> AdditionalCommands { get; set; } = null!;

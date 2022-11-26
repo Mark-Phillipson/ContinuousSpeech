@@ -1,4 +1,6 @@
-﻿using Microsoft.CognitiveServices.Speech;
+﻿using DataAccessLibrary.Models;
+
+using Microsoft.CognitiveServices.Speech;
 using Microsoft.EntityFrameworkCore;
 
 using SpeechContinuousRecognition.Models;
@@ -13,7 +15,7 @@ namespace SpeechContinuousRecognition.Repositories
 {
     public class WindowsVoiceCommand
     {
-        Model Model = new Model("Data Source=DESKTOP-UROO8T1;Initial Catalog=VoiceLauncher;Integrated Security=True;Connect Timeout=120;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+        VoiceAdminDbContext Model = new VoiceAdminDbContext("Data Source=DESKTOP-UROO8T1;Initial Catalog=VoiceLauncher;Integrated Security=True;Connect Timeout=120;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
         public List<WindowsSpeechVoiceCommand> GetCommands()
         {
             var result = Model.WindowsSpeechVoiceCommands
@@ -41,34 +43,64 @@ namespace SpeechContinuousRecognition.Repositories
                 return result;
             }
         }
-        public WindowsSpeechVoiceCommand? GetCommand(string spokenCommand,string? applicationName)
+        public WindowsSpeechVoiceCommand? GetCommand(string spokenCommand, string? applicationName)
         {
-            if (applicationName!= null )
+            if (applicationName != null)
             {
                 WindowsSpeechVoiceCommand? applicationCommand = Model.WindowsSpeechVoiceCommands
                     .AsNoTracking()
-                    .Where(v => v.SpokenCommand.ToLower() == spokenCommand.ToLower() && v.ApplicationName==applicationName)
+                    .Where(v => v.SpokenCommand.ToLower() == spokenCommand.ToLower() && v.ApplicationName == applicationName)
                     .FirstOrDefault();
-                if (applicationCommand!= null )
+                if (applicationCommand != null)
                 {
                     return applicationCommand;
                 }
             }
             WindowsSpeechVoiceCommand? command = Model.WindowsSpeechVoiceCommands
                 .AsNoTracking()
-                .Where(v => v.SpokenCommand.ToLower() == spokenCommand.ToLower() && v.ApplicationName=="Global")
+                .Where(v => v.SpokenCommand.ToLower() == spokenCommand.ToLower() && v.ApplicationName == "Global")
                 .FirstOrDefault();
             return command;
         }
         public List<CustomWindowsSpeechCommand>? GetChildActions(int windowsSpeechVoiceCommandId)
         {
             var results = Model.CustomWindowsSpeechCommands
-                //.AsNoTracking()
+                .AsNoTracking()
                 .Where(v => v.WindowsSpeechVoiceCommandId == windowsSpeechVoiceCommandId);
             if (results != null)
             {
                 var actions = results.ToList();
                 return actions;
+            }
+            return null;
+        }
+        public List<PhraseListGrammarStorage>? GetPhraseListGrammars()
+        {
+            var results = Model.PhraseListGrammars.AsNoTracking();
+            if (results != null)
+            {
+                var phraseListGrammars = results.ToList();
+                return phraseListGrammars;
+            }
+            return null;
+        }
+        public List<DataAccessLibrary.Models.ApplicationDetail>? GetApplicationDetails()
+        {
+            var results = Model.ApplicationDetails.AsNoTracking();
+            if (results != null)
+            {
+                var applicationDetails = results.ToList();
+                return applicationDetails;
+            }
+            return null;
+        }
+        public List<Idiosyncrasy>? GetIdiosyncrasies()
+        {
+            var results=Model.Idiosyncrasies.AsNoTracking();
+            if (results!= null )
+            {
+                var idiosyncrasies = results.ToList();
+                return idiosyncrasies;
             }
             return null;
         }
