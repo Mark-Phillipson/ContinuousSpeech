@@ -175,7 +175,7 @@ namespace SpeechContinuousRecognition
 			}
 			UpdateTheCurrentProcess();
 
-			Text = "Microsoft Azure - Continuous Speech";
+			Text = "Azure Cognitive Services - Continuous Speech Code by Voice in Visual Studio";
 			await SpeechSetupAsync();
 			buttonStart.Enabled = false;
 			buttonStop.Enabled = true;
@@ -435,15 +435,15 @@ namespace SpeechContinuousRecognition
 					}
 					string[] words = resultRaw.Split(' ');
 					words = resultRaw.Split(' ');
-					if (resultRaw.ToLower().StartsWith("mouse wheel up"))
+					if (resultRaw.ToLower().StartsWith("wheel up"))
 					{
-						var number = SpeechCommandsHelper.GetNumber(words[3] ?? "1");
+						var number = SpeechCommandsHelper.GetNumber(words[2] ?? "1");
 						PerformMouseWheelDirection("Up", number);
 						resultMain = "{Wheel Up}";
 					}
-					else if (resultRaw.ToLower().StartsWith("mouse wheel down"))
+					else if (resultRaw.ToLower().StartsWith("wheel down"))
 					{
-						var number = SpeechCommandsHelper.GetNumber(words[3] ?? "1");
+						var number = SpeechCommandsHelper.GetNumber(words[2] ?? "1");
 						PerformMouseWheelDirection("Down",	number);
 						resultMain = "{Wheel Down}";
 					}
@@ -486,7 +486,14 @@ namespace SpeechContinuousRecognition
 		{
 			Text = " Disposing of recogniser please wait! ";
 			await StopContinuous().ConfigureAwait(false);
-			recognizer?.Dispose();
+			try
+			{
+				recognizer?.Dispose();
+			}
+			catch (Exception exception)
+			{
+				Console.WriteLine(exception.Message);
+			}
 			Application.Exit();
 		}
 
