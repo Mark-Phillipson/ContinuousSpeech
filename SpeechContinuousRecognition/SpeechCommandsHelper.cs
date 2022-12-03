@@ -161,6 +161,18 @@ namespace SpeechContinuousRecognition
                 }
                 rawResult = value;
             }
+            else if (rawResult.ToLower().StartsWith("all caps"))
+            {
+                words.RemoveAt(0);
+                words.RemoveAt(0);
+
+                string value = "";
+                foreach (var word in words)
+                {
+                    value = value + word.ToUpper() + " ";
+                }
+                rawResult = value;
+            }
             else if (rawResult.ToLower().StartsWith("lower"))
             {
                 words.RemoveAt(0);
@@ -198,7 +210,7 @@ namespace SpeechContinuousRecognition
             if (currentProcess != null)
             {
                 ApplicationDetail? applicationDetail = windowsVoiceCommand.GetApplicationDetails()?.Where(v => v.ProcessName == currentProcess.ProcessName).FirstOrDefault();
-                if (applicationDetail!= null )
+                if (applicationDetail != null)
                 {
                     applicationName = applicationDetail.ApplicationTitle;
                 }
@@ -206,7 +218,7 @@ namespace SpeechContinuousRecognition
             //fix common recognition problems/idiosyncrasies
             var idiosyncrasies = windowsVoiceCommand.GetIdiosyncrasies();
             if (idiosyncrasies != null)
-            { 
+            {
                 foreach (Idiosyncrasy item in idiosyncrasies)
                 {
                     resultRaw = resultRaw.ToLower().Replace(item.FindString, item.ReplaceWith);
@@ -1082,7 +1094,7 @@ namespace SpeechContinuousRecognition
                 inputSimulator.Keyboard.TextEntry("==");
                 return "{==}";
             }
-            if (resultRaw.ToLower().EndsWith("items") && resultRaw.ToLower() != "items")
+            if (resultRaw.ToLower().EndsWith("items") && resultRaw.ToLower() != "items" && words.Count == 2)
             {
                 var repeatCount = GetNumber(words[0]);
                 inputSimulator.Keyboard.KeyDown(VirtualKeyCode.SHIFT);
@@ -1091,7 +1103,32 @@ namespace SpeechContinuousRecognition
                     inputSimulator.Keyboard.KeyPress(VirtualKeyCode.DOWN);
                 }
                 inputSimulator.Keyboard.KeyUp(VirtualKeyCode.SHIFT);
-                return "{Select # Item}";
+                if (repeatCount > 0)
+                {
+                    return "{Select # Item}";
+                }
+            }
+            if (resultRaw.ToLower().EndsWith("items") && words.Count == 3)
+            {
+                var repeatCount = GetNumber(words[1]);
+                inputSimulator.Keyboard.KeyDown(VirtualKeyCode.SHIFT);
+                for (int i = 0; i < repeatCount; i++)
+                {
+                    if (words[0].ToLower() == "left")
+                    {
+                        inputSimulator.Keyboard.KeyPress(VirtualKeyCode.LEFT);
+                    }
+                    else
+                    {
+                        inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RIGHT); 
+                    }
+                }
+                inputSimulator.Keyboard.KeyUp(VirtualKeyCode.SHIFT);
+                if (repeatCount > 0)
+                {
+                    return "{Select # Item}";
+                }
+
             }
             if (resultRaw.ToLower() == "undo")
             {
