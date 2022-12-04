@@ -308,7 +308,8 @@ namespace SpeechContinuousRecognition
 			{
 				await global::System.Console.Out.WriteLineAsync(exception.Message);
 			}
-		}
+            labelStatus.Invoke(new MethodInvoker(delegate { labelStatus.ForeColor = Color.Red; }));
+        }
 
 		private void ContinuousSpeech_FormClosing(object sender, FormClosingEventArgs e)
 		{
@@ -340,6 +341,7 @@ namespace SpeechContinuousRecognition
 				await global::System.Console.Out.WriteLineAsync(exception.Message);
 			}
 			buttonStop.Invoke(new MethodInvoker(delegate { buttonStop.Enabled = true; }));
+			labelStatus.Invoke(new MethodInvoker(delegate { labelStatus.ForeColor=Color.LightGreen; }));
 		}
 		private async void SpeechRecognizer_SpeechRecognised(object? sender, SpeechRecognitionEventArgs e)
 		{
