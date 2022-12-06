@@ -34,7 +34,7 @@
             this.textBoxResultsLocal = new System.Windows.Forms.TextBox();
             this.labelStatus = new System.Windows.Forms.Label();
             this.checkBoxTreatAsCommand = new System.Windows.Forms.CheckBox();
-            this.checkBoxConvertWordsToSymbols = new System.Windows.Forms.CheckBox();
+            this.checkBoxTreatAsCommandFirst = new System.Windows.Forms.CheckBox();
             this.checkBoxRemovePunctuation = new System.Windows.Forms.CheckBox();
             this.buttonStop = new System.Windows.Forms.Button();
             this.buttonStart = new System.Windows.Forms.Button();
@@ -77,14 +77,14 @@
             // 
             // textBoxResultsLocal
             // 
-            this.textBoxResultsLocal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxResultsLocal.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
+            this.textBoxResultsLocal.Dock = System.Windows.Forms.DockStyle.Right;
             this.textBoxResultsLocal.Font = new System.Drawing.Font("Cascadia Code SemiBold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.textBoxResultsLocal.ForeColor = System.Drawing.SystemColors.Control;
-            this.textBoxResultsLocal.Location = new System.Drawing.Point(410, 7);
+            this.textBoxResultsLocal.Location = new System.Drawing.Point(415, 0);
             this.textBoxResultsLocal.Multiline = true;
             this.textBoxResultsLocal.Name = "textBoxResultsLocal";
-            this.textBoxResultsLocal.Size = new System.Drawing.Size(695, 628);
+            this.textBoxResultsLocal.Size = new System.Drawing.Size(695, 644);
             this.textBoxResultsLocal.TabIndex = 2;
             // 
             // labelStatus
@@ -116,20 +116,20 @@
             this.checkBoxTreatAsCommand.UseVisualStyleBackColor = false;
             this.checkBoxTreatAsCommand.Visible = false;
             // 
-            // checkBoxConvertWordsToSymbols
+            // checkBoxTreatAsCommandFirst
             // 
-            this.checkBoxConvertWordsToSymbols.AutoSize = true;
-            this.checkBoxConvertWordsToSymbols.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
-            this.checkBoxConvertWordsToSymbols.Checked = true;
-            this.checkBoxConvertWordsToSymbols.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxConvertWordsToSymbols.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.checkBoxConvertWordsToSymbols.ForeColor = System.Drawing.SystemColors.Control;
-            this.checkBoxConvertWordsToSymbols.Location = new System.Drawing.Point(23, 116);
-            this.checkBoxConvertWordsToSymbols.Name = "checkBoxConvertWordsToSymbols";
-            this.checkBoxConvertWordsToSymbols.Size = new System.Drawing.Size(231, 25);
-            this.checkBoxConvertWordsToSymbols.TabIndex = 5;
-            this.checkBoxConvertWordsToSymbols.Text = "Convert Words to Symbols";
-            this.checkBoxConvertWordsToSymbols.UseVisualStyleBackColor = false;
+            this.checkBoxTreatAsCommandFirst.AutoSize = true;
+            this.checkBoxTreatAsCommandFirst.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
+            this.checkBoxTreatAsCommandFirst.Checked = true;
+            this.checkBoxTreatAsCommandFirst.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxTreatAsCommandFirst.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.checkBoxTreatAsCommandFirst.ForeColor = System.Drawing.SystemColors.Control;
+            this.checkBoxTreatAsCommandFirst.Location = new System.Drawing.Point(23, 116);
+            this.checkBoxTreatAsCommandFirst.Name = "checkBoxTreatAsCommandFirst";
+            this.checkBoxTreatAsCommandFirst.Size = new System.Drawing.Size(206, 25);
+            this.checkBoxTreatAsCommandFirst.TabIndex = 5;
+            this.checkBoxTreatAsCommandFirst.Text = "Treat as Command First";
+            this.checkBoxTreatAsCommandFirst.UseVisualStyleBackColor = false;
             // 
             // checkBoxRemovePunctuation
             // 
@@ -283,7 +283,7 @@
             this.Controls.Add(this.buttonStart);
             this.Controls.Add(this.buttonStop);
             this.Controls.Add(this.checkBoxRemovePunctuation);
-            this.Controls.Add(this.checkBoxConvertWordsToSymbols);
+            this.Controls.Add(this.checkBoxTreatAsCommandFirst);
             this.Controls.Add(this.checkBoxTreatAsCommand);
             this.Controls.Add(this.labelStatus);
             this.Controls.Add(this.textBoxResultsLocal);
@@ -309,7 +309,7 @@
         private TextBox textBoxResultsLocal;
         private Label labelStatus;
         private CheckBox checkBoxTreatAsCommand;
-        private CheckBox checkBoxConvertWordsToSymbols;
+        private CheckBox checkBoxTreatAsCommandFirst;
         private CheckBox checkBoxRemovePunctuation;
         private Button buttonStop;
         private Button buttonStart;

@@ -173,13 +173,24 @@ namespace SpeechContinuousRecognition
                 }
                 rawResult = value;
             }
+            else if (rawResult.ToLower().StartsWith("lower gap"))
+            {
+                words.RemoveAt(0);
+                words.RemoveAt(0);
+                string value = "";
+                foreach (var word in words)
+                {
+                    value = value + word.ToLower() + " ";
+                }
+                rawResult = value;
+            }
             else if (rawResult.ToLower().StartsWith("lower"))
             {
                 words.RemoveAt(0);
                 string value = "";
                 foreach (var word in words)
                 {
-                    value = value + word.ToLower() + " ";
+                    value = value + word.ToLower();
                 }
                 rawResult = value;
             }
@@ -290,8 +301,11 @@ namespace SpeechContinuousRecognition
             }
             List<string> phoneticAlphabet = new List<string>() { "Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliet", "Kilo", "Lima", "Mike", "November", "Oscar", "Paper", "Papa", "Quebec", "Romeo", "Sierra", "Tango", "Uniform", "Victor", "Whiskey", "X-ray", "Yankee", "Zulu" };
 
-            resultRaw = resultRaw.Replace("Press", "").Trim();
-            resultRaw = resultRaw.Replace("press", "").Trim();
+            if (resultRaw.ToLower().StartsWith("press"))
+            {
+                resultRaw = resultRaw.Replace("Press ", "").Trim();
+                resultRaw = resultRaw.Replace("press ", "").Trim();
+            }
             if (phoneticAlphabet.Any(f => f.ToLower().Equals(resultRaw.ToLower())))
             {
                 if (form.OutputUppercase)
@@ -822,7 +836,7 @@ namespace SpeechContinuousRecognition
                 return $"{{Left {number.ToString()} Select}}";
 
             }
-            if (resultRaw.Trim().ToLower() == "right select")
+            if (resultRaw.Trim().ToLower() == "right select" || resultRaw.Trim().ToLower() == "write select")
             {
                 inputSimulator.Keyboard.KeyDown(VirtualKeyCode.SHIFT);
                 inputSimulator.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
@@ -831,7 +845,7 @@ namespace SpeechContinuousRecognition
                 inputSimulator.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
                 return "{right Select}";
             }
-            else if (resultRaw.ToLower().Contains("right select"))
+            else if (resultRaw.ToLower().Contains("right select") || resultRaw.ToLower().Contains("write select"))
             {
                 int number = 0;
                 number = GetNumber(words[2]);
@@ -1120,7 +1134,7 @@ namespace SpeechContinuousRecognition
                     }
                     else
                     {
-                        inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RIGHT); 
+                        inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RIGHT);
                     }
                 }
                 inputSimulator.Keyboard.KeyUp(VirtualKeyCode.SHIFT);
@@ -1238,9 +1252,9 @@ namespace SpeechContinuousRecognition
                 form.TreatAsCommand = !form.TreatAsCommand;
                 return "";
             }
-            if (resultRaw.Trim().ToLower() == "toggle convert words to symbols" || resultRaw.Trim().ToLower() == "toggle convert words")
+            if (resultRaw.Trim().ToLower() == "toggle treat as command first" || resultRaw.Trim().ToLower() == "toggle command first")
             {
-                form.ConvertWordsToSymbols = !form.ConvertWordsToSymbols;
+                form.TreatAsCommandFirst = !form.TreatAsCommandFirst;
                 return "";
             }
             if (resultRaw.Trim().ToLower() == "toggle remove punctuation" || resultRaw.Trim().ToLower() == "toggle punctuation")
@@ -1400,7 +1414,11 @@ namespace SpeechContinuousRecognition
                     }
                     if (!string.IsNullOrWhiteSpace(action.TextToEnter))
                     {
-                        inputSimulator.Keyboard.TextEntry(action.TextToEnter.Replace("<dictation>", dictation));
+                        string textEntry = action.TextToEnter.Replace("<dictation>", dictation);
+                        if (textEntry != null && textEntry.Length > 0)
+                        {
+                            inputSimulator.Keyboard.TextEntry(textEntry);
+                        }
                     }
                     if (action.ControlKey || action.AlternateKey || action.ShiftKey || action.WindowsKey)
                     {

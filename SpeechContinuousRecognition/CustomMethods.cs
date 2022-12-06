@@ -35,7 +35,7 @@ namespace SpeechContinuousRecognition
             KillAllProcesses(processName);
             processName = "KBPro";
             KillAllProcesses(processName);
-            processName = "dragonlogger";
+            processName = "draAgedgonlogger";
             KillAllProcesses(processName);
 
             try
@@ -61,6 +61,18 @@ namespace SpeechContinuousRecognition
                 AutoClosingMessageBox.Show(exception.Message, "Error trying to start a process", 3000);
             }
             return $"{{Dragon Restarted}}";
+        }
+        public string ShutdownWindows(string dictation)
+        {
+            if (dictation.ToLower() == "shut down windows" || dictation.ToLower()=="shutdown windows")
+            {
+                Process.Start("shutdown", "/s /t 10");
+            }
+            else if (dictation.ToLower()== "restart windows")
+            {
+                Process.Start("shutdown", "/r /t 10");
+            }
+            return $"{{Windows has left the building}}";
         }
         private void KillAllProcesses(string name)
         {
