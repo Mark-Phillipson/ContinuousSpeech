@@ -529,7 +529,6 @@ namespace SpeechContinuousRecognition
             var psi = new System.Diagnostics.ProcessStartInfo();
             psi.UseShellExecute = true;
             psi.FileName = uri;
-            System.Diagnostics.Process.Start(psi);
             Process.Start(psi);
             Process.Start("C:\\Users\\MPhil\\OneDrive\\Documents\\Voice Launcher Blazor.bat");
         }
@@ -540,7 +539,6 @@ namespace SpeechContinuousRecognition
             var psi = new System.Diagnostics.ProcessStartInfo();
             psi.UseShellExecute = true;
             psi.FileName = uri;
-            System.Diagnostics.Process.Start(psi);
             Process.Start(psi);
         }
     }
