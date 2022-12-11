@@ -5,10 +5,13 @@ using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using System.Drawing;
 
 using DataAccessLibrary.Models;
 
 using Microsoft.CognitiveServices.Speech;
+
+
 using Microsoft.CognitiveServices.Speech.Intent;
 
 using SpeechContinuousRecognition.Repositories;
@@ -86,12 +89,71 @@ namespace SpeechContinuousRecognition
         private IInputSimulator _inputSimulator = new InputSimulator();
         SpeechRecognizer? recognizer = null;
         private string resultMain = "";
+        private System.Windows.Forms.NotifyIcon? notifyIcon1;
+        private System.Windows.Forms.ContextMenuStrip? contextMenu1;
+        private System.Windows.Forms.ToolStripMenuItem? menuItem1;
+        private System.ComponentModel.IContainer? components2;
+
         public ContinuousSpeech()
         {
             InitializeComponent();
 
+            this.components2 = new System.ComponentModel.Container();
+            this.contextMenu1 = new System.Windows.Forms.ContextMenuStrip();
+            this.menuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+
+            // Initialize contextMenu1
+            this.contextMenu1.Items.AddRange(
+                        new System.Windows.Forms.ToolStripItem[] { this.menuItem1 });
+            // Initialize menuItem1
+            //this.menuItem1.Index = 0;
+            this.menuItem1.Text = "E&xit";
+            this.menuItem1.Click += new System.EventHandler(this.menuItem1_Click);
+
+            // Set up how the form should be displayed.
+            //this.ClientSize = new System.Drawing.Size(292, 266);
+            //this.Text = "Notify Icon Example";
+
+            // Create the NotifyIcon.
+            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components2);
+
+            // The Icon property sets the icon that will appear
+            // in the systray for this application.
+            notifyIcon1.Icon = new Icon($"{Application.StartupPath}Mic-04.ico");
+
+            // The ContextMenu property sets the menu that will
+            // appear when the systray icon is right clicked.
+            notifyIcon1.ContextMenuStrip = this.contextMenu1;
+            
+
+            // The Text property sets the text that will be displayed,
+            // in a tooltip, when the mouse hovers over the systray icon.
+            notifyIcon1.Text = "Continuous Speech";
+            notifyIcon1.Visible = true;
+
+            // Handle the DoubleClick event to activate the form.
+            notifyIcon1.DoubleClick += new System.EventHandler(this.notifyIcon1_DoubleClick);
+
         }
-        private SpeechCommandsHelper _speechCommandsHelper = new SpeechCommandsHelper();
+        private void notifyIcon1_DoubleClick(object Sender, EventArgs e)
+        {
+            // Show the form when the user double clicks on the notify icon.
+
+            // Set the WindowState to normal if the form is minimized.
+            if (this.WindowState == FormWindowState.Minimized)
+                this.WindowState = FormWindowState.Normal;
+
+            // Activate the form.
+            this.Activate();
+        }
+
+        private void menuItem1_Click(object Sender, EventArgs e)
+        {
+            // Close the form, which closes the application.
+            this.Close();
+        }
+    
+    private SpeechCommandsHelper _speechCommandsHelper = new SpeechCommandsHelper();
         public string TextBoxResults
         {
             get => textBoxResultsLocal.Text; set
@@ -300,14 +362,16 @@ namespace SpeechContinuousRecognition
 
         private async Task StopContinuous()
         {
+            string filename = $"{Application.StartupPath}Mic-04.ico";
             if (recognizer == null) { return; }
             try
             {
                 await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false);
-                Icon? icon = Icon.ExtractAssociatedIcon($"{Application.StartupPath}Mic-04.ico");
+                Icon? icon = Icon.ExtractAssociatedIcon(filename);
                 if (icon != null)
                 {
                     this.Invoke(new MethodInvoker(delegate { this.Icon = icon; }));
+                    notifyIcon1.Icon = new Icon(filename);
                     //statusDisplay.LabelStatus = labelStatus.Text;
                     //statusDisplay.Text = this.Text;
                     //statusDisplay.Icon = icon;
@@ -344,6 +408,7 @@ namespace SpeechContinuousRecognition
                 if (icon != null)
                 {
                     this.Invoke(new MethodInvoker(delegate { this.Icon = icon; }));
+                    notifyIcon1.Icon = new Icon("Mic-03.ico");
                     //statusDisplay.Icon = icon;
                     //statusDisplay.LabelStatus = labelStatus.Text;
                     //statusDisplay.Text = this.Text;
