@@ -294,7 +294,7 @@
             this.Name = "ContinuousSpeech";
             this.Opacity = 0.8D;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "Form1";
+            this.Text = "Coding by Voice";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ContinuousSpeech_FormClosing);
             this.Load += new System.EventHandler(this.ContinuousSpeech_Load);
             this.ResumeLayout(false);
@@ -320,5 +320,5 @@
         private Label label1;
         private Button buttonVoiceAdministration;
 		private Button buttonDatabaseCommands;
-	}
+    }
 }

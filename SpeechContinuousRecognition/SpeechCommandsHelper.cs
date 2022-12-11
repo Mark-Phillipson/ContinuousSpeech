@@ -184,7 +184,7 @@ namespace SpeechContinuousRecognition
                 }
                 rawResult = value;
             }
-            else if (rawResult.ToLower().StartsWith("lower"))
+            else if (rawResult.ToLower().StartsWith("lower") || rawResult.ToLower().StartsWith("trim"))
             {
                 words.RemoveAt(0);
                 string value = "";
@@ -291,7 +291,7 @@ namespace SpeechContinuousRecognition
             }
             if (resultRaw.ToLower().StartsWith("pressure "))
             {
-                resultRaw = resultRaw.ToLower().Replace("pressure", "press ");
+                resultRaw = resultRaw.ToLower().Replace("pressure ", "press ");
             }
             IInputSimulator inputSimulator = new InputSimulator();
             (bool finish, string? commandName, string? errorMessage) = PerformDatabaseCommands(result, resultRaw, inputSimulator, form, applicationName);
@@ -657,10 +657,11 @@ namespace SpeechContinuousRecognition
                 {
                     if (counter >= 1)
                     {
-                        searchTerm = $"{searchTerm}{word}";
+                        searchTerm = $"{searchTerm}{word} ";
                     }
                     counter++;
                 }
+                searchTerm=searchTerm.Trim();
                 if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
                     inputSimulator.Keyboard.TextEntry(searchTerm);
@@ -776,6 +777,14 @@ namespace SpeechContinuousRecognition
             resultRaw = resultRaw.ToLower().Replace("hyphen", "-");
             resultRaw = resultRaw.ToLower().Replace("at sign", "@");
             resultRaw = resultRaw.ToLower().Replace("apostrophe", "'");
+            resultRaw = resultRaw.ToLower().Replace("pound ", "£");
+            resultRaw = resultRaw.ToLower().Replace("dollar ", "$");
+            resultRaw = resultRaw.ToLower().Replace("percent ", "%");
+            resultRaw = resultRaw.ToLower().Replace("ampersand ", "&");
+            resultRaw = resultRaw.ToLower().Replace("asterisks ", "*");
+            resultRaw = resultRaw.ToLower().Replace("backtick ", "`");
+            resultRaw = resultRaw.ToLower().Replace("pipe ", "|");
+            resultRaw = resultRaw.ToLower().Replace("back slash", "\\");
 
             resultRaw = resultRaw.ToLower().Replace(" dot ", ".");
             resultRaw = resultRaw.ToLower().Replace("dot ", ".");

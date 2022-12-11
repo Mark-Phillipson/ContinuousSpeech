@@ -22,6 +22,9 @@ namespace SpeechContinuousRecognition
 {
     public partial class ContinuousSpeech : Form
     {
+
+
+        StatusDisplayForm statusDisplay = new StatusDisplayForm();
         private int _counter = 0;
         private string? lastCommand = null;
         WindowsVoiceCommand _windowsVoiceCommand = new WindowsVoiceCommand();
@@ -86,6 +89,7 @@ namespace SpeechContinuousRecognition
         public ContinuousSpeech()
         {
             InitializeComponent();
+
         }
         private SpeechCommandsHelper _speechCommandsHelper = new SpeechCommandsHelper();
         public string TextBoxResults
@@ -179,6 +183,8 @@ namespace SpeechContinuousRecognition
             await SpeechSetupAsync();
             buttonStart.Enabled = false;
             buttonStop.Enabled = true;
+            
+            
         }
 
         private void UpdateTheCurrentProcess()
@@ -302,6 +308,10 @@ namespace SpeechContinuousRecognition
                 if (icon != null)
                 {
                     this.Invoke(new MethodInvoker(delegate { this.Icon = icon; }));
+                    //statusDisplay.LabelStatus = labelStatus.Text;
+                    //statusDisplay.Text = this.Text;
+                    //statusDisplay.Icon = icon;
+                    //statusDisplay.Show(this);
                 }
             }
             catch (Exception exception)
@@ -324,6 +334,7 @@ namespace SpeechContinuousRecognition
             // Starts continuous recognition. 
             // Uses StopContinuousRecognitionAsync() to stop recognition.
             if (recognizer == null) { return; }
+            
             try
             {
                 await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
@@ -333,6 +344,11 @@ namespace SpeechContinuousRecognition
                 if (icon != null)
                 {
                     this.Invoke(new MethodInvoker(delegate { this.Icon = icon; }));
+                    //statusDisplay.Icon = icon;
+                    //statusDisplay.LabelStatus = labelStatus.Text;
+                    //statusDisplay.Text = this.Text;
+                    //statusDisplay.Show(this);
+
                 }
             }
             catch (Exception exception)
@@ -466,7 +482,7 @@ namespace SpeechContinuousRecognition
                     if (resultMain != null && resultMain.Trim().Length > 0)
                     {
                         TextBoxResults = $"Text entry: {resultMain}{Environment.NewLine}{TextBoxResults}";
-                         _inputSimulator.Keyboard.TextEntry($"{resultMain}".Trim());
+                        _inputSimulator.Keyboard.TextEntry($"{resultMain}".Trim());
                     }
                 }
                 else
