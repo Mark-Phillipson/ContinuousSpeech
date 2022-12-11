@@ -25,9 +25,6 @@ namespace SpeechContinuousRecognition
 {
     public partial class ContinuousSpeech : Form
     {
-
-
-        StatusDisplayForm statusDisplay = new StatusDisplayForm();
         private int _counter = 0;
         private string? lastCommand = null;
         WindowsVoiceCommand _windowsVoiceCommand = new WindowsVoiceCommand();
@@ -119,7 +116,7 @@ namespace SpeechContinuousRecognition
 
             // The Icon property sets the icon that will appear
             // in the systray for this application.
-            notifyIcon1.Icon = new Icon($"{Application.StartupPath}Mic-04.ico");
+            notifyIcon1.Icon = new Icon($"{Application.StartupPath}Mic-03.ico");
 
             // The ContextMenu property sets the menu that will
             // appear when the systray icon is right clicked.
@@ -368,14 +365,10 @@ namespace SpeechContinuousRecognition
             {
                 await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false);
                 Icon? icon = Icon.ExtractAssociatedIcon(filename);
-                if (icon != null)
+                if (icon != null && notifyIcon1!= null )
                 {
                     this.Invoke(new MethodInvoker(delegate { this.Icon = icon; }));
                     notifyIcon1.Icon = new Icon(filename);
-                    //statusDisplay.LabelStatus = labelStatus.Text;
-                    //statusDisplay.Text = this.Text;
-                    //statusDisplay.Icon = icon;
-                    //statusDisplay.Show(this);
                 }
             }
             catch (Exception exception)
@@ -405,15 +398,10 @@ namespace SpeechContinuousRecognition
                 // This should Toggle DRAGON Microphone
                 _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ADD);
                 Icon? icon = Icon.ExtractAssociatedIcon($"{Application.StartupPath}Mic-03.ico");
-                if (icon != null)
+                if (icon != null && notifyIcon1!= null )
                 {
                     this.Invoke(new MethodInvoker(delegate { this.Icon = icon; }));
                     notifyIcon1.Icon = new Icon("Mic-03.ico");
-                    //statusDisplay.Icon = icon;
-                    //statusDisplay.LabelStatus = labelStatus.Text;
-                    //statusDisplay.Text = this.Text;
-                    //statusDisplay.Show(this);
-
                 }
             }
             catch (Exception exception)
@@ -435,11 +423,17 @@ namespace SpeechContinuousRecognition
                 {
                     _counter = 0;
                 }
-                if (_counter >= 10)
+                if (_counter >= 10 && notifyIcon1!= null )
                 {
                     await StopContinuous().ConfigureAwait(false);
                     TextBoxResults = $"Stopped after 10 empty results: {result.Text}{Environment.NewLine}{TextBoxResults}";
                     _counter = 0;
+                        notifyIcon1.Icon = SystemIcons.Information;
+                    notifyIcon1.BalloonTipTitle = TextBoxResults;
+                        notifyIcon1.BalloonTipText = $"Continuous Speech has stopped {DateTime.Now.ToString("HH:mm:ss")}"; 
+                        notifyIcon1.BalloonTipIcon = ToolTipIcon.Info;
+                        notifyIcon1.Visible = true;
+                        notifyIcon1.ShowBalloonTip(30000);
                 }
                 //form.LabelStatus = ($"Reason: {result.Reason.ToString()}");
                 if (result.Reason == ResultReason.RecognizedSpeech)
