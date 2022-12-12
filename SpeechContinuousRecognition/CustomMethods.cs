@@ -23,7 +23,7 @@ namespace SpeechContinuousRecognition
             return $"{{Entered timestamp}}";
         }
 
-        public string RestartDragon( string ? dictation= null )
+        public string RestartDragon(string? dictation = null)
         {
             var processName = "nsbrowse";
             KillAllProcesses(processName);
@@ -64,11 +64,11 @@ namespace SpeechContinuousRecognition
         }
         public string ShutdownWindows(string dictation)
         {
-            if (dictation.ToLower() == "shut down windows" || dictation.ToLower()=="shutdown windows")
+            if (dictation.ToLower() == "shut down windows" || dictation.ToLower() == "shutdown windows")
             {
                 Process.Start("shutdown", "/s /t 10");
             }
-            else if (dictation.ToLower()== "restart windows")
+            else if (dictation.ToLower() == "restart windows")
             {
                 Process.Start("shutdown", "/r /t 10");
             }
@@ -92,5 +92,48 @@ namespace SpeechContinuousRecognition
                 }
             }
         }
+        List<string> phoneticAlphabet = new List<string>() { "Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliet", "Kilo", "Lima", "Mike", "November", "Oscar", "Paper", "Papa", "Quebec", "Romeo", "Sierra", "Tango", "Uniform", "Victor", "Whiskey", "X-ray", "Yankee", "Zulu" };
+
+        public string ProcessCapitalLetters(string dictation)
+        {
+             return ProcessLetters(dictation, "Upper");
+        }
+        public string ProcessMixedLetters(string dictation)
+        {
+             return ProcessLetters(dictation, "Mixed");
+        }
+        public string ProcessLowerLetters(string dictation)
+        {
+             return ProcessLetters(dictation, "Lower");
+        }
+         private  string ProcessLetters(string dictation, string caseType)
+        {
+            foreach (var item in phoneticAlphabet)
+            {
+                if (dictation.ToLower().Contains(item.ToLower()))
+                {
+                    dictation = dictation.ToLower().Replace(item.ToLower(), item.Substring(0, 1));
+                }
+            }
+            dictation = dictation.Replace(" ", "");
+            if (caseType == "Upper")
+            {
+                dictation = dictation.ToUpper();
+            }
+            else if (caseType=="Mixed")
+            {
+                dictation = dictation.Substring(0,1).ToUpper() +
+                    dictation.ToLower().Substring(1);
+            }
+            else
+            {
+                dictation = dictation.ToLower();
+            }
+            _inputSimulator.Keyboard.TextEntry(dictation);
+            return $"{{Letters Processed: {dictation}}}";
+
+        }
+
+
     }
 }

@@ -238,12 +238,11 @@ namespace SpeechContinuousRecognition
             }
             UpdateTheCurrentProcess();
 
-            Text = "Azure Cognitive Services - Continuous Speech Code by Voice in Visual Studio";
+            Text = "Azure Cognitive Services - Continuous Speech - Code by Voice in Visual Studio";
             await SpeechSetupAsync();
             buttonStart.Enabled = false;
             buttonStop.Enabled = true;
-            
-            
+            this.ShowInTaskbar = false;
         }
 
         private void UpdateTheCurrentProcess()
@@ -391,17 +390,17 @@ namespace SpeechContinuousRecognition
             // Starts continuous recognition. 
             // Uses StopContinuousRecognitionAsync() to stop recognition.
             if (recognizer == null) { return; }
-            
+            string fileName = $"{Application.StartupPath}Mic-03.ico";
             try
             {
                 await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
                 // This should Toggle DRAGON Microphone
                 _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ADD);
-                Icon? icon = Icon.ExtractAssociatedIcon($"{Application.StartupPath}Mic-03.ico");
+                Icon? icon = Icon.ExtractAssociatedIcon(fileName);
                 if (icon != null && notifyIcon1!= null )
                 {
                     this.Invoke(new MethodInvoker(delegate { this.Icon = icon; }));
-                    notifyIcon1.Icon = new Icon("Mic-03.ico");
+                    notifyIcon1.Icon = new Icon(fileName);
                 }
             }
             catch (Exception exception)
