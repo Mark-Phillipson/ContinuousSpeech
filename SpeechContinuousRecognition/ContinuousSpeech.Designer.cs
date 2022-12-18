@@ -178,7 +178,7 @@
             this.buttonStart.TabIndex = 8;
             this.buttonStart.Text = "Start";
             this.buttonStart.UseVisualStyleBackColor = false;
-            this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
+
             // 
             // buttonCloseApplication
             // 
@@ -303,6 +303,8 @@
             this.Text = "Coding by Voice";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ContinuousSpeech_FormClosing);
             this.Load += new System.EventHandler(this.ContinuousSpeech_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ContinuousSpeech_KeyDownAsync);
+
             this.ResumeLayout(false);
             this.PerformLayout();
 

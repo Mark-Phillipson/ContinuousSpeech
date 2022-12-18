@@ -4,6 +4,8 @@ using System.Linq.Expressions;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Windows.Input;
+
 using System.Xml.Linq;
 using System.Drawing;
 
@@ -20,6 +22,7 @@ using WindowsInput;
 using WindowsInput.Native;
 
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace SpeechContinuousRecognition
 {
@@ -90,10 +93,14 @@ namespace SpeechContinuousRecognition
         private System.Windows.Forms.ContextMenuStrip? contextMenu1;
         private System.Windows.Forms.ToolStripMenuItem? menuItem1;
         private System.ComponentModel.IContainer? components2;
+        KeyboardHook keyboardHook;
 
         public ContinuousSpeech()
         {
             InitializeComponent();
+
+            keyboardHook = new KeyboardHook(this);
+
 
             this.components2 = new System.ComponentModel.Container();
             this.contextMenu1 = new System.Windows.Forms.ContextMenuStrip();
@@ -382,7 +389,7 @@ namespace SpeechContinuousRecognition
         {
             this.Invoke(new MethodInvoker(delegate { this.Text = "Closing please wait.."; }));
 
-
+            keyboardHook.Dispose();
             recognizer?.Dispose();
         }
 
@@ -390,6 +397,11 @@ namespace SpeechContinuousRecognition
         {
             // Starts continuous recognition. 
             // Uses StopContinuousRecognitionAsync() to stop recognition.
+            await StartContinuousRecognition().ConfigureAwait(false);
+        }
+
+        private async Task StartContinuousRecognition()
+        {
             if (recognizer == null) { return; }
             string fileName = $"{Application.StartupPath}Mic-03.ico";
             try
@@ -398,7 +410,7 @@ namespace SpeechContinuousRecognition
                 // This should Toggle DRAGON Microphone
                 _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ADD);
                 Icon? icon = Icon.ExtractAssociatedIcon(fileName);
-                if (icon != null && notifyIcon1!= null )
+                if (icon != null && notifyIcon1 != null)
                 {
                     this.Invoke(new MethodInvoker(delegate { this.Icon = icon; }));
                     notifyIcon1.Icon = new Icon(fileName);
@@ -411,6 +423,7 @@ namespace SpeechContinuousRecognition
             buttonStop.Invoke(new MethodInvoker(delegate { buttonStop.Enabled = true; }));
             labelStatus.Invoke(new MethodInvoker(delegate { labelStatus.ForeColor = Color.LightGreen; }));
         }
+
         private async void SpeechRecognizer_SpeechRecognised(object? sender, SpeechRecognitionEventArgs e)
         {
             {
@@ -615,6 +628,13 @@ namespace SpeechContinuousRecognition
             psi.UseShellExecute = true;
             psi.FileName = uri;
             Process.Start(psi);
+        }
+        private async void ContinuousSpeech_KeyDownAsync(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode==Keys.F12 && e.Alt)
+            {
+                await StartContinuousRecognition().ConfigureAwait(false);
+            }
         }
     }
 }
