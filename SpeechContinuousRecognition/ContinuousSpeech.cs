@@ -321,7 +321,8 @@ namespace SpeechContinuousRecognition
                 };
 
                 // Before starting recognition, add a phrase list to help recognition.
-                //Note does not work for single words has to be a phrase, Maybe put these in a database table later
+                //Note does not work for single words has to be a phrase
+                //Now in a database table see Voice Launcher
                 //Should be no more than 500 to be practical
                 var results = _windowsVoiceCommand.GetPhraseListGrammars();
                 PhraseListGrammar phraseListGrammar = PhraseListGrammar.FromRecognizer(recognizer);
@@ -332,7 +333,7 @@ namespace SpeechContinuousRecognition
                         phraseListGrammar.AddPhrase(item.PhraseListGrammarValue);
                     }
                 }
-
+                
                 await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
                 //do
                 //{

@@ -1466,6 +1466,7 @@ namespace SpeechContinuousRecognition
                     {
                         ModifierProcessing(action, true, inputSimulator);
                         inputSimulator.Mouse.LeftButtonDown();
+                        
                     }
                     else if (action.MouseCommand == "RightButtonDown")
                     {
