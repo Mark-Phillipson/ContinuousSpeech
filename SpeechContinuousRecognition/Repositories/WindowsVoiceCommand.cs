@@ -24,7 +24,7 @@ namespace SpeechContinuousRecognition.Repositories
             }
             else if (Environment.MachineName == "SURFACEPRO")
             {
-                new VoiceAdminDbContext("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=VoiceLauncher;Integrated Security=True;Connect Timeout=120;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+                new VoiceAdminDbContext("Data Source=Localhost\\SqlExpress;Initial Catalog=VoiceLauncher;Integrated Security=True;Connect Timeout=120;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
             }
         }
         public List<WindowsSpeechVoiceCommand> GetCommands()
