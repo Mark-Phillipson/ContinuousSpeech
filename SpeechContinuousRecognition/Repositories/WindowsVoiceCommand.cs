@@ -22,7 +22,7 @@ namespace SpeechContinuousRecognition.Repositories
             {
                 new VoiceAdminDbContext("Data Source=DESKTOP-UROO8T1;Initial Catalog=VoiceLauncher;Integrated Security=True;Connect Timeout=120;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
             }
-            else if (Environment.MachineName == "SERVICEPRO")
+            else if (Environment.MachineName == "SURFACEPRO")
             {
                 new VoiceAdminDbContext("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=VoiceLauncher;Integrated Security=True;Connect Timeout=120;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
             }
