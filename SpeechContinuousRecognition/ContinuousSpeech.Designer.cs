@@ -45,12 +45,15 @@
             this.buttonStop = new System.Windows.Forms.Button();
             this.buttonStart = new System.Windows.Forms.Button();
             this.buttonCloseApplication = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
             this.labelCurrentProcess = new System.Windows.Forms.Label();
             this.buttonRestartDragon = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.buttonVoiceAdministration = new System.Windows.Forms.Button();
             this.buttonDatabaseCommands = new System.Windows.Forms.Button();
+            this.textBoxKey = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textBoxRegion = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // checkBoxUppercase
@@ -158,7 +161,7 @@
             this.buttonStop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonStop.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonStop.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonStop.Location = new System.Drawing.Point(34, 321);
+            this.buttonStop.Location = new System.Drawing.Point(34, 292);
             this.buttonStop.Name = "buttonStop";
             this.buttonStop.Size = new System.Drawing.Size(199, 36);
             this.buttonStop.TabIndex = 7;
@@ -172,7 +175,7 @@
             this.buttonStart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonStart.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonStart.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonStart.Location = new System.Drawing.Point(34, 279);
+            this.buttonStart.Location = new System.Drawing.Point(34, 250);
             this.buttonStart.Name = "buttonStart";
             this.buttonStart.Size = new System.Drawing.Size(199, 36);
             this.buttonStart.TabIndex = 8;
@@ -186,26 +189,13 @@
             this.buttonCloseApplication.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCloseApplication.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonCloseApplication.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonCloseApplication.Location = new System.Drawing.Point(33, 363);
+            this.buttonCloseApplication.Location = new System.Drawing.Point(33, 334);
             this.buttonCloseApplication.Name = "buttonCloseApplication";
             this.buttonCloseApplication.Size = new System.Drawing.Size(199, 36);
             this.buttonCloseApplication.TabIndex = 9;
             this.buttonCloseApplication.Text = "Close Application";
             this.buttonCloseApplication.UseVisualStyleBackColor = false;
             this.buttonCloseApplication.Click += new System.EventHandler(this.buttonCloseApplication_Click);
-            // 
-            // button1
-            // 
-            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.button1.ForeColor = System.Drawing.SystemColors.Control;
-            this.button1.Location = new System.Drawing.Point(32, 533);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(199, 36);
-            this.button1.TabIndex = 10;
-            this.button1.Text = "Testing";
-            this.button1.UseVisualStyleBackColor = false;
             // 
             // labelCurrentProcess
             // 
@@ -251,7 +241,7 @@
             this.buttonVoiceAdministration.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonVoiceAdministration.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonVoiceAdministration.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonVoiceAdministration.Location = new System.Drawing.Point(34, 405);
+            this.buttonVoiceAdministration.Location = new System.Drawing.Point(34, 376);
             this.buttonVoiceAdministration.Name = "buttonVoiceAdministration";
             this.buttonVoiceAdministration.Size = new System.Drawing.Size(199, 36);
             this.buttonVoiceAdministration.TabIndex = 14;
@@ -265,7 +255,7 @@
             this.buttonDatabaseCommands.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonDatabaseCommands.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonDatabaseCommands.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonDatabaseCommands.Location = new System.Drawing.Point(34, 447);
+            this.buttonDatabaseCommands.Location = new System.Drawing.Point(34, 418);
             this.buttonDatabaseCommands.Name = "buttonDatabaseCommands";
             this.buttonDatabaseCommands.Size = new System.Drawing.Size(199, 36);
             this.buttonDatabaseCommands.TabIndex = 15;
@@ -273,18 +263,56 @@
             this.buttonDatabaseCommands.UseVisualStyleBackColor = false;
             this.buttonDatabaseCommands.Click += new System.EventHandler(this.buttonDatabaseCommands_Click);
             // 
+            // textBoxKey
+            // 
+            this.textBoxKey.Location = new System.Drawing.Point(33, 490);
+            this.textBoxKey.Name = "textBoxKey";
+            this.textBoxKey.PasswordChar = 'x';
+            this.textBoxKey.Size = new System.Drawing.Size(199, 23);
+            this.textBoxKey.TabIndex = 16;
+            this.textBoxKey.Text = "123";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(36, 462);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(120, 15);
+            this.label2.TabIndex = 17;
+            this.label2.Text = "Azure application key";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(35, 518);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(77, 15);
+            this.label3.TabIndex = 19;
+            this.label3.Text = "Azure Region";
+            // 
+            // textBoxRegion
+            // 
+            this.textBoxRegion.Location = new System.Drawing.Point(32, 546);
+            this.textBoxRegion.Name = "textBoxRegion";
+            this.textBoxRegion.Size = new System.Drawing.Size(199, 23);
+            this.textBoxRegion.TabIndex = 18;
+            this.textBoxRegion.Text = "UKSouth";
+            // 
             // ContinuousSpeech
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
             this.ClientSize = new System.Drawing.Size(1110, 644);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.textBoxRegion);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.textBoxKey);
             this.Controls.Add(this.buttonDatabaseCommands);
             this.Controls.Add(this.buttonVoiceAdministration);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonRestartDragon);
             this.Controls.Add(this.labelCurrentProcess);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.buttonCloseApplication);
             this.Controls.Add(this.buttonStart);
             this.Controls.Add(this.buttonStop);
@@ -320,11 +348,14 @@
         private Button buttonStop;
         private Button buttonStart;
         private Button buttonCloseApplication;
-        private Button button1;
         private Label labelCurrentProcess;
         private Button buttonRestartDragon;
         private Label label1;
         private Button buttonVoiceAdministration;
 		private Button buttonDatabaseCommands;
+        private TextBox textBoxKey;
+        private Label label2;
+        private Label label3;
+        private TextBox textBoxRegion;
     }
 }

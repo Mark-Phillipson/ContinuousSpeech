@@ -121,36 +121,42 @@ namespace SpeechContinuousRecognition
             // The ContextMenu property sets the menu that will
             // appear when the systray icon is right clicked.
             notifyIcon1.ContextMenuStrip = this.contextMenu1;
-            
+
 
             // The Text property sets the text that will be displayed,
             // in a tooltip, when the mouse hovers over the systray icon.
             notifyIcon1.Text = "Continuous Speech";
             notifyIcon1.Visible = true;
 
-            // Handle the DoubleClick event to activate the form.
+
             notifyIcon1.DoubleClick += new System.EventHandler(this.notifyIcon1_DoubleClick);
-
+            notifyIcon1.Click += new System.EventHandler(this.notifyIcon1_Click);
         }
-        private void notifyIcon1_DoubleClick(object Sender, EventArgs e)
+        private void notifyIcon1_DoubleClick(object? sender, System.EventArgs? e)
         {
-            // Show the form when the user double clicks on the notify icon.
-
-            // Set the WindowState to normal if the form is minimized.
+            if (sender != null && e != null)
+            {
+                notifyIcon1_Click(sender, e);
+            }
+        }
+        private void notifyIcon1_Click(object? sender, System.EventArgs? e)
+        {
             if (this.WindowState == FormWindowState.Minimized)
                 this.WindowState = FormWindowState.Normal;
-
             // Activate the form.
             this.Activate();
+            if (LabelStatus.ToLower().Contains("stop") && sender != null && e != null)
+            {
+                buttonStart_Click(sender, e);
+            }
         }
-
         private void menuItem1_Click(object Sender, EventArgs e)
         {
             // Close the form, which closes the application.
             this.Close();
         }
-    
-    private SpeechCommandsHelper _speechCommandsHelper = new SpeechCommandsHelper();
+
+        private SpeechCommandsHelper _speechCommandsHelper = new SpeechCommandsHelper();
         public string TextBoxResults
         {
             get => textBoxResultsLocal.Text; set
@@ -260,8 +266,17 @@ namespace SpeechContinuousRecognition
             // Replace with your own subscription key and service region (e.g., "westus").
             string? SPEECH__SERVICE__KEY;
             string? SPEECH__SERVICE__REGION;
-            SPEECH__SERVICE__KEY = ConfigurationManager.AppSettings.Get("SpeechAzureKey");
-            SPEECH__SERVICE__REGION = ConfigurationManager.AppSettings.Get("SpeechAzureRegion");
+            if (Environment.MachineName == "DESKTOP-UROO8T1")
+            {
+                SPEECH__SERVICE__KEY = ConfigurationManager.AppSettings.Get("SpeechAzureKey");
+                SPEECH__SERVICE__REGION = ConfigurationManager.AppSettings.Get("SpeechAzureRegion");
+            }
+            else
+            {
+                SPEECH__SERVICE__KEY = textBoxKey.Text;
+                SPEECH__SERVICE__REGION = textBoxRegion.Text;
+
+            }
             var config = SpeechConfig.FromSubscription(SPEECH__SERVICE__KEY, SPEECH__SERVICE__REGION);
 
             // Creates a speech recognizer from microphone.
@@ -333,7 +348,7 @@ namespace SpeechContinuousRecognition
                         phraseListGrammar.AddPhrase(item.PhraseListGrammarValue);
                     }
                 }
-                
+
                 await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
                 //do
                 //{
@@ -365,7 +380,7 @@ namespace SpeechContinuousRecognition
             {
                 await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false);
                 Icon? icon = Icon.ExtractAssociatedIcon(filename);
-                if (icon != null && notifyIcon1!= null )
+                if (icon != null && notifyIcon1 != null)
                 {
                     this.Invoke(new MethodInvoker(delegate { this.Icon = icon; }));
                     notifyIcon1.Icon = new Icon(filename);
@@ -398,7 +413,7 @@ namespace SpeechContinuousRecognition
                 // This should Toggle DRAGON Microphone
                 _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ADD);
                 Icon? icon = Icon.ExtractAssociatedIcon(fileName);
-                if (icon != null && notifyIcon1!= null )
+                if (icon != null && notifyIcon1 != null)
                 {
                     this.Invoke(new MethodInvoker(delegate { this.Icon = icon; }));
                     notifyIcon1.Icon = new Icon(fileName);
@@ -409,7 +424,7 @@ namespace SpeechContinuousRecognition
                 await global::System.Console.Out.WriteLineAsync(exception.Message);
             }
             buttonStop.Invoke(new MethodInvoker(delegate { buttonStop.Enabled = true; }));
-            labelStatus.Invoke(new MethodInvoker(delegate { labelStatus.ForeColor = Color.LightGreen; }));
+            labelStatus.Invoke(new MethodInvoker(delegate { labelStatus.ForeColor = Color.Green; }));
         }
         private async void SpeechRecognizer_SpeechRecognised(object? sender, SpeechRecognitionEventArgs e)
         {
@@ -423,17 +438,17 @@ namespace SpeechContinuousRecognition
                 {
                     _counter = 0;
                 }
-                if (_counter >= 10 && notifyIcon1!= null )
+                if (_counter >= 10 && notifyIcon1 != null)
                 {
                     await StopContinuous().ConfigureAwait(false);
                     TextBoxResults = $"Stopped after 10 empty results: {result.Text}{Environment.NewLine}{TextBoxResults}";
                     _counter = 0;
-                        notifyIcon1.Icon = SystemIcons.Information;
+                    notifyIcon1.Icon = SystemIcons.Information;
                     notifyIcon1.BalloonTipTitle = TextBoxResults;
-                        notifyIcon1.BalloonTipText = $"Continuous Speech has stopped {DateTime.Now.ToString("HH:mm:ss")}"; 
-                        notifyIcon1.BalloonTipIcon = ToolTipIcon.Info;
-                        notifyIcon1.Visible = true;
-                        notifyIcon1.ShowBalloonTip(30000);
+                    notifyIcon1.BalloonTipText = $"Continuous Speech has stopped {DateTime.Now.ToString("HH:mm:ss")}";
+                    notifyIcon1.BalloonTipIcon = ToolTipIcon.Info;
+                    notifyIcon1.Visible = true;
+                    notifyIcon1.ShowBalloonTip(30000);
                 }
                 //form.LabelStatus = ($"Reason: {result.Reason.ToString()}");
                 if (result.Reason == ResultReason.RecognizedSpeech)

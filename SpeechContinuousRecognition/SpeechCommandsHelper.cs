@@ -776,6 +776,10 @@ namespace SpeechContinuousRecognition
             resultRaw = resultRaw.ToLower().Replace(" hyphen ", "-");
             resultRaw = resultRaw.ToLower().Replace("hyphen ", "-");
             resultRaw = resultRaw.ToLower().Replace("hyphen", "-");
+            resultRaw = resultRaw.ToLower().Replace(" under score ", "_");
+            resultRaw = resultRaw.ToLower().Replace("under score ", "_");
+            resultRaw = resultRaw.ToLower().Replace(" underscore ", "_");
+            resultRaw = resultRaw.ToLower().Replace("underscore ", "_");
             resultRaw = resultRaw.ToLower().Replace("at sign", "@");
             resultRaw = resultRaw.ToLower().Replace("apostrophe", "'");
             resultRaw = resultRaw.ToLower().Replace("pound ", "£");
