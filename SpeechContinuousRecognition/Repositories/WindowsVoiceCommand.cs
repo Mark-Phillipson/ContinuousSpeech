@@ -15,7 +15,18 @@ namespace SpeechContinuousRecognition.Repositories
 {
     public class WindowsVoiceCommand
     {
-        VoiceAdminDbContext Model = new VoiceAdminDbContext("Data Source=DESKTOP-UROO8T1;Initial Catalog=VoiceLauncher;Integrated Security=True;Connect Timeout=120;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+        VoiceAdminDbContext? Model = null;
+        public WindowsVoiceCommand()
+        {
+            if (System.Environment.MachineName == "DESKTOP-UROO8T1")
+            {
+                new VoiceAdminDbContext("Data Source=DESKTOP-UROO8T1;Initial Catalog=VoiceLauncher;Integrated Security=True;Connect Timeout=120;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+            }
+            else if (Environment.MachineName == "SERVICEPRO")
+            {
+                new VoiceAdminDbContext("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=VoiceLauncher;Integrated Security=True;Connect Timeout=120;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+            }
+        }
         public List<WindowsSpeechVoiceCommand> GetCommands()
         {
             var result = Model.WindowsSpeechVoiceCommands
@@ -96,8 +107,8 @@ namespace SpeechContinuousRecognition.Repositories
         }
         public List<Idiosyncrasy>? GetIdiosyncrasies()
         {
-            var results=Model.Idiosyncrasies.AsNoTracking();
-            if (results!= null )
+            var results = Model.Idiosyncrasies.AsNoTracking();
+            if (results != null)
             {
                 var idiosyncrasies = results.ToList();
                 return idiosyncrasies;
