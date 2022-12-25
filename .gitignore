@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /SpeechContinuousRecognition/App.DEBUG.config
+/SpeechContinuousRecognition/App.config
