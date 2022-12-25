@@ -266,7 +266,7 @@ namespace SpeechContinuousRecognition
             // Replace with your own subscription key and service region (e.g., "westus").
             string? SPEECH__SERVICE__KEY;
             string? SPEECH__SERVICE__REGION;
-            if (Environment.MachineName == "DESKTOP-UROO8T1")
+            if (Environment.MachineName == "DESKTOP-UROO8T1"|| Environment.MachineName== "SURFACEPRO")
             {
                 SPEECH__SERVICE__KEY = ConfigurationManager.AppSettings.Get("SpeechAzureKey");
                 SPEECH__SERVICE__REGION = ConfigurationManager.AppSettings.Get("SpeechAzureRegion");
@@ -280,87 +280,98 @@ namespace SpeechContinuousRecognition
             var config = SpeechConfig.FromSubscription(SPEECH__SERVICE__KEY, SPEECH__SERVICE__REGION);
 
             // Creates a speech recognizer from microphone.
-            recognizer = new Microsoft.CognitiveServices.Speech.SpeechRecognizer(config);
+            try
             {
-                // Subscribes to events.
-                //recognizer.Recognizing +=
-
-                //(s, e) =>
-                //{
-                //    try
-                //    {
-                //        TextBoxResults = $"RECOGNISING: Text= {e.Result.Text}{Environment.NewLine}{TextBoxResults}";
-                //    }
-                //    catch (Exception exception)
-                //    {
-                //        global::System.Console.WriteLine(exception.Message);
-                //    }
-                //};
-
-                recognizer.Recognized += new EventHandler<SpeechRecognitionEventArgs>(SpeechRecognizer_SpeechRecognised);
-
-                recognizer.Canceled += (s, e) =>
+                recognizer = new Microsoft.CognitiveServices.Speech.SpeechRecognizer(config);
                 {
-                    try
-                    {
-                        TextBoxResults = $"\n    Canceled. Reason: {e.Reason.ToString()}, CanceledReason: {e.ErrorDetails}";
+                    // Subscribes to events.
+                    //recognizer.Recognizing +=
 
-                    }
-                    catch (Exception exception)
-                    {
-                        global::System.Console.WriteLine(exception.Message);
-                    }
-                };
+                    //(s, e) =>
+                    //{
+                    //    try
+                    //    {
+                    //        TextBoxResults = $"RECOGNISING: Text= {e.Result.Text}{Environment.NewLine}{TextBoxResults}";
+                    //    }
+                    //    catch (Exception exception)
+                    //    {
+                    //        global::System.Console.WriteLine(exception.Message);
+                    //    }
+                    //};
 
-                recognizer.SessionStarted += (s, e) =>
-                {
-                    try
-                    {
-                        LabelStatus = "Continuous Dictation STARTED";
-                    }
-                    catch (Exception exception)
-                    {
-                        global::System.Console.WriteLine(exception.Message);
-                    }
-                };
+                    recognizer.Recognized += new EventHandler<SpeechRecognitionEventArgs>(SpeechRecognizer_SpeechRecognised);
 
-                recognizer.SessionStopped += (s, e) =>
-                {
-                    try
+                    recognizer.Canceled += (s, e) =>
                     {
-                        LabelStatus = $"STOPPED {recognizer.Properties.GetProperty("Status")}";
-                        buttonStop.Invoke(new MethodInvoker(delegate { buttonStop.Enabled = false; }));
-                        buttonStart.Invoke(new MethodInvoker(delegate { buttonStart.Enabled = true; }));
-                    }
-                    catch (Exception exception) { global::System.Console.WriteLine(exception.Message); }
-                };
+                        try
+                        {
+                            TextBoxResults = $"\n    Canceled. Reason: {e.Reason.ToString()}, CanceledReason: {e.ErrorDetails}";
 
-                // Before starting recognition, add a phrase list to help recognition.
-                //Note does not work for single words has to be a phrase
-                //Now in a database table see Voice Launcher
-                //Should be no more than 500 to be practical
-                var results = _windowsVoiceCommand.GetPhraseListGrammars();
-                PhraseListGrammar phraseListGrammar = PhraseListGrammar.FromRecognizer(recognizer);
-                if (results != null)
-                {
-                    foreach (PhraseListGrammarStorage item in results)
+                        }
+                        catch (Exception exception)
+                        {
+                            global::System.Console.WriteLine(exception.Message);
+                        }
+                    };
+
+                    recognizer.SessionStarted += (s, e) =>
                     {
-                        phraseListGrammar.AddPhrase(item.PhraseListGrammarValue);
+                        try
+                        {
+                            LabelStatus = "Continuous Dictation STARTED";
+                        }
+                        catch (Exception exception)
+                        {
+                            global::System.Console.WriteLine(exception.Message);
+                        }
+                    };
+
+                    recognizer.SessionStopped += (s, e) =>
+                    {
+                        try
+                        {
+                            LabelStatus = $"STOPPED {recognizer.Properties.GetProperty("Status")}";
+                            buttonStop.Invoke(new MethodInvoker(delegate { buttonStop.Enabled = false; }));
+                            buttonStart.Invoke(new MethodInvoker(delegate { buttonStart.Enabled = true; }));
+                        }
+                        catch (Exception exception) { global::System.Console.WriteLine(exception.Message); }
+                    };
+
+                    // Before starting recognition, add a phrase list to help recognition.
+                    //Note does not work for single words has to be a phrase
+                    //Now in a database table see Voice Launcher
+                    //Should be no more than 500 to be practical
+                    var results = _windowsVoiceCommand.GetPhraseListGrammars();
+                    PhraseListGrammar phraseListGrammar = PhraseListGrammar.FromRecognizer(recognizer);
+                    if (results != null)
+                    {
+                        foreach (PhraseListGrammarStorage item in results)
+                        {
+                            phraseListGrammar.AddPhrase(item.PhraseListGrammarValue);
+                        }
                     }
+
+                    await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
+                    //do
+                    //{
+                    //    LabelStatus = " Say stop continuous to stop ";
+
+                    //    //Console.WriteLine("Press Enter to stop");
+
+                    //} while ( !resultMain!.ToLower().Contains("stop continuous"));
+
+                    // Stops recognition.
+                    labelStatus.Invoke(new MethodInvoker(delegate { labelStatus.ForeColor = Color.Green; }));
+
                 }
 
-                await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
-                //do
-                //{
-                //    LabelStatus = " Say stop continuous to stop ";
-
-                //    //Console.WriteLine("Press Enter to stop");
-
-                //} while ( !resultMain!.ToLower().Contains("stop continuous"));
-
-                // Stops recognition.
-                labelStatus.Invoke(new MethodInvoker(delegate { labelStatus.ForeColor = Color.Green; }));
-
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message);
+                textBoxResultsLocal.Text=exception.Message;
+                labelStatus.Text = "ERROR";
+                labelStatus.ForeColor=Color.Red;
             }
 
         }
