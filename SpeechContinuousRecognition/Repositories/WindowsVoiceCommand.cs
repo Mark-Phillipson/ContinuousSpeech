@@ -54,9 +54,27 @@ namespace SpeechContinuousRecognition.Repositories
                 return result;
             }
         }
+        public WindowsSpeechVoiceCommand? GetRandomCommand()
+        {
+            if (Model == null)
+            {
+                return null;
+            }
+            //Get a random voice command
+            var result = Model.WindowsSpeechVoiceCommands
+                .AsNoTracking()
+                .Where(v => v.AutoCreated == false)
+                .OrderBy(r => Guid.NewGuid())
+                .FirstOrDefault();
+            return result;
+        }
         public WindowsSpeechVoiceCommand? GetCommand(string spokenCommand, string? applicationName)
         {
-            if (applicationName != null)
+            if (Model==null)
+            {
+                return null;
+            }
+            if (applicationName != null && Model != null)
             {
                 WindowsSpeechVoiceCommand? applicationCommand = Model.WindowsSpeechVoiceCommands
                     .AsNoTracking()

@@ -47,13 +47,13 @@
             this.buttonCloseApplication = new System.Windows.Forms.Button();
             this.labelCurrentProcess = new System.Windows.Forms.Label();
             this.buttonRestartDragon = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
             this.buttonVoiceAdministration = new System.Windows.Forms.Button();
             this.buttonDatabaseCommands = new System.Windows.Forms.Button();
             this.textBoxKey = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.textBoxRegion = new System.Windows.Forms.TextBox();
+            this.buttonRandomCommand = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // checkBoxUppercase
@@ -62,7 +62,7 @@
             this.checkBoxUppercase.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
             this.checkBoxUppercase.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.checkBoxUppercase.ForeColor = System.Drawing.SystemColors.Control;
-            this.checkBoxUppercase.Location = new System.Drawing.Point(23, 50);
+            this.checkBoxUppercase.Location = new System.Drawing.Point(19, 35);
             this.checkBoxUppercase.Name = "checkBoxUppercase";
             this.checkBoxUppercase.Size = new System.Drawing.Size(137, 29);
             this.checkBoxUppercase.TabIndex = 0;
@@ -76,7 +76,7 @@
             this.checkBoxLowercase.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
             this.checkBoxLowercase.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.checkBoxLowercase.ForeColor = System.Drawing.SystemColors.Control;
-            this.checkBoxLowercase.Location = new System.Drawing.Point(23, 85);
+            this.checkBoxLowercase.Location = new System.Drawing.Point(19, 70);
             this.checkBoxLowercase.Name = "checkBoxLowercase";
             this.checkBoxLowercase.Size = new System.Drawing.Size(105, 25);
             this.checkBoxLowercase.TabIndex = 1;
@@ -93,7 +93,7 @@
             this.textBoxResultsLocal.Location = new System.Drawing.Point(415, 0);
             this.textBoxResultsLocal.Multiline = true;
             this.textBoxResultsLocal.Name = "textBoxResultsLocal";
-            this.textBoxResultsLocal.Size = new System.Drawing.Size(695, 644);
+            this.textBoxResultsLocal.Size = new System.Drawing.Size(695, 679);
             this.textBoxResultsLocal.TabIndex = 2;
             // 
             // labelStatus
@@ -103,7 +103,7 @@
             this.labelStatus.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.labelStatus.Font = new System.Drawing.Font("Britannic Bold", 15.75F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point);
             this.labelStatus.ForeColor = System.Drawing.Color.Red;
-            this.labelStatus.Location = new System.Drawing.Point(32, 184);
+            this.labelStatus.Location = new System.Drawing.Point(19, 169);
             this.labelStatus.Name = "labelStatus";
             this.labelStatus.Size = new System.Drawing.Size(147, 23);
             this.labelStatus.TabIndex = 3;
@@ -117,7 +117,7 @@
             this.checkBoxTreatAsCommand.Enabled = false;
             this.checkBoxTreatAsCommand.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.checkBoxTreatAsCommand.ForeColor = System.Drawing.SystemColors.Control;
-            this.checkBoxTreatAsCommand.Location = new System.Drawing.Point(177, 57);
+            this.checkBoxTreatAsCommand.Location = new System.Drawing.Point(161, 36);
             this.checkBoxTreatAsCommand.Name = "checkBoxTreatAsCommand";
             this.checkBoxTreatAsCommand.Size = new System.Drawing.Size(170, 25);
             this.checkBoxTreatAsCommand.TabIndex = 4;
@@ -133,7 +133,7 @@
             this.checkBoxTreatAsCommandFirst.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxTreatAsCommandFirst.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.checkBoxTreatAsCommandFirst.ForeColor = System.Drawing.SystemColors.Control;
-            this.checkBoxTreatAsCommandFirst.Location = new System.Drawing.Point(23, 116);
+            this.checkBoxTreatAsCommandFirst.Location = new System.Drawing.Point(19, 101);
             this.checkBoxTreatAsCommandFirst.Name = "checkBoxTreatAsCommandFirst";
             this.checkBoxTreatAsCommandFirst.Size = new System.Drawing.Size(206, 25);
             this.checkBoxTreatAsCommandFirst.TabIndex = 5;
@@ -148,7 +148,7 @@
             this.checkBoxRemovePunctuation.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxRemovePunctuation.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.checkBoxRemovePunctuation.ForeColor = System.Drawing.SystemColors.Control;
-            this.checkBoxRemovePunctuation.Location = new System.Drawing.Point(23, 147);
+            this.checkBoxRemovePunctuation.Location = new System.Drawing.Point(19, 132);
             this.checkBoxRemovePunctuation.Name = "checkBoxRemovePunctuation";
             this.checkBoxRemovePunctuation.Size = new System.Drawing.Size(189, 25);
             this.checkBoxRemovePunctuation.TabIndex = 6;
@@ -161,9 +161,9 @@
             this.buttonStop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonStop.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonStop.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonStop.Location = new System.Drawing.Point(34, 292);
+            this.buttonStop.Location = new System.Drawing.Point(20, 264);
             this.buttonStop.Name = "buttonStop";
-            this.buttonStop.Size = new System.Drawing.Size(199, 36);
+            this.buttonStop.Size = new System.Drawing.Size(325, 36);
             this.buttonStop.TabIndex = 7;
             this.buttonStop.Text = "Stop";
             this.buttonStop.UseVisualStyleBackColor = false;
@@ -175,9 +175,9 @@
             this.buttonStart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonStart.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonStart.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonStart.Location = new System.Drawing.Point(34, 250);
+            this.buttonStart.Location = new System.Drawing.Point(20, 222);
             this.buttonStart.Name = "buttonStart";
-            this.buttonStart.Size = new System.Drawing.Size(199, 36);
+            this.buttonStart.Size = new System.Drawing.Size(325, 36);
             this.buttonStart.TabIndex = 8;
             this.buttonStart.Text = "Start";
             this.buttonStart.UseVisualStyleBackColor = false;
@@ -189,9 +189,9 @@
             this.buttonCloseApplication.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCloseApplication.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonCloseApplication.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonCloseApplication.Location = new System.Drawing.Point(33, 334);
+            this.buttonCloseApplication.Location = new System.Drawing.Point(20, 306);
             this.buttonCloseApplication.Name = "buttonCloseApplication";
-            this.buttonCloseApplication.Size = new System.Drawing.Size(199, 36);
+            this.buttonCloseApplication.Size = new System.Drawing.Size(325, 36);
             this.buttonCloseApplication.TabIndex = 9;
             this.buttonCloseApplication.Text = "Close Application";
             this.buttonCloseApplication.UseVisualStyleBackColor = false;
@@ -203,7 +203,7 @@
             this.labelCurrentProcess.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
             this.labelCurrentProcess.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.labelCurrentProcess.ForeColor = System.Drawing.SystemColors.Control;
-            this.labelCurrentProcess.Location = new System.Drawing.Point(126, 25);
+            this.labelCurrentProcess.Location = new System.Drawing.Point(19, 10);
             this.labelCurrentProcess.Name = "labelCurrentProcess";
             this.labelCurrentProcess.Size = new System.Drawing.Size(100, 17);
             this.labelCurrentProcess.TabIndex = 11;
@@ -215,25 +215,13 @@
             this.buttonRestartDragon.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonRestartDragon.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonRestartDragon.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonRestartDragon.Location = new System.Drawing.Point(33, 575);
+            this.buttonRestartDragon.Location = new System.Drawing.Point(20, 547);
             this.buttonRestartDragon.Name = "buttonRestartDragon";
-            this.buttonRestartDragon.Size = new System.Drawing.Size(199, 36);
+            this.buttonRestartDragon.Size = new System.Drawing.Size(325, 36);
             this.buttonRestartDragon.TabIndex = 12;
             this.buttonRestartDragon.Text = "Restart Dragon";
             this.buttonRestartDragon.UseVisualStyleBackColor = false;
             this.buttonRestartDragon.Click += new System.EventHandler(this.buttonRestartDragon_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label1.ForeColor = System.Drawing.SystemColors.Control;
-            this.label1.Location = new System.Drawing.Point(25, 26);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(104, 17);
-            this.label1.TabIndex = 13;
-            this.label1.Text = "Current Process";
             // 
             // buttonVoiceAdministration
             // 
@@ -241,11 +229,11 @@
             this.buttonVoiceAdministration.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonVoiceAdministration.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonVoiceAdministration.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonVoiceAdministration.Location = new System.Drawing.Point(34, 376);
+            this.buttonVoiceAdministration.Location = new System.Drawing.Point(20, 348);
             this.buttonVoiceAdministration.Name = "buttonVoiceAdministration";
-            this.buttonVoiceAdministration.Size = new System.Drawing.Size(199, 36);
+            this.buttonVoiceAdministration.Size = new System.Drawing.Size(325, 36);
             this.buttonVoiceAdministration.TabIndex = 14;
-            this.buttonVoiceAdministration.Text = "Voice Administration";
+            this.buttonVoiceAdministration.Text = "Start Voice Administration";
             this.buttonVoiceAdministration.UseVisualStyleBackColor = false;
             this.buttonVoiceAdministration.Click += new System.EventHandler(this.buttonVoiceAdministration_Click);
             // 
@@ -255,9 +243,9 @@
             this.buttonDatabaseCommands.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonDatabaseCommands.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonDatabaseCommands.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonDatabaseCommands.Location = new System.Drawing.Point(34, 418);
+            this.buttonDatabaseCommands.Location = new System.Drawing.Point(20, 390);
             this.buttonDatabaseCommands.Name = "buttonDatabaseCommands";
-            this.buttonDatabaseCommands.Size = new System.Drawing.Size(199, 36);
+            this.buttonDatabaseCommands.Size = new System.Drawing.Size(325, 36);
             this.buttonDatabaseCommands.TabIndex = 15;
             this.buttonDatabaseCommands.Text = "Database Commands";
             this.buttonDatabaseCommands.UseVisualStyleBackColor = false;
@@ -265,17 +253,17 @@
             // 
             // textBoxKey
             // 
-            this.textBoxKey.Location = new System.Drawing.Point(33, 490);
+            this.textBoxKey.Location = new System.Drawing.Point(20, 462);
             this.textBoxKey.Name = "textBoxKey";
             this.textBoxKey.PasswordChar = 'x';
-            this.textBoxKey.Size = new System.Drawing.Size(199, 23);
+            this.textBoxKey.Size = new System.Drawing.Size(325, 23);
             this.textBoxKey.TabIndex = 16;
             this.textBoxKey.Text = "123";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(36, 462);
+            this.label2.Location = new System.Drawing.Point(20, 434);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(120, 15);
             this.label2.TabIndex = 17;
@@ -284,7 +272,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(35, 518);
+            this.label3.Location = new System.Drawing.Point(20, 490);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(77, 15);
             this.label3.TabIndex = 19;
@@ -292,25 +280,39 @@
             // 
             // textBoxRegion
             // 
-            this.textBoxRegion.Location = new System.Drawing.Point(32, 546);
+            this.textBoxRegion.Location = new System.Drawing.Point(20, 518);
             this.textBoxRegion.Name = "textBoxRegion";
-            this.textBoxRegion.Size = new System.Drawing.Size(199, 23);
+            this.textBoxRegion.Size = new System.Drawing.Size(325, 23);
             this.textBoxRegion.TabIndex = 18;
             this.textBoxRegion.Text = "UKSouth";
+            // 
+            // buttonRandomCommand
+            // 
+            this.buttonRandomCommand.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
+            this.buttonRandomCommand.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonRandomCommand.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.buttonRandomCommand.ForeColor = System.Drawing.Color.BurlyWood;
+            this.buttonRandomCommand.Location = new System.Drawing.Point(20, 589);
+            this.buttonRandomCommand.Name = "buttonRandomCommand";
+            this.buttonRandomCommand.Size = new System.Drawing.Size(386, 78);
+            this.buttonRandomCommand.TabIndex = 21;
+            this.buttonRandomCommand.Text = "Command Tip";
+            this.buttonRandomCommand.UseVisualStyleBackColor = false;
+            this.buttonRandomCommand.Click += new System.EventHandler(this.buttonRandomCommand_Click);
             // 
             // ContinuousSpeech
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
-            this.ClientSize = new System.Drawing.Size(1110, 644);
+            this.ClientSize = new System.Drawing.Size(1110, 679);
+            this.Controls.Add(this.buttonRandomCommand);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.textBoxRegion);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBoxKey);
             this.Controls.Add(this.buttonDatabaseCommands);
             this.Controls.Add(this.buttonVoiceAdministration);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonRestartDragon);
             this.Controls.Add(this.labelCurrentProcess);
             this.Controls.Add(this.buttonCloseApplication);
@@ -350,12 +352,12 @@
         private Button buttonCloseApplication;
         private Label labelCurrentProcess;
         private Button buttonRestartDragon;
-        private Label label1;
         private Button buttonVoiceAdministration;
 		private Button buttonDatabaseCommands;
         private TextBox textBoxKey;
         private Label label2;
         private Label label3;
         private TextBox textBoxRegion;
+        private Button buttonRandomCommand;
     }
 }

@@ -20,6 +20,7 @@ using WindowsInput;
 using WindowsInput.Native;
 
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System;
 
 namespace SpeechContinuousRecognition
 {
@@ -249,6 +250,16 @@ namespace SpeechContinuousRecognition
             buttonStart.Enabled = false;
             buttonStop.Enabled = true;
             this.ShowInTaskbar = false;
+            DisplayRandomCommand();
+        }
+
+        private void DisplayRandomCommand()
+        {
+            var result = _windowsVoiceCommand.GetRandomCommand();
+            if (result!=null)
+            {
+                buttonRandomCommand.Text=$"Random Command: '{result.SpokenCommand}' Application: {result.ApplicationName}" ; 
+            }
         }
 
         private void UpdateTheCurrentProcess()
@@ -449,16 +460,18 @@ namespace SpeechContinuousRecognition
                 {
                     _counter = 0;
                 }
-                if (_counter >= 10 && notifyIcon1 != null)
+                if (_counter >= 5 && notifyIcon1 != null)
                 {
                     await StopContinuous().ConfigureAwait(false);
-                    TextBoxResults = $"Stopped after 10 empty results: {result.Text}{Environment.NewLine}{TextBoxResults}";
+                    TextBoxResults = $"Stopped after 5 empty results: {result.Text}{Environment.NewLine}{TextBoxResults}";
                     _counter = 0;
                     notifyIcon1.Icon = SystemIcons.Information;
                     notifyIcon1.BalloonTipTitle = TextBoxResults;
                     notifyIcon1.BalloonTipText = $"Continuous Speech has stopped {DateTime.Now.ToString("HH:mm:ss")}";
                     notifyIcon1.BalloonTipIcon = ToolTipIcon.Info;
                     notifyIcon1.Visible = true;
+                    // This should Toggle DRAGON Microphone
+                    _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ADD);
                     notifyIcon1.ShowBalloonTip(30000);
                 }
                 //form.LabelStatus = ($"Reason: {result.Reason.ToString()}");
@@ -626,21 +639,32 @@ namespace SpeechContinuousRecognition
 
         private void buttonVoiceAdministration_Click(object sender, EventArgs e)
         {
-            var uri = "https://localhost:7264";
             var psi = new System.Diagnostics.ProcessStartInfo();
             psi.UseShellExecute = true;
-            psi.FileName = uri;
+            psi.FileName = @"C:\Users\MPhil\source\repos\VoiceLauncherBlazor\VoiceLauncher\bin\Release\net7.0\publish\VoiceLauncher.exe";
+            psi.WorkingDirectory= @"C:\Users\MPhil\source\repos\VoiceLauncherBlazor\VoiceLauncher\bin\Release\net7.0\publish\";
+            psi.WindowStyle = System.Diagnostics.ProcessWindowStyle.Maximized;
             Process.Start(psi);
-            Process.Start("C:\\Users\\MPhil\\OneDrive\\Documents\\Voice Launcher Blazor.bat");
+            //Process.Start("C:\\Users\\MPhil\\OneDrive\\Documents\\Voice Launcher Blazor.bat");
         }
 
         private void buttonDatabaseCommands_Click(object sender, EventArgs e)
         {
-            var uri = "https://localhost:7264/windowsspeechvoicecommands";
+            var uri = "http://localhost:5000/windowsspeechvoicecommands";
             var psi = new System.Diagnostics.ProcessStartInfo();
             psi.UseShellExecute = true;
             psi.FileName = uri;
             Process.Start(psi);
+        }
+
+        private void labelCommandTip_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void buttonRandomCommand_Click(object sender, EventArgs e)
+        {
+            DisplayRandomCommand();
         }
     }
 }
