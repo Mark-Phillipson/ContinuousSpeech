@@ -1,26 +1,15 @@
-using System.Configuration;
-using System.Diagnostics;
-using System.Linq.Expressions;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using System.Xml.Linq;
-using System.Drawing;
-
 using DataAccessLibrary.Models;
 
 using Microsoft.CognitiveServices.Speech;
 
-
-using Microsoft.CognitiveServices.Speech.Intent;
-
 using SpeechContinuousRecognition.Repositories;
+
+using System.Configuration;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 using WindowsInput;
 using WindowsInput.Native;
-
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System;
 
 namespace SpeechContinuousRecognition
 {
@@ -145,11 +134,20 @@ namespace SpeechContinuousRecognition
             if (this.WindowState == FormWindowState.Minimized)
                 this.WindowState = FormWindowState.Normal;
             // Activate the form.
-            this.Activate();
+            //this.Activate();
             if (LabelStatus.ToLower().Contains("stop") && sender != null && e != null)
             {
                 buttonStart_Click(sender, e);
             }
+            SendKeys.SendWait("%{Tab}");
+            //IntPtr applicationHandle = IntPtr.Zero;
+            //string processName = "devenv";
+            //Process process = Process.GetProcessesByName(processName)[0];
+            //if (process != null)
+            //{
+            //    applicationHandle = process.Handle;
+            //    SetForegroundWindow(applicationHandle);
+            //}
         }
         private void menuItem1_Click(object Sender, EventArgs e)
         {
@@ -256,9 +254,9 @@ namespace SpeechContinuousRecognition
         private void DisplayRandomCommand()
         {
             var result = _windowsVoiceCommand.GetRandomCommand();
-            if (result!=null)
+            if (result != null)
             {
-                buttonRandomCommand.Text=$"Random Command: '{result.SpokenCommand}' Application: {result.ApplicationName}" ; 
+                buttonRandomCommand.Text = $"Random Command: '{result.SpokenCommand}' Application: {result.ApplicationName}";
             }
         }
 
@@ -277,7 +275,7 @@ namespace SpeechContinuousRecognition
             // Replace with your own subscription key and service region (e.g., "westus").
             string? SPEECH__SERVICE__KEY;
             string? SPEECH__SERVICE__REGION;
-            if (Environment.MachineName == "DESKTOP-UROO8T1"|| Environment.MachineName== "SURFACEPRO")
+            if (Environment.MachineName == "DESKTOP-UROO8T1" || Environment.MachineName == "SURFACEPRO")
             {
                 SPEECH__SERVICE__KEY = ConfigurationManager.AppSettings.Get("SpeechAzureKey");
                 SPEECH__SERVICE__REGION = ConfigurationManager.AppSettings.Get("SpeechAzureRegion");
@@ -380,9 +378,9 @@ namespace SpeechContinuousRecognition
             catch (Exception exception)
             {
                 Console.WriteLine(exception.Message);
-                textBoxResultsLocal.Text=exception.Message;
+                textBoxResultsLocal.Text = exception.Message;
                 labelStatus.Text = "ERROR";
-                labelStatus.ForeColor=Color.Red;
+                labelStatus.ForeColor = Color.Red;
             }
 
         }
@@ -450,7 +448,9 @@ namespace SpeechContinuousRecognition
         }
         private async void SpeechRecognizer_SpeechRecognised(object? sender, SpeechRecognitionEventArgs e)
         {
+            try
             {
+
                 SpeechRecognitionResult result = e.Result;
                 if (result.Text == "")
                 {
@@ -565,6 +565,11 @@ namespace SpeechContinuousRecognition
                     await PerformTextEntryOrLog().ConfigureAwait(false);
                 }
             }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message, "Exception has occurred:", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw;
+            }
         }
 
         private async Task PerformTextEntryOrLog()
@@ -642,7 +647,7 @@ namespace SpeechContinuousRecognition
             var psi = new System.Diagnostics.ProcessStartInfo();
             psi.UseShellExecute = true;
             psi.FileName = @"C:\Users\MPhil\source\repos\VoiceLauncherBlazor\VoiceLauncher\bin\Release\net7.0\publish\VoiceLauncher.exe";
-            psi.WorkingDirectory= @"C:\Users\MPhil\source\repos\VoiceLauncherBlazor\VoiceLauncher\bin\Release\net7.0\publish\";
+            psi.WorkingDirectory = @"C:\Users\MPhil\source\repos\VoiceLauncherBlazor\VoiceLauncher\bin\Release\net7.0\publish\";
             psi.WindowStyle = System.Diagnostics.ProcessWindowStyle.Maximized;
             Process.Start(psi);
             //Process.Start("C:\\Users\\MPhil\\OneDrive\\Documents\\Voice Launcher Blazor.bat");
@@ -659,7 +664,7 @@ namespace SpeechContinuousRecognition
 
         private void labelCommandTip_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private void buttonRandomCommand_Click(object sender, EventArgs e)
