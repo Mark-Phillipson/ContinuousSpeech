@@ -247,7 +247,7 @@ namespace SpeechContinuousRecognition
             await SpeechSetupAsync();
             buttonStart.Enabled = false;
             buttonStop.Enabled = true;
-            this.ShowInTaskbar = false;
+            this.ShowInTaskbar = true;
             DisplayRandomCommand();
         }
 
