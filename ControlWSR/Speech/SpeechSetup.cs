@@ -54,7 +54,7 @@ namespace ControlWSR.Speech
                     CreateDictationGrammar(speechRecogniser, command.SpokenCommand, command.SpokenCommand);
                 }
             }
-            if (Environment.MachineName == "DESKTOP-UROO8T1")// These are only really applicable for my machine
+            if (Environment.MachineName == "J40L4V3")// These are only really applicable for my machine
             {
                 CreateDictationGrammar(speechRecogniser, "Default Box", "Default Box", false);
                 availableCommands = $"{availableCommands}\nDefault Box (MSP)";

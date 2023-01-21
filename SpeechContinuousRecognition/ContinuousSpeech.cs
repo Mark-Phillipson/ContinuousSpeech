@@ -275,7 +275,7 @@ namespace SpeechContinuousRecognition
             // Replace with your own subscription key and service region (e.g., "westus").
             string? SPEECH__SERVICE__KEY;
             string? SPEECH__SERVICE__REGION;
-            if (Environment.MachineName == "DESKTOP-UROO8T1" || Environment.MachineName == "SURFACEPRO")
+            if (Environment.MachineName == "J40L4V3" || Environment.MachineName == "SURFACEPRO")
             {
                 SPEECH__SERVICE__KEY = ConfigurationManager.AppSettings.Get("SpeechAzureKey");
                 SPEECH__SERVICE__REGION = ConfigurationManager.AppSettings.Get("SpeechAzureRegion");
