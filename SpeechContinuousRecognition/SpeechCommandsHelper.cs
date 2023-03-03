@@ -1396,6 +1396,15 @@ namespace SpeechContinuousRecognition
                     }
                 }
             }
+            if (command== null ) {
+                string? enterCommand = windowsVoiceCommand.GetEnterCommand(resultRaw);
+                if (enterCommand!= null && enterCommand.Length>0 ) {
+                    inputSimulator.Keyboard.TextEntry(enterCommand);
+                    commandRun = true;
+                    commandName = $"Enter **********";
+                    return (commandRun, commandName, null);
+                }
+            }
             if (command != null)
             {
                 List<CustomWindowsSpeechCommand>? actions = windowsVoiceCommand.GetChildActions(command.Id);

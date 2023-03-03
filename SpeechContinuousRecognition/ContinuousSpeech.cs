@@ -139,7 +139,16 @@ namespace SpeechContinuousRecognition
             {
                 buttonStart_Click(sender, e);
             }
-            SendKeys.SendWait("%{Tab}");
+
+            try
+            {
+                SendKeys.SendWait("%{Tab}");
+            }
+            catch (Exception exception)
+            {
+                AutoClosingMessageBox.Show(exception.Message,"Error when sending keys", 30);
+                throw;
+            }
             //IntPtr applicationHandle = IntPtr.Zero;
             //string processName = "devenv";
             //Process process = Process.GetProcessesByName(processName)[0];
@@ -234,6 +243,7 @@ namespace SpeechContinuousRecognition
                 checkBoxRemovePunctuation.Invoke(new MethodInvoker(delegate { checkBoxRemovePunctuation.Checked = value; }));
             }
         }
+        public int EmptyResultsToStopOn { get; } = 7;
         private async void ContinuousSpeech_Load(object sender, EventArgs e)
         {
             Screen[] screens = Screen.AllScreens;
@@ -245,10 +255,10 @@ namespace SpeechContinuousRecognition
 
             Text = "Azure Cognitive Services - Continuous Speech - Code by Voice in Visual Studio";
             await SpeechSetupAsync();
-            buttonStart.Enabled = false;
-            buttonStop.Enabled = true;
+            buttonStart.Enabled = true;
+            buttonStop.Enabled = false;
             this.ShowInTaskbar = true;
-            DisplayRandomCommand();
+            // DisplayRandomCommand();
         }
 
         private void DisplayRandomCommand()
@@ -360,7 +370,7 @@ namespace SpeechContinuousRecognition
                         }
                     }
 
-                    await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
+                    // await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
                     //do
                     //{
                     //    LabelStatus = " Say stop continuous to stop ";
@@ -460,10 +470,10 @@ namespace SpeechContinuousRecognition
                 {
                     _counter = 0;
                 }
-                if (_counter >= 5 && notifyIcon1 != null)
+                if (_counter >= EmptyResultsToStopOn && notifyIcon1 != null)
                 {
                     await StopContinuous().ConfigureAwait(false);
-                    TextBoxResults = $"Stopped after 5 empty results: {result.Text}{Environment.NewLine}{TextBoxResults}";
+                    TextBoxResults = $"Stopped after {EmptyResultsToStopOn} empty results: {result.Text}{Environment.NewLine}{TextBoxResults}";
                     _counter = 0;
                     notifyIcon1.Icon = SystemIcons.Information;
                     notifyIcon1.BalloonTipTitle = TextBoxResults;

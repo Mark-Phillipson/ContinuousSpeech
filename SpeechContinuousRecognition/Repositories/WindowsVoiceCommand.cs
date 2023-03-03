@@ -11,42 +11,50 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpeechContinuousRecognition.Repositories
-{
-    public class WindowsVoiceCommand
-    {
-        VoiceAdminDbContext? Model = null;
-        public WindowsVoiceCommand()
-        {
-            if (System.Environment.MachineName == "J40L4V3")
-            {
+namespace SpeechContinuousRecognition.Repositories {
+    public class WindowsVoiceCommand {
+        VoiceAdminDbContext Model ;
+        public WindowsVoiceCommand() {
+            if (System.Environment.MachineName == "J40L4V3") {
                 Model = new VoiceAdminDbContext("Data Source=J40L4V3;Initial Catalog=VoiceLauncher;Integrated Security=True;Connect Timeout=120;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
             }
-            else if (Environment.MachineName == "SURFACEPRO")
-            {
-                Model = new VoiceAdminDbContext("Data Source=Localhost\\SqlExpress;Initial Catalog=VoiceLauncher;Integrated Security=True;Connect Timeout=120;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+            else  {
+                Model = new VoiceAdminDbContext("Data Source=Localhost;Initial Catalog=VoiceLauncher;Integrated Security=True;Connect Timeout=120;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
             }
         }
-        public List<WindowsSpeechVoiceCommand> GetCommands()
-        {
-            var result = Model.WindowsSpeechVoiceCommands
+        public List<WindowsSpeechVoiceCommand> GetCommands() {
+            var result = Model?.WindowsSpeechVoiceCommands
                 .AsNoTracking()
                 .Where(v => v.ApplicationName == "Global")
                 .ToList();
+            if (result== null ) {
+                throw new Exception("Failed to get commands from database");
+            }
             return result;
         }
-        public List<WindowsSpeechVoiceCommand> GetDictationCommands(string? applicationName)
-        {
-            if (applicationName == null)
-            {
+        public string GetEnterCommand(string command) {
+            if (Model == null) {
+                return "";
+            }
+            command = command.Replace("enter", "").Trim();
+            var result = Model.ValuesToInserts
+                .AsNoTracking()
+                .Where(v => v.Lookup.ToLower() == command.ToLower()).FirstOrDefault();
+            if (result != null) {
+                return result.ValueToInsert;
+            }
+            return "";
+
+        }
+        public List<WindowsSpeechVoiceCommand> GetDictationCommands(string? applicationName) {
+            if (applicationName == null) {
                 var result = Model.WindowsSpeechVoiceCommands
                     .AsNoTracking()
                     .Where(v => v.ApplicationName == "Global" && v.SpokenCommand.EndsWith("<dictation>"))
                     .ToList();
                 return result;
             }
-            else
-            {
+            else {
                 var result = Model.WindowsSpeechVoiceCommands
                     .AsNoTracking()
                     .Where(v => (v.ApplicationName == "Global" || v.ApplicationName == applicationName) && v.SpokenCommand.EndsWith("<dictation>"))
@@ -54,10 +62,8 @@ namespace SpeechContinuousRecognition.Repositories
                 return result;
             }
         }
-        public WindowsSpeechVoiceCommand? GetRandomCommand()
-        {
-            if (Model == null)
-            {
+        public WindowsSpeechVoiceCommand? GetRandomCommand() {
+            if (Model == null) {
                 return null;
             }
             //Get a random voice command
@@ -68,20 +74,16 @@ namespace SpeechContinuousRecognition.Repositories
                 .FirstOrDefault();
             return result;
         }
-        public WindowsSpeechVoiceCommand? GetCommand(string spokenCommand, string? applicationName)
-        {
-            if (Model==null)
-            {
+        public WindowsSpeechVoiceCommand? GetCommand(string spokenCommand, string? applicationName) {
+            if (Model == null) {
                 return null;
             }
-            if (applicationName != null && Model != null)
-            {
+            if (applicationName != null && Model != null) {
                 WindowsSpeechVoiceCommand? applicationCommand = Model.WindowsSpeechVoiceCommands
                     .AsNoTracking()
                     .Where(v => v.SpokenCommand.ToLower() == spokenCommand.ToLower() && v.ApplicationName == applicationName)
                     .FirstOrDefault();
-                if (applicationCommand != null)
-                {
+                if (applicationCommand != null) {
                     return applicationCommand;
                 }
             }
@@ -91,81 +93,66 @@ namespace SpeechContinuousRecognition.Repositories
                 .FirstOrDefault();
             return command;
         }
-        public List<CustomWindowsSpeechCommand>? GetChildActions(int windowsSpeechVoiceCommandId)
-        {
+        public List<CustomWindowsSpeechCommand>? GetChildActions(int windowsSpeechVoiceCommandId) {
             var results = Model.CustomWindowsSpeechCommands
                 .AsNoTracking()
                 .Where(v => v.WindowsSpeechVoiceCommandId == windowsSpeechVoiceCommandId);
-            if (results != null)
-            {
+            if (results != null) {
                 var actions = results.ToList();
                 return actions;
             }
             return null;
         }
-        public List<PhraseListGrammarStorage>? GetPhraseListGrammars()
-        {
+        public List<PhraseListGrammarStorage>? GetPhraseListGrammars() {
             var results = Model.PhraseListGrammars.AsNoTracking();
-            if (results != null)
-            {
+            if (results != null) {
                 var phraseListGrammars = results.ToList();
                 return phraseListGrammars;
             }
             return null;
         }
-        public List<DataAccessLibrary.Models.ApplicationDetail>? GetApplicationDetails()
-        {
+        public List<DataAccessLibrary.Models.ApplicationDetail>? GetApplicationDetails() {
             var results = Model.ApplicationDetails.AsNoTracking();
-            if (results != null)
-            {
+            if (results != null) {
                 var applicationDetails = results.ToList();
                 return applicationDetails;
             }
             return null;
         }
-        public List<Idiosyncrasy>? GetIdiosyncrasies()
-        {
+        public List<Idiosyncrasy>? GetIdiosyncrasies() {
             var results = Model.Idiosyncrasies.AsNoTracking();
-            if (results != null)
-            {
+            if (results != null) {
                 var idiosyncrasies = results.ToList();
                 return idiosyncrasies;
             }
             return null;
         }
-        public List<GrammarItem>? GetListItems(string grammarName)
-        {
+        public List<GrammarItem>? GetListItems(string grammarName) {
             var result = Model.GrammarNames.Where(v => v.NameOfGrammar == grammarName).FirstOrDefault();
-            if (result != null)
-            {
+            if (result != null) {
                 List<GrammarItem> items = Model.GrammarItems.Where(v => v.GrammarNameId == result.Id).ToList();
                 return items;
             }
             return null;
         }
-        public HtmlTag? GetHtmlTag(string tag)
-        {
+        public HtmlTag? GetHtmlTag(string tag) {
             var result = Model.HtmlTags.Where(v => v.SpokenForm == tag).FirstOrDefault();
             return result;
         }
-        public List<HtmlTag> GetHtmlTags()
-        {
+        public List<HtmlTag> GetHtmlTags() {
             var result = Model.HtmlTags.Where(v => v.SpokenForm != null).OrderBy(v => v.SpokenForm).ToList();
             return result;
         }
 
-        public CustomIntelliSense? GetWord(string searchTerm)
-        {
+        public CustomIntelliSense? GetWord(string searchTerm) {
             var result = Model.CustomIntelliSenses.Where(i => i.LanguageID == 1 && i.CategoryID == 39 && i.Display_Value.ToLower() == searchTerm.ToLower()).OrderBy(v => v.Display_Value).FirstOrDefault();
-            if (result == null)
-            {
+            if (result == null) {
                 return null;
             }
             return result;
         }
 
-        public List<AdditionalCommand> GetAdditionalCommands(int id)
-        {
+        public List<AdditionalCommand> GetAdditionalCommands(int id) {
             var result = Model.AdditionalCommands.Where(v => v.CustomIntelliSenseID == id).ToList();
             return result;
         }
