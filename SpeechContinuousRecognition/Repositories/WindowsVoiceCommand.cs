@@ -93,6 +93,16 @@ namespace SpeechContinuousRecognition.Repositories {
                 .FirstOrDefault();
             return command;
         }
+         public WindowsSpeechVoiceCommand? GetCommandById(int id) {
+            if (Model == null) {
+                return null;
+            }
+            WindowsSpeechVoiceCommand? command = Model.WindowsSpeechVoiceCommands
+                .AsNoTracking()
+                .Where(v => v.Id == id)
+                .FirstOrDefault();
+            return command;
+        }
         public List<CustomWindowsSpeechCommand>? GetChildActions(int windowsSpeechVoiceCommandId) {
             var results = Model.CustomWindowsSpeechCommands
                 .AsNoTracking()

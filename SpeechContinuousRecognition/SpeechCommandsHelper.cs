@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Windows;
 using System.Windows.Forms;
-
+using System.Windows.Forms.Design;
 using WindowsInput;
 using WindowsInput.Native;
 
@@ -31,7 +31,9 @@ namespace SpeechContinuousRecognition
 {
     public partial class SpeechCommandsHelper
     {
+
         WindowsVoiceCommand windowsVoiceCommand = new WindowsVoiceCommand();
+        
         const string VOICE_LAUNCHER = @"C:\Users\MPhil\source\repos\SpeechRecognitionHelpers\VoiceLauncher\bin\Release\VoiceLauncher.exe";
 
         public string ConvertTextToNumber(string lineNumber)
@@ -1576,6 +1578,7 @@ namespace SpeechContinuousRecognition
                             return (commandRun, commandName, null);
                         }
                     }
+                    form.LastRunCommandId = command.Id;
                     commandRun = true;
                     commandName = command.SpokenCommand;
                 }

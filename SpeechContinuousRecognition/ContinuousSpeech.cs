@@ -146,7 +146,7 @@ namespace SpeechContinuousRecognition
             }
             catch (Exception exception)
             {
-                AutoClosingMessageBox.Show(exception.Message,"Error when sending keys", 30);
+                AutoClosingMessageBox.Show(exception.Message, "Error when sending keys", 30);
                 throw;
             }
             //IntPtr applicationHandle = IntPtr.Zero;
@@ -243,6 +243,7 @@ namespace SpeechContinuousRecognition
                 checkBoxRemovePunctuation.Invoke(new MethodInvoker(delegate { checkBoxRemovePunctuation.Checked = value; }));
             }
         }
+         public  int LastRunCommandId { get; set; } = 0;
         public int EmptyResultsToStopOn { get; } = 7;
         private async void ContinuousSpeech_Load(object sender, EventArgs e)
         {
@@ -264,9 +265,18 @@ namespace SpeechContinuousRecognition
         private void DisplayRandomCommand()
         {
             var result = _windowsVoiceCommand.GetRandomCommand();
+            LastRunCommandId= result?.Id ?? 0;
             if (result != null)
             {
-                buttonRandomCommand.Text = $"Random Command: '{result.SpokenCommand}' Application: {result.ApplicationName}";
+                var actions = _windowsVoiceCommand.GetChildActions(result.Id);
+                var action = actions?.FirstOrDefault();
+                string? sendKeys = null;
+                if (action != null && action.SendKeysValue != null)
+                {
+                    sendKeys = $"Keys: {action.SendKeysValue}";
+                }
+                buttonRandomCommand.Text = $"Random Command: '{result.SpokenCommand}' Application: {result.ApplicationName} {sendKeys}";
+
             }
         }
 
@@ -652,21 +662,26 @@ namespace SpeechContinuousRecognition
             customMethods.RestartDragon();
         }
 
-        private void buttonVoiceAdministration_Click(object sender, EventArgs e)
+
+        private void buttonDatabaseCommands_Click(object sender, EventArgs e)
         {
             var psi = new System.Diagnostics.ProcessStartInfo();
             psi.UseShellExecute = true;
             psi.FileName = @"C:\Users\MPhil\source\repos\VoiceLauncherBlazor\VoiceLauncher\bin\Release\net7.0\publish\VoiceLauncher.exe";
             psi.WorkingDirectory = @"C:\Users\MPhil\source\repos\VoiceLauncherBlazor\VoiceLauncher\bin\Release\net7.0\publish\";
-            psi.WindowStyle = System.Diagnostics.ProcessWindowStyle.Maximized;
+            psi.WindowStyle = System.Diagnostics.ProcessWindowStyle.Minimized;
             Process.Start(psi);
-            //Process.Start("C:\\Users\\MPhil\\OneDrive\\Documents\\Voice Launcher Blazor.bat");
-        }
-
-        private void buttonDatabaseCommands_Click(object sender, EventArgs e)
-        {
-            var uri = "http://localhost:5000/windowsspeechvoicecommands";
-            var psi = new System.Diagnostics.ProcessStartInfo();
+            string commandIdParameter = "";
+            if (LastRunCommandId != 0 )
+            {
+                var command = _windowsVoiceCommand.GetCommandById(LastRunCommandId);
+                if (command!=  null )
+                {
+                    commandIdParameter = $"/{command.SpokenCommand}"; 
+                }
+            }
+            var uri = $"http://localhost:5000/windowsspeechvoicecommands{commandIdParameter}";
+            psi = new System.Diagnostics.ProcessStartInfo();
             psi.UseShellExecute = true;
             psi.FileName = uri;
             Process.Start(psi);

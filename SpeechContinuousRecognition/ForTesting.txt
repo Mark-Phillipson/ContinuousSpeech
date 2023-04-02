@@ -1,4 +1,4 @@
-					  I try to avoid using the keyboard or mouse (I use the microphone instead) so there may be an issue when trying to show someone how to do something in that I would have to talk to the computer at the same time as talking to the person or explain to the person how to do something.
+Testing only					  I try to avoid using the keyboard or mouse (I use the microphone instead) so there may be an issue when trying to show someone how to do something in that I would have to talk to the computer at the same time as talking to the person or explain to the person how to do something.
 
 					  My most recently developed applications using ASP.net MVC C#:
 
@@ -24,3 +24,8 @@ https://www.screencmove u5ast.com/t/5x32kcV9
 move u5move up fivePlease note all these applications require a username and password so you can't see very much.
 Collation of Barristers Cases for Publication
 https://www.screencast.com/t/eW555teU95L
+Testing only
+
+Testing only
+
+
