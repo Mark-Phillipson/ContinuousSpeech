@@ -53,6 +53,7 @@
             label3 = new Label();
             textBoxRegion = new TextBox();
             buttonRandomCommand = new Button();
+            checkBoxIncludeSpace = new CheckBox();
             SuspendLayout();
             // 
             // checkBoxUppercase
@@ -285,12 +286,26 @@
             buttonRandomCommand.UseVisualStyleBackColor = false;
             buttonRandomCommand.Click += buttonRandomCommand_Click;
             // 
+            // checkBoxIncludeSpace
+            // 
+            checkBoxIncludeSpace.AutoSize = true;
+            checkBoxIncludeSpace.BackColor = Color.FromArgb(64, 0, 64);
+            checkBoxIncludeSpace.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            checkBoxIncludeSpace.ForeColor = SystemColors.Control;
+            checkBoxIncludeSpace.Location = new Point(161, 70);
+            checkBoxIncludeSpace.Name = "checkBoxIncludeSpace";
+            checkBoxIncludeSpace.Size = new Size(135, 25);
+            checkBoxIncludeSpace.TabIndex = 22;
+            checkBoxIncludeSpace.Text = "Include Space";
+            checkBoxIncludeSpace.UseVisualStyleBackColor = false;
+            // 
             // ContinuousSpeech
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(64, 0, 64);
             ClientSize = new Size(1110, 679);
+            Controls.Add(checkBoxIncludeSpace);
             Controls.Add(buttonRandomCommand);
             Controls.Add(label3);
             Controls.Add(textBoxRegion);
@@ -341,5 +356,6 @@
         private Label label3;
         private TextBox textBoxRegion;
         private Button buttonRandomCommand;
+        private CheckBox checkBoxIncludeSpace;
     }
 }

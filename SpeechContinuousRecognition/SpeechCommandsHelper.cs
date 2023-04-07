@@ -1833,12 +1833,12 @@ namespace SpeechContinuousRecognition
             else if (tagReturned == "img")
             {
                 textToType = $"<{tagReturned} src='' />";
-                moveLeft = 4;
+                moveLeft = 5;
             }
             else
             {
-                textToType = $"<{tagReturned}></{tagReturned}>";
-                moveLeft = 4 + tagReturned!.Length;
+                textToType = $"<{tagReturned}>";
+                moveLeft = 1;// + tagReturned!.Length;
             }
             inputSimulator.Keyboard.TextEntry(textToType);
             for (int i = 1; i < moveLeft; i++)

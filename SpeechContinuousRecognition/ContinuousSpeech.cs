@@ -6,6 +6,7 @@ using SpeechContinuousRecognition.Repositories;
 
 using System.Configuration;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Runtime.InteropServices;
 
 using WindowsInput;
@@ -206,6 +207,27 @@ namespace SpeechContinuousRecognition
                 }
             }
         }
+        public bool IncludeSpace
+        {
+            get => checkBoxIncludeSpace.Checked;
+            set
+            {
+                try
+                {
+                    checkBoxIncludeSpace.Invoke(new MethodInvoker(delegate { checkBoxIncludeSpace.Checked = value; }));
+                }
+                catch (Exception exception)
+                {
+                    global::System.Console.WriteLine(exception.Message);
+                }
+                if (value)
+                {
+                    IncludeSpace = false;
+                }
+
+            }
+        }
+
         public bool OutputLowercase
         {
             get => checkBoxLowercase.Checked;
@@ -243,8 +265,9 @@ namespace SpeechContinuousRecognition
                 checkBoxRemovePunctuation.Invoke(new MethodInvoker(delegate { checkBoxRemovePunctuation.Checked = value; }));
             }
         }
-         public  int LastRunCommandId { get; set; } = 0;
-        public int EmptyResultsToStopOn { get; } = 7;
+           
+        public int LastRunCommandId { get; set; } = 0;
+        public int EmptyResultsToStopOn { get; } = 20;
         private async void ContinuousSpeech_Load(object sender, EventArgs e)
         {
             Screen[] screens = Screen.AllScreens;
@@ -253,7 +276,8 @@ namespace SpeechContinuousRecognition
                 this.SetBounds(1680, 100, this.Width, this.Height);
             }
             UpdateTheCurrentProcess();
-
+              
+                
             Text = "Azure Cognitive Services - Continuous Speech - Code by Voice in Visual Studio";
             await SpeechSetupAsync();
             buttonStart.Enabled = true;
@@ -265,7 +289,7 @@ namespace SpeechContinuousRecognition
         private void DisplayRandomCommand()
         {
             var result = _windowsVoiceCommand.GetRandomCommand();
-            LastRunCommandId= result?.Id ?? 0;
+            LastRunCommandId = result?.Id ?? 0;
             if (result != null)
             {
                 var actions = _windowsVoiceCommand.GetChildActions(result.Id);
@@ -512,6 +536,10 @@ namespace SpeechContinuousRecognition
                     {
                         resultRaw = SpeechCommandsHelper.RemovePunctuation(resultRaw);
                     }
+                    if (this.IncludeSpace)
+                    {
+                        resultRaw = $" {resultRaw}";
+                    }
                     var temporary = resultRaw;
                     if (resultRaw.ToLower() == "voice typing")
                     {
@@ -605,7 +633,7 @@ namespace SpeechContinuousRecognition
                     if (resultMain != null && resultMain.Trim().Length > 0)
                     {
                         TextBoxResults = $"Text entry: {resultMain}{Environment.NewLine}{TextBoxResults}";
-                        _inputSimulator.Keyboard.TextEntry($"{resultMain}".Trim());
+                        _inputSimulator.Keyboard.TextEntry($"{resultMain}".TrimEnd());
                     }
                 }
                 else
@@ -672,12 +700,12 @@ namespace SpeechContinuousRecognition
             psi.WindowStyle = System.Diagnostics.ProcessWindowStyle.Minimized;
             Process.Start(psi);
             string commandIdParameter = "";
-            if (LastRunCommandId != 0 )
+            if (LastRunCommandId != 0)
             {
                 var command = _windowsVoiceCommand.GetCommandById(LastRunCommandId);
-                if (command!=  null )
+                if (command != null)
                 {
-                    commandIdParameter = $"/{command.SpokenCommand}"; 
+                    commandIdParameter = $"/{command.SpokenCommand}";
                 }
             }
             var uri = $"http://localhost:5000/windowsspeechvoicecommands{commandIdParameter}";
