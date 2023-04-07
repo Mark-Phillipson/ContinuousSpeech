@@ -12,9 +12,12 @@ The application uses the Speech SDK for C#.
 
 Note Microsoft Azure subscription includes a number of hours free per month, but you will need to create a subscription to get the key and region.
 
-<a href="https://www.youtube.com/watch?v=0gsq9fAEa9c">Example Video</a>
+
 
 
 Most commands have been written into a database, and you can add your own commands fairly easily if they are just pressing keys in specific applications.
 
 
+Old video showing how I used to control Windows Speech Recognition (WSR):
+
+<a href="https://www.youtube.com/watch?v=0gsq9fAEa9c">Example Video</a>
