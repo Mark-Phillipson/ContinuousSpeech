@@ -584,8 +584,7 @@ namespace SpeechContinuousRecognition
                     {
                         lastCommand = temporary;
                     }
-                    if (this.TreatAsCommandFirst)
-                    {
+                    if (this.TreatAsCommandFirst) { 
                         string temporaryResult = resultRaw;
                         resultRaw = SpeechCommandsHelper.PerformCodeFunctions(resultRaw);
                         if (temporaryResult.ToLower() == resultRaw.ToLower())

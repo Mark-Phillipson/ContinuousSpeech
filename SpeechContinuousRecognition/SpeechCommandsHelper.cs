@@ -140,6 +140,19 @@ namespace SpeechContinuousRecognition
                 }
                 rawResult = value.Substring(0, value.Length - 1);
             }
+            else if (rawResult.ToLower().StartsWith("-ate "))
+            {
+                words.RemoveAt(0);
+                string value = "";
+                foreach (var word in words)
+                {
+                    if (word.Length > 0)
+                    {
+                        value = value + word.ToLower() + "-";
+                    }
+                }
+                rawResult = value.Substring(0, value.Length - 1);
+            }
             else if (rawResult.ToLower().StartsWith("title") || rawResult.ToLower().StartsWith("mixed"))
             {
                 words.RemoveAt(0);
@@ -769,8 +782,7 @@ namespace SpeechContinuousRecognition
                     inputSimulator.Keyboard.Sleep(100);
                     inputSimulator.Keyboard.KeyPress(VirtualKeyCode.TAB);
                 }
-
-                return $"{{{resultRaw}}}";
+              return $"{{{resultRaw}}}";
             }
 
             resultRaw = resultRaw.ToLower().Replace("equals", "=");
