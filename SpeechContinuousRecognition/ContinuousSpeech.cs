@@ -584,8 +584,9 @@ namespace SpeechContinuousRecognition
                     {
                         lastCommand = temporary;
                     }
-
-                    resultRaw = SpeechCommandsHelper.PerformCodeFunctions(resultRaw);
+                    if (this.TreatAsCommandFirst) {
+                        resultRaw = SpeechCommandsHelper.PerformCodeFunctions(resultRaw);
+                    }
 
                     resultMain = resultRaw;
                     if (resultRaw.Trim().ToLower() == "use dragon")

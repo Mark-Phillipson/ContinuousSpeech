@@ -127,9 +127,8 @@ namespace SpeechContinuousRecognition
                 }
                 rawResult = value;
             }
-            else if (rawResult.ToLower().StartsWith("dot notation"))
+            else if (rawResult.ToLower().StartsWith("period "))
             {
-                words.RemoveAt(0);
                 words.RemoveAt(0);
                 string value = "";
                 foreach (var word in words)
@@ -230,6 +229,7 @@ namespace SpeechContinuousRecognition
                 }
             }
             //fix common recognition problems/idiosyncrasies
+                string saveTemporaryResults = resultRaw;
             var idiosyncrasies = windowsVoiceCommand.GetIdiosyncrasies();
             if (idiosyncrasies != null)
             {
@@ -295,6 +295,10 @@ namespace SpeechContinuousRecognition
             if (resultRaw.ToLower().StartsWith("pressure "))
             {
                 resultRaw = resultRaw.ToLower().Replace("pressure ", "press ");
+            }
+            if (resultRaw.ToLower() == saveTemporaryResults.ToLower())
+            {
+                resultRaw = saveTemporaryResults;
             }
             IInputSimulator inputSimulator = new InputSimulator();
             (bool finish, string? commandName, string? errorMessage) = PerformDatabaseCommands(result, resultRaw, inputSimulator, form, applicationName);
@@ -792,21 +796,12 @@ namespace SpeechContinuousRecognition
             resultRaw = resultRaw.ToLower().Replace("backtick ", "`");
             resultRaw = resultRaw.ToLower().Replace("pipe ", "|");
             resultRaw = resultRaw.ToLower().Replace("back slash", "\\");
-
             resultRaw = resultRaw.ToLower().Replace(" dot ", ".");
             resultRaw = resultRaw.ToLower().Replace("dot ", ".");
-
-
-
-            //resultRaw = resultRaw.ToLower().Replace(" enter ", "{Enter}");
-            //resultRaw = resultRaw.ToLower().Replace(" return ", "{Return}");
-            //resultRaw = resultRaw.ToLower().Replace(" tab ", "{Tab}");
-            //resultRaw = resultRaw.ToLower().Replace(" new line", "{Return}");
-            //resultRaw = resultRaw.ToLower().Replace(" new paragraph", "{Return}{Return}");
-            //resultRaw = resultRaw.ToLower().Replace(" end ", "{Home}");
-            //resultRaw = resultRaw.ToLower().Replace(" undo ", "^z");
-            //resultRaw = resultRaw.ToLower().Replace(" end ", "{End}");
-            //resultRaw = resultRaw.ToLower().Replace(" space ", "{Space}");
+            if (resultRaw.ToLower() == saveTemporaryResults.ToLower())
+            {
+                resultRaw = saveTemporaryResults;
+            }
 
             return resultRaw;
         }
