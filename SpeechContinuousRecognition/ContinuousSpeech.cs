@@ -265,7 +265,7 @@ namespace SpeechContinuousRecognition
                 checkBoxRemovePunctuation.Invoke(new MethodInvoker(delegate { checkBoxRemovePunctuation.Checked = value; }));
             }
         }
-           
+
         public int LastRunCommandId { get; set; } = 0;
         public int EmptyResultsToStopOn { get; } = 20;
         private async void ContinuousSpeech_Load(object sender, EventArgs e)
@@ -276,8 +276,8 @@ namespace SpeechContinuousRecognition
                 this.SetBounds(1680, 100, this.Width, this.Height);
             }
             UpdateTheCurrentProcess();
-              
-                
+
+
             Text = "Azure Cognitive Services - Continuous Speech - Code by Voice in Visual Studio";
             await SpeechSetupAsync();
             buttonStart.Enabled = true;
@@ -584,10 +584,15 @@ namespace SpeechContinuousRecognition
                     {
                         lastCommand = temporary;
                     }
-                    if (this.TreatAsCommandFirst) {
+                    if (this.TreatAsCommandFirst)
+                    {
+                        string temporaryResult = resultRaw;
                         resultRaw = SpeechCommandsHelper.PerformCodeFunctions(resultRaw);
+                        if (temporaryResult.ToLower() == resultRaw.ToLower())
+                        {
+                            resultRaw = temporaryResult;
+                        }
                     }
-
                     resultMain = resultRaw;
                     if (resultRaw.Trim().ToLower() == "use dragon")
                     {
