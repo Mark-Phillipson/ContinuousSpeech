@@ -166,9 +166,9 @@
       buttonStop.ForeColor = SystemColors.Control;
       buttonStop.Location = new Point(20, 243);
       buttonStop.Name = "buttonStop";
-      buttonStop.Size = new Size(190, 36);
+      buttonStop.Size = new Size(386, 36);
       buttonStop.TabIndex = 7;
-      buttonStop.Text = "Stop && Toggle ";
+      buttonStop.Text = "Stop";
       buttonStop.UseVisualStyleBackColor = false;
       buttonStop.Click += buttonStop_Click;
       // 
@@ -180,9 +180,9 @@
       buttonStart.ForeColor = SystemColors.Control;
       buttonStart.Location = new Point(20, 200);
       buttonStart.Name = "buttonStart";
-      buttonStart.Size = new Size(190, 36);
+      buttonStart.Size = new Size(386, 36);
       buttonStart.TabIndex = 8;
-      buttonStart.Text = "Start && Toggle";
+      buttonStart.Text = "Start";
       buttonStart.UseVisualStyleBackColor = false;
       buttonStart.Click += buttonStart_Click;
       // 
@@ -308,12 +308,13 @@
       buttonStartWithoutToggle.FlatStyle = FlatStyle.Flat;
       buttonStartWithoutToggle.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
       buttonStartWithoutToggle.ForeColor = SystemColors.Control;
-      buttonStartWithoutToggle.Location = new Point(215, 200);
+      buttonStartWithoutToggle.Location = new Point(219, 132);
       buttonStartWithoutToggle.Name = "buttonStartWithoutToggle";
       buttonStartWithoutToggle.Size = new Size(190, 36);
       buttonStartWithoutToggle.TabIndex = 23;
       buttonStartWithoutToggle.Text = "Start";
       buttonStartWithoutToggle.UseVisualStyleBackColor = false;
+      buttonStartWithoutToggle.Visible = false;
       buttonStartWithoutToggle.Click += buttonStartWithoutToggle_Click;
       // 
       // buttonStopNoToggle
@@ -322,12 +323,13 @@
       buttonStopNoToggle.FlatStyle = FlatStyle.Flat;
       buttonStopNoToggle.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
       buttonStopNoToggle.ForeColor = SystemColors.Control;
-      buttonStopNoToggle.Location = new Point(216, 244);
+      buttonStopNoToggle.Location = new Point(219, 156);
       buttonStopNoToggle.Name = "buttonStopNoToggle";
       buttonStopNoToggle.Size = new Size(190, 36);
       buttonStopNoToggle.TabIndex = 24;
       buttonStopNoToggle.Text = "Stop";
       buttonStopNoToggle.UseVisualStyleBackColor = false;
+      buttonStopNoToggle.Visible = false;
       buttonStopNoToggle.Click += buttonStopNoToggle_Click;
       // 
       // label1

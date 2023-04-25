@@ -1,7 +1,7 @@
 using DataAccessLibrary.Models;
 using NAudio.CoreAudioApi;
 using System.Linq;
-
+using DNSTools;
 using Microsoft.CognitiveServices.Speech;
 
 using SpeechContinuousRecognition.Repositories;
@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 using WindowsInput;
 using WindowsInput.Native;
 using Microsoft.CognitiveServices.Speech.Audio;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace SpeechContinuousRecognition
 {
@@ -476,7 +477,8 @@ string lpWindowName);
     {
       await StopContinuous().ConfigureAwait(false);
       // This should Toggle DRAGON Microphone
-      _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ADD);
+      //_inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ADD);
+
     }
 
     private async Task StopContinuous()
@@ -498,6 +500,14 @@ string lpWindowName);
         await global::System.Console.Out.WriteLineAsync(exception.Message);
       }
       labelStatus.Invoke(new MethodInvoker(delegate { labelStatus.ForeColor = Color.Red; }));
+      TurnOnDragonMicrophone();
+    }
+
+    private static void TurnOnDragonMicrophone()
+    {
+      DgnMicBtn gDgnMic = new DgnMicBtn();
+      gDgnMic.Register(0);
+      ((IDgnMicBtn)gDgnMic).MicState = DgnMicStateConstants.dgnmicOn;
     }
 
     private void ContinuousSpeech_FormClosing(object sender, FormClosingEventArgs e)
@@ -517,8 +527,7 @@ string lpWindowName);
       try
       {
         await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
-        // This should Toggle DRAGON Microphone
-        _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ADD);
+        TurnDragonOff();
         Icon? icon = Icon.ExtractAssociatedIcon(fileName);
         if (icon != null && notifyIcon1 != null)
         {
@@ -534,6 +543,16 @@ string lpWindowName);
       buttonStopNoToggle.Invoke(new MethodInvoker(delegate { buttonStopNoToggle.Enabled = true; }));
       labelStatus.Invoke(new MethodInvoker(delegate { labelStatus.ForeColor = Color.Green; }));
     }
+
+    private static void TurnDragonOff()
+    {
+      DNSTools.DgnEngineControl engineControl = new DNSTools.DgnEngineControl();
+      engineControl.Register();
+      engineControl.RecognitionMimic("microphone off", 0);
+      //engineControl.RecognitionMimic("microphone on", 0);
+      engineControl.UnRegister(false);
+    }
+
     private async void SpeechRecognizer_SpeechRecognised(object? sender, SpeechRecognitionEventArgs e)
     {
       try
