@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.Devices;
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -22,7 +24,6 @@ namespace SpeechContinuousRecognition
             _inputSimulator.Keyboard.TextEntry(value);
             return $"{{Entered timestamp}}";
         }
-
         public string RestartDragon(string? dictation = null)
         {
             var processName = "nsbrowse";

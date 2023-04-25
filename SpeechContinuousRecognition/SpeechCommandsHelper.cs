@@ -76,7 +76,7 @@ namespace SpeechContinuousRecognition
       rawResult = rawResult.Replace(";", "");
       rawResult = rawResult.Replace(":", "");
       rawResult = rawResult.Replace("?", "");
-      rawResult = rawResult.Replace(".", "");
+      if (rawResult.EndsWith(".")) { rawResult = rawResult.Substring(startIndex: 0, length: rawResult.Length - 1); }
       return rawResult;
     }
     public static string PerformCodeFunctions(string rawResult)
@@ -95,7 +95,7 @@ namespace SpeechContinuousRecognition
         rawResult = rawResult.ToLower().Replace("pascal ", "");
         rawResult = rawResult.Pascalize();
       }
-      else if (rawResult.ToLower().StartsWith("period "))
+      else if (rawResult.ToLower().StartsWith("period ") || rawResult.ToLower().StartsWith("period."))
       {
         words.RemoveAt(0);
         string value = "";
@@ -120,10 +120,10 @@ namespace SpeechContinuousRecognition
         //rawResult = rawResult.Hyphenate();
         // rawResult = rawResult.Dasherize();
       }
-      else if (rawResult.ToLower().StartsWith("title") || rawResult.ToLower().StartsWith("mixed"))
+      else if (rawResult.ToLower().StartsWith("title")  || rawResult.ToLower().StartsWith("title.") )
       {
         rawResult = rawResult.ToLower().Replace("title ", "");
-        rawResult = rawResult.ToLower().Replace("mixed ", "");
+        rawResult = rawResult.ToLower().Replace("title.", "");
         rawResult = rawResult.Titleize();
       }
       else if (rawResult.ToLower().StartsWith("upper"))

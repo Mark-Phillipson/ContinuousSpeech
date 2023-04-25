@@ -287,7 +287,7 @@ string lpWindowName);
       buttonStartWithoutToggle.Enabled = true;
       buttonStop.Enabled = false;
       buttonStopNoToggle.Enabled = false;
-
+      labelStatus.Invoke(new MethodInvoker(delegate { labelStatus.ForeColor = Color.Red; }));
       this.ShowInTaskbar = true;
       // DisplayRandomCommand();
     }
@@ -345,29 +345,37 @@ string lpWindowName);
 
       }
       var config = SpeechConfig.FromSubscription(SPEECH__SERVICE__KEY, SPEECH__SERVICE__REGION);
-            // Custom Model
-            //config.EndpointId = "861801a0-8d0a-4455-915c-43bebddcaa8a";
-            config.EnableAudioLogging();
+      // Custom Model
+      //config.EndpointId = "861801a0-8d0a-4455-915c-43bebddcaa8a";
+      config.EnableAudioLogging();
 
 
 
-            // Find all audio input devices
-            var deviceEnumerator = new MMDeviceEnumerator();
-            var deviceList = deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
+      // Find all audio input devices
+      var deviceEnumerator = new MMDeviceEnumerator();
+      var deviceList = deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
 
-            // Select the microphone device you want to use 
-            var microphoneDevice = deviceList.FirstOrDefault(c  => c.DeviceFriendlyName=="Sennheiser SC30 for Lync");
+      // Select the microphone device you want to use 
+      var microphoneDevice = deviceList.FirstOrDefault(c => c.DeviceFriendlyName == "Sennheiser SC30 for Lync");
 
-            // Get the device ID of the selected microphone
-            string audioDeviceId = microphoneDevice.ID;
+      if (microphoneDevice == null)
+      {
+        microphoneDevice = deviceList.FirstOrDefault();
+      }
+      string audioDeviceId = string.Empty;
+      if (microphoneDevice != null)
+      {
+        // Get the device ID of the selected microphone
+        audioDeviceId = microphoneDevice.ID;
 
-            // Configure the audio input source with the selected device ID
-            var audioConfig = AudioConfig.FromMicrophoneInput(audioDeviceId);
+      }
+      // Configure the audio input source with the selected device ID
+      var audioConfig = AudioConfig.FromMicrophoneInput(audioDeviceId);
 
 
-            // Creates a speech recognizer from microphone.
-            try
-            {
+      // Creates a speech recognizer from microphone.
+      try
+      {
         recognizer = new Microsoft.CognitiveServices.Speech.SpeechRecognizer(config, audioConfig);
         {
           // Subscribes to events.
