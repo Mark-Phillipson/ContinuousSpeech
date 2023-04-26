@@ -49,14 +49,14 @@ namespace SpeechContinuousRecognition.Repositories
       return "";
 
     }
-    public List<WindowsSpeechVoiceCommand> GetDictationCommands(string? applicationName)
+    public List<WindowsSpeechVoiceCommand> GetSpecialCommands(string? applicationName, string endsWith)
     {
       if (applicationName == null)
       {
         var result = Model.WindowsSpeechVoiceCommands
             .AsNoTracking()
             .Include(i => i.SpokenForms)
-            .Where(v => v.ApplicationName == "Global" && v.SpokenForms != null && v.SpokenForms.Any(i => i.SpokenFormText.EndsWith("<dictation>")))
+            .Where(v => v.ApplicationName == "Global" && v.SpokenForms != null && v.SpokenForms.Any(i => i.SpokenFormText.EndsWith(endsWith)))
             .ToList();
         return result;
       }
@@ -64,7 +64,8 @@ namespace SpeechContinuousRecognition.Repositories
       {
         var result = Model.WindowsSpeechVoiceCommands
             .AsNoTracking()
-            .Where(v => (v.ApplicationName == "Global" || v.ApplicationName == applicationName) && v.SpokenForms != null && v.SpokenForms.Any(i => i.SpokenFormText.EndsWith("<dictation>")))
+            .Include(i => i.SpokenForms)
+            .Where(v => (v.ApplicationName == "Global" || v.ApplicationName == applicationName) && v.SpokenForms != null && v.SpokenForms.Any(i => i.SpokenFormText.EndsWith(endsWith)))
             .ToList();
         return result;
       }

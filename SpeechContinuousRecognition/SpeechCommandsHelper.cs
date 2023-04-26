@@ -1345,8 +1345,8 @@ namespace SpeechContinuousRecognition
       command = windowsVoiceCommand.GetCommand(resultRaw, applicationName);
       if (command == null)
       {
-        var dictationCommands = windowsVoiceCommand.GetDictationCommands(applicationName);
-        foreach (var dictationCommand in dictationCommands)
+        var specialCommands = windowsVoiceCommand.GetSpecialCommands(applicationName, "<dictation>");
+        foreach (var dictationCommand in specialCommands)
         {
           if (dictationCommand.SpokenForms != null)
           {
@@ -1359,7 +1359,10 @@ namespace SpeechContinuousRecognition
                 dictation = resultRaw.ToLower().Replace(spokenForm.ToLower(), "").Trim();
                 break;
               }
-
+              if (command != null )
+              {
+                break;
+              }
             }
           }
         }
@@ -1408,6 +1411,9 @@ namespace SpeechContinuousRecognition
           if (!string.IsNullOrWhiteSpace(action.TextToEnter))
           {
             string textEntry = action.TextToEnter.Replace("<dictation>", dictation);
+            string clipboard = Clipboard.GetText();
+            textEntry = action.TextToEnter.Replace("<clipboard>", clipboard);
+
             if (textEntry != null && textEntry.Length > 0)
             {
               inputSimulator.Keyboard.TextEntry(textEntry);
