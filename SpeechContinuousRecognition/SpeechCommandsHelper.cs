@@ -204,6 +204,10 @@ namespace SpeechContinuousRecognition
           resultRaw = resultRaw.ToLower().Replace(item.FindString, item.ReplaceWith);
         }
       }
+      if (resultRaw.ToLower().StartsWith("words "))
+      {
+        resultRaw = resultRaw.ToLower().Replace(".", "");
+      }
       if (resultRaw.ToLower().StartsWith("a "))
       {
         resultRaw = resultRaw.Substring(2);
