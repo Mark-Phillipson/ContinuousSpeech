@@ -208,18 +208,18 @@ namespace SpeechContinuousRecognition
       {
         resultRaw = resultRaw.ToLower().Replace(".", "");
       }
-      if (resultRaw.ToLower().StartsWith("a "))
+      if (resultRaw.ToLower().StartsWith("a ")) // Useful when Azure Cognitive Services decides to add a Even though it was not said
       {
         resultRaw = resultRaw.Substring(2);
       }
-      if (resultRaw.ToLower().StartsWith("the "))
+      if (resultRaw.ToLower().StartsWith("the "))//Same As for a above
       {
         resultRaw = resultRaw.Substring(4);
       }
-      if (resultRaw.ToLower().Contains(" the "))
-      {
-        resultRaw = resultRaw.Replace(" the ", " ");
-      }
+      //if (resultRaw.ToLower().Contains(" the ")) //This is too annoying as it removes every the Even when it's said
+      //{
+      //  resultRaw = resultRaw.Replace(" the ", " ");
+      //}
       if (resultRaw.ToLower() == "don't")
       {
         resultRaw = resultRaw.ToLower().Replace("don't", "dot");
@@ -253,7 +253,7 @@ namespace SpeechContinuousRecognition
       {
         resultRaw = "Move Up";
       }
-      if (resultRaw.ToLower().StartsWith("dictation cap"))
+      if (resultRaw.ToLower().StartsWith("dictation. cap"))
       {
         resultRaw = resultRaw.Replace("dictation", "");
       }
