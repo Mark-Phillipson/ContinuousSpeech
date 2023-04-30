@@ -1,7 +1,7 @@
 using DataAccessLibrary.Models;
 using NAudio.CoreAudioApi;
 using System.Linq;
-using DNSTools;
+
 using Microsoft.CognitiveServices.Speech;
 
 using SpeechContinuousRecognition.Repositories;
@@ -500,14 +500,15 @@ namespace SpeechContinuousRecognition
         await global::System.Console.Out.WriteLineAsync(exception.Message);
       }
       labelStatus.Invoke(new MethodInvoker(delegate { labelStatus.ForeColor = Color.Red; }));
-      TurnOnDragonMicrophone();
+            _inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ADD);
+           // TurnOnDragonMicrophone();
     }
 
     private static void TurnOnDragonMicrophone()
     {
-      DgnMicBtn gDgnMic = new DgnMicBtn();
-      gDgnMic.Register(0);
-      ((IDgnMicBtn)gDgnMic).MicState = DgnMicStateConstants.dgnmicOn;
+      //DgnMicBtn gDgnMic = new DgnMicBtn();
+      //gDgnMic.Register(0);
+      //((IDgnMicBtn)gDgnMic).MicState = DgnMicStateConstants.dgnmicOn;
     }
 
     private void ContinuousSpeech_FormClosing(object sender, FormClosingEventArgs e)
