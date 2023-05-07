@@ -25,6 +25,7 @@ namespace SpeechContinuousRecognition.Models
             optionsBuilder.UseSqlServer(_connectionString);
         }
         public virtual DbSet<ApplicationDetail> ApplicationDetails { get; set; }
+        public virtual DbSet<Microphone> Microphones { get; set; }
         public virtual DbSet<Idiosyncrasy> Idiosyncrasies { get; set; }
         public virtual DbSet<PhraseListGrammarStorage> PhraseListGrammars { get; set; }
 
