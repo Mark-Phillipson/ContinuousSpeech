@@ -282,7 +282,7 @@ namespace SpeechContinuousRecognition
             UpdateTheCurrentProcess();
 
 
-            
+
             SpeechSetupAsync();
             buttonStart.Enabled = true;
             buttonStartWithoutToggle.Enabled = true;
@@ -356,16 +356,16 @@ namespace SpeechContinuousRecognition
             var deviceEnumerator = new MMDeviceEnumerator();
             var deviceList = deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
             // Try to get a default microphone from the Table
-            var defaultMicrophone= _windowsVoiceCommand.GetMicrophoneFromTable();
+            var defaultMicrophone = _windowsVoiceCommand.GetMicrophoneFromTable();
 
             // Select the microphone device you want to use 
 
-            MMDevice? microphoneDevice= null ;
-            if (defaultMicrophone != null )
+            MMDevice? microphoneDevice = null;
+            if (defaultMicrophone != null)
             {
                 microphoneDevice = deviceList.FirstOrDefault(c => c.DeviceFriendlyName == defaultMicrophone.MicrophoneName);
             }
-            else if (deviceList != null && deviceList.Count>0 )
+            else if (deviceList != null && deviceList.Count > 0)
             {
                 microphoneDevice = deviceList.FirstOrDefault();
             }
