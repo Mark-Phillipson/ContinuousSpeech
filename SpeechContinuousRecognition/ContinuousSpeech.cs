@@ -325,7 +325,7 @@ namespace SpeechContinuousRecognition
             uint pid;
             GetWindowThreadProcessId(hwnd, out pid);
             currentProcess = Process.GetProcessById((int)pid);
-            labelCurrentProcess.Invoke(new MethodInvoker(delegate { labelCurrentProcess.Text = currentProcess.ProcessName; }));
+            labelCurrentProcess.Invoke(new MethodInvoker(delegate { labelCurrentProcess.Text = $"Current Process: {currentProcess.ProcessName}"; }));
         }
 
         private void SpeechSetupAsync()
