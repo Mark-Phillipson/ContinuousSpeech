@@ -23,9 +23,9 @@ namespace SpeechContinuousRecognition.Repositories
         public List<WindowsSpeechVoiceCommand> GetCommands()
         {
             var result = Model?.WindowsSpeechVoiceCommands
-                .AsNoTracking()
-                .Where(v => v.ApplicationName == "Global")
-                .ToList();
+                    .AsNoTracking()
+                    .Where(v => v.ApplicationName == "Global")
+                    .ToList();
             if (result == null)
             {
                 throw new Exception("Failed to get commands from database");
@@ -40,8 +40,8 @@ namespace SpeechContinuousRecognition.Repositories
             }
             command = command.Replace("enter", "").Trim();
             var result = Model.ValuesToInserts
-                .AsNoTracking()
-                .Where(v => v.Lookup.ToLower() == command.ToLower()).FirstOrDefault();
+                    .AsNoTracking()
+                    .Where(v => v.Lookup.ToLower() == command.ToLower()).FirstOrDefault();
             if (result != null)
             {
                 return result.ValueToInsert;
@@ -54,19 +54,19 @@ namespace SpeechContinuousRecognition.Repositories
             if (applicationName == null)
             {
                 var result = Model.WindowsSpeechVoiceCommands
-                    .AsNoTracking()
-                    .Include(i => i.SpokenForms)
-                    .Where(v => v.ApplicationName == "Global" && v.SpokenForms != null && v.SpokenForms.Any(i => i.SpokenFormText.EndsWith(endsWith)))
-                    .ToList();
+                        .AsNoTracking()
+                        .Include(i => i.SpokenForms)
+                        .Where(v => v.ApplicationName == "Global" && v.SpokenForms != null && v.SpokenForms.Any(i => i.SpokenFormText.EndsWith(endsWith)))
+                        .ToList();
                 return result;
             }
             else
             {
                 var result = Model.WindowsSpeechVoiceCommands
-                    .AsNoTracking()
-                    .Include(i => i.SpokenForms)
-                    .Where(v => (v.ApplicationName == "Global" || v.ApplicationName == applicationName) && v.SpokenForms != null && v.SpokenForms.Any(i => i.SpokenFormText.EndsWith(endsWith)))
-                    .ToList();
+                        .AsNoTracking()
+                        .Include(i => i.SpokenForms)
+                        .Where(v => (v.ApplicationName == "Global" || v.ApplicationName == applicationName) && v.SpokenForms != null && v.SpokenForms.Any(i => i.SpokenFormText.EndsWith(endsWith)))
+                        .ToList();
                 return result;
             }
         }
@@ -78,11 +78,11 @@ namespace SpeechContinuousRecognition.Repositories
             }
             //Get a random voice command
             var result = Model.WindowsSpeechVoiceCommands
-                .AsNoTracking()
-                .Include(c => c.SpokenForms)
-                .Where(v => v.AutoCreated == false)
-                .OrderBy(r => Guid.NewGuid())
-                .FirstOrDefault();
+                    .AsNoTracking()
+                    .Include(c => c.SpokenForms)
+                    .Where(v => v.AutoCreated == false)
+                    .OrderBy(r => Guid.NewGuid())
+                    .FirstOrDefault();
             return result;
         }
         public WindowsSpeechVoiceCommand? GetCommand(string spokenCommand, string? applicationName)
@@ -94,20 +94,20 @@ namespace SpeechContinuousRecognition.Repositories
             if (applicationName != null && Model != null)
             {
                 WindowsSpeechVoiceCommand? applicationCommand = Model.WindowsSpeechVoiceCommands
-                    .AsNoTracking()
-                    .Include(i => i.SpokenForms)
-                    .Where(v => v.SpokenForms != null && v.SpokenForms.Any(c => c.SpokenFormText.ToLower() == spokenCommand.ToLower()) && v.ApplicationName == applicationName)
-                    .FirstOrDefault();
+                        .AsNoTracking()
+                        .Include(i => i.SpokenForms)
+                        .Where(v => v.SpokenForms != null && v.SpokenForms.Any(c => c.SpokenFormText.ToLower().Trim() == spokenCommand.ToLower().Trim()) && v.ApplicationName == applicationName)
+                        .FirstOrDefault();
                 if (applicationCommand != null)
                 {
                     return applicationCommand;
                 }
             }
             WindowsSpeechVoiceCommand? command = Model?.WindowsSpeechVoiceCommands
-                .AsNoTracking()
-                .Include(i => i.SpokenForms)
-                .Where(v => v.SpokenForms != null && v.SpokenForms.Any(i => i.SpokenFormText.ToLower() == spokenCommand.ToLower()) && v.ApplicationName == "Global")
-                .FirstOrDefault();
+                    .AsNoTracking()
+                    .Include(i => i.SpokenForms)
+                    .Where(v => v.SpokenForms != null && v.SpokenForms.Any(i => i.SpokenFormText.ToLower() == spokenCommand.ToLower()) && v.ApplicationName == "Global")
+                    .FirstOrDefault();
             return command;
         }
         public WindowsSpeechVoiceCommand? GetCommandById(int id)
@@ -117,17 +117,17 @@ namespace SpeechContinuousRecognition.Repositories
                 return null;
             }
             WindowsSpeechVoiceCommand? command = Model.WindowsSpeechVoiceCommands
-                .AsNoTracking()
-                .Include(i => i.SpokenForms)
-                .Where(v => v.Id == id)
-                .FirstOrDefault();
+                    .AsNoTracking()
+                    .Include(i => i.SpokenForms)
+                    .Where(v => v.Id == id)
+                    .FirstOrDefault();
             return command;
         }
         public List<CustomWindowsSpeechCommand>? GetChildActions(int windowsSpeechVoiceCommandId)
         {
             var results = Model.CustomWindowsSpeechCommands
-                .AsNoTracking()
-                .Where(v => v.WindowsSpeechVoiceCommandId == windowsSpeechVoiceCommandId);
+                    .AsNoTracking()
+                    .Where(v => v.WindowsSpeechVoiceCommandId == windowsSpeechVoiceCommandId);
             if (results != null)
             {
                 var actions = results.ToList();
@@ -207,5 +207,15 @@ namespace SpeechContinuousRecognition.Repositories
             var microphone = Model.Microphones.FirstOrDefault(c => c.Default);
             return microphone;
         }
+        public SpeechContinuousRecognition.Models.Prompt? GetDefaultOrSpecificPrompt(int? id = null)
+        {
+            Prompt? prompt = Model.Prompts.FirstOrDefault(c => c.IsDefault);
+            if (id != null)
+            {
+                prompt = Model.Prompts.FirstOrDefault(c => c.Id == id);
+            }
+            return prompt;
+        }
     }
 }
+

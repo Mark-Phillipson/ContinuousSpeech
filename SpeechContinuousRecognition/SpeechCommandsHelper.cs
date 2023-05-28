@@ -6,8 +6,9 @@ using Humanizer;
 using Microsoft.CognitiveServices.Speech;
 
 using SpeechContinuousRecognition.Models;
+using SpeechContinuousRecognition.OpenAI;
 using SpeechContinuousRecognition.Repositories;
-
+using System.Configuration;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -183,7 +184,7 @@ namespace SpeechContinuousRecognition
             value = value.Humanize(LetterCasing.Title);
             return value;
         }
-        public string IdentifyAndRunCommand(string resultRaw, ContinuousSpeech form, SpeechRecognitionResult result, Process? currentProcess)
+        public async Task<string> IdentifyAndRunCommandAsync(string resultRaw, ContinuousSpeech form, SpeechRecognitionResult result, Process? currentProcess)
         {
             string? applicationName = null;
             if (currentProcess != null)
@@ -208,7 +209,7 @@ namespace SpeechContinuousRecognition
                     }
                     else if (item.StringFormattingMethod == "Equals")
                     {
-                        if (resultRaw.ToLower()==item.FindString.ToLower())
+                        if (resultRaw.ToLower() == item.FindString.ToLower())
                         {
                             performIdiosyncrasy = true;
                         }
@@ -311,6 +312,10 @@ namespace SpeechContinuousRecognition
             if (resultRaw.ToLower() == saveTemporaryResults.ToLower())
             {
                 resultRaw = saveTemporaryResults;
+            }
+            if (resultRaw.ToLower().StartsWith("command"))
+            {
+                resultRaw = await GetOpenAICommandFromPhrase(resultRaw);
             }
             IInputSimulator inputSimulator = new InputSimulator();
             (bool finish, string? commandName, string? errorMessage) = PerformDatabaseCommands(result, resultRaw, inputSimulator, form, applicationName);
@@ -1886,8 +1891,41 @@ namespace SpeechContinuousRecognition
             }
         }
 
+        public async Task<string> GetOpenAICommandFromPhrase(string resultRaw)
+        {
+            var promptRecord = windowsVoiceCommand.GetDefaultOrSpecificPrompt(5);
+            string systemPrompt = "";
+            if (promptRecord != null && promptRecord.PromptText.Length > 0)
+            {
+                systemPrompt = promptRecord.PromptText;
+            }
+            if (resultRaw.ToLower().StartsWith("command"))
+            {
+                resultRaw = resultRaw.Replace("Command", "");
+            }
+            string apiKey = ConfigurationManager.AppSettings.Get("OpenAI") ?? "NotFound!";
+            string prompt = $"{systemPrompt}\n\n{resultRaw}";
+            string result = string.Empty;
+            try
+            {
+                result = await OpenAIHelper.GetResultAsync(apiKey, prompt);
+            }
+            catch (Exception exception)
+            {
+                await Console.Out.WriteLineAsync(exception.Message);
 
-
-
+            }
+            //string result = OpenAIHelper.GetResultAzureAsync(apiKey,dictation, systemPrompt).Result;
+            if (result.Length > 0)
+            {
+                result = result.Replace("\r\n", "");
+                result = result.Replace("\n", "");
+                result = result.Replace(".", "");
+                result = result.Replace("Output:", "").Trim();
+                result = RemovePunctuation(result);
+              //  Clipboard.SetText(result);
+            }
+            return result;
+        }
     }
 }

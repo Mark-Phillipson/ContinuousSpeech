@@ -1,11 +1,7 @@
-﻿using Microsoft.VisualBasic.Devices;
-
-using System;
-using System.Collections.Generic;
+﻿using SpeechContinuousRecognition.OpenAI;
+using SpeechContinuousRecognition.Repositories;
+using System.Configuration;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using WindowsInput;
 
@@ -14,8 +10,38 @@ namespace SpeechContinuousRecognition
     public class CustomMethods
     {
         IInputSimulator _inputSimulator = new InputSimulator();
+        WindowsVoiceCommand windowsVoiceCommand = new WindowsVoiceCommand();
         public CustomMethods()
         {
+
+        }
+        public async Task<string> GetOpenAIResponse(string? dictation = null)
+        {
+            var promptRecord = windowsVoiceCommand.GetDefaultOrSpecificPrompt();
+            string  systemPrompt = "When I type some Natural language text convert it into C# code or any other programming language that I specify.  Include comments When appropriate to explain what the code is doing.\r\n";
+            if (promptRecord != null  && promptRecord.PromptText.Length>0)
+            {
+                systemPrompt = promptRecord.PromptText;
+            }
+            if (dictation == null)
+            {
+                return $"{{Called Open AI Cancelled as no dictation supplied}}";
+            }
+            string apiKey = ConfigurationManager.AppSettings.Get("OpenAI") ?? "NotFound!";
+            string prompt = $"{systemPrompt}{Environment.NewLine}{dictation}";
+            string result = await OpenAIHelper.GetResultAsync(apiKey, prompt);
+            //string result = OpenAIHelper.GetResultAzureAsync(apiKey,dictation, systemPrompt).Result;
+            result = result.Replace("\r\n", Environment.NewLine);
+            result = result.Replace("\n", Environment.NewLine);
+
+            if (result != null && result.Length > 0)
+            {
+                //_inputSimulator.Keyboard.TextEntry(prompt);
+                //_inputSimulator.Keyboard.TextEntry(Environment.NewLine);
+                _inputSimulator.Keyboard.TextEntry(result);
+                Clipboard.SetText(result);
+            }
+            return $"{{Called Open AI {dictation}}}";
 
         }
         public string EnterTimestamp(string? dictation = null)
@@ -97,17 +123,17 @@ namespace SpeechContinuousRecognition
 
         public string ProcessCapitalLetters(string dictation)
         {
-             return ProcessLetters(dictation, "Upper");
+            return ProcessLetters(dictation, "Upper");
         }
         public string ProcessMixedLetters(string dictation)
         {
-             return ProcessLetters(dictation, "Mixed");
+            return ProcessLetters(dictation, "Mixed");
         }
         public string ProcessLowerLetters(string dictation)
         {
-             return ProcessLetters(dictation, "Lower");
+            return ProcessLetters(dictation, "Lower");
         }
-         private  string ProcessLetters(string dictation, string caseType)
+        private string ProcessLetters(string dictation, string caseType)
         {
             foreach (var item in phoneticAlphabet)
             {
@@ -121,10 +147,10 @@ namespace SpeechContinuousRecognition
             {
                 dictation = dictation.ToUpper();
             }
-            else if (caseType=="Mixed")
+            else if (caseType == "Mixed")
             {
-                dictation = dictation.Substring(0,1).ToUpper() +
-                    dictation.ToLower().Substring(1);
+                dictation = dictation.Substring(0, 1).ToUpper() +
+                        dictation.ToLower().Substring(1);
             }
             else
             {
