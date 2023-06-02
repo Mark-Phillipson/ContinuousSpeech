@@ -17,7 +17,7 @@ namespace SpeechContinuousRecognition.OpenAI
             CompletionResult result;
             try
 			{
-                result = await api.Completions.CreateCompletionAsync(prompt, "text-davinci-003", 1000);
+                result = await api.Completions.CreateCompletionAsync(prompt, "text-davinci-003", 1000,0,1,null,0);
             }
 			catch (Exception exception)
 			{

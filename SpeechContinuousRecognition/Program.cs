@@ -1,4 +1,5 @@
 
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace SpeechContinuousRecognition;
@@ -19,6 +20,7 @@ internal static class Program
         }
 
         ApplicationConfiguration.Initialize();
+
         Application.Run(new ContinuousSpeech());
 
 

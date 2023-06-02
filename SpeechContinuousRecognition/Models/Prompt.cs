@@ -11,7 +11,7 @@ namespace SpeechContinuousRecognition.Models
 	{
 		public int Id { get; set; }
 		[Required]
-		[StringLength(900)]
+		[StringLength(3000)]
 		public string PromptText { get; set; } = "";
 		[StringLength(2000)]
 		public string? Description { get; set; }

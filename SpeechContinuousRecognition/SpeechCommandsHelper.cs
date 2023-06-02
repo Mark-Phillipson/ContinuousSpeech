@@ -1893,7 +1893,13 @@ namespace SpeechContinuousRecognition
 
         public async Task<string> GetOpenAICommandFromPhrase(string resultRaw)
         {
-            var promptRecord = windowsVoiceCommand.GetDefaultOrSpecificPrompt(5);
+            // https://platform.openai.com/docs/guides/fine-tuning
+            // Needs fine tuning and cannot join Azure Open AI as I'm not a Big company Enter date today
+            // Could look into doing via Python/ Open AI API            
+            // https://openai.com/blog/openai-api/
+
+
+            var promptRecord = windowsVoiceCommand.GetDefaultOrSpecificPrompt(13);
             string systemPrompt = "";
             if (promptRecord != null && promptRecord.PromptText.Length > 0)
             {
@@ -1913,7 +1919,7 @@ namespace SpeechContinuousRecognition
             catch (Exception exception)
             {
                 await Console.Out.WriteLineAsync(exception.Message);
-
+               
             }
             //string result = OpenAIHelper.GetResultAzureAsync(apiKey,dictation, systemPrompt).Result;
             if (result.Length > 0)
@@ -1925,6 +1931,10 @@ namespace SpeechContinuousRecognition
                 result = RemovePunctuation(result);
               //  Clipboard.SetText(result);
             }
+#if DEBUG
+            InputSimulator inputSimulator = new InputSimulator();
+            inputSimulator.Keyboard.TextEntry(result);
+#endif
             return result;
         }
     }
