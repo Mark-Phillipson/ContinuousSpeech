@@ -1309,6 +1309,7 @@ namespace SpeechContinuousRecognition
                 inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
                 return $"{{Go to Line {number.ToString()}}}";
             }
+            if (resultRaw.ToLower().StartsWith("move the line")) { resultRaw = resultRaw.Replace("move the line", "move line"); }
             if (resultRaw.ToLower().StartsWith("move line up") || resultRaw.ToLower().StartsWith("move line down"))
             {
                 int number = 0;
@@ -1360,7 +1361,7 @@ namespace SpeechContinuousRecognition
             if (resultRaw.Trim().ToLower() == "previous method")
             {
                 SendKeys.Flush();
-                SendKeys.SendWait("^+m");
+                SendKeys.SendWait("^+%m");
                 return "{previous method}";
             }
             if (resultRaw.Trim().ToLower() == "following method" || resultRaw.Trim().ToLower() == "next method")
@@ -1673,7 +1674,7 @@ namespace SpeechContinuousRecognition
                     inputSimulator.Keyboard.KeyPress(VirtualKeyCode.ESCAPE);
                 }
                 commandRun = true;
-                commandName = $"Find Next/Previous {searchTerm}";
+                commandName = $"{result.Text} {searchTerm}";
             }
             return (commandRun, commandName, null);
 
