@@ -153,13 +153,13 @@ string lpWindowName);
 
 			try
 			{
-				//SendKeys.Send("%{Tab}");
 				InputSimulator inputSimulator = new InputSimulator();
 				inputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.MENU, VirtualKeyCode.TAB);
 				inputSimulator.Keyboard.Sleep(100);
 				inputSimulator.Keyboard.KeyPress(VirtualKeyCode.RETURN);
 
 			}
+
 			catch (Exception exception)
 			{
 				AutoClosingMessageBox.Show(exception.Message, "Error when sending keys", 30);
@@ -296,7 +296,8 @@ string lpWindowName);
 			Screen[] screens = Screen.AllScreens;
 			if (Screen.AllScreens.Count() > 1)
 			{
-				this.SetBounds(1680, 100, this.Width, this.Height);
+				this.SetBounds(80, 100, this.Width, this.Height);
+				//this.SetBounds(1680, 100, this.Width, this.Height);
 			}
 			UpdateTheCurrentProcess();
 
@@ -594,6 +595,7 @@ string lpWindowName);
 			try
 			{
 				SpeechRecognitionResult result = e.Result;
+				DisplayInTooltip(result.Text);
 				_logger.LogInformation($"Continuous Speech Recognised: {result.Text}");
 				if (result.Text == "")
 				{
@@ -728,6 +730,21 @@ string lpWindowName);
 				throw;
 			}
 		}
+		void DisplayInTooltip(string text)
+		{
+			if (notifyIcon1 != null && text.Length > 0)
+			{
+				notifyIcon1.Text = text;
+
+
+				notifyIcon1.Icon = new Icon($"{Application.StartupPath}Mic-03.ico");
+
+
+				notifyIcon1.Visible = true;
+
+			}
+
+		}
 
 		private async Task PerformTextEntryOrLog()
 		{
@@ -810,16 +827,16 @@ string lpWindowName);
 			psi.WorkingDirectory = @"C:\Users\MPhil\source\repos\VoiceLauncherBlazor\VoiceLauncher\bin\Release\net7.0\publish\";
 			psi.WindowStyle = System.Diagnostics.ProcessWindowStyle.Minimized;
 			Process.Start(psi);
-			string commandIdParameter = "";
-			if (LastRunCommandId != 0)
-			{
-				var command = _windowsVoiceCommand.GetCommandById(LastRunCommandId);
-				if (command != null)
-				{
-					commandIdParameter = $"/{LastRunCommandId}";
-				}
-			}
-			var uri = $"http://localhost:5000/windowsspeechvoicecommands{commandIdParameter}";
+			//string commandIdParameter = "";.
+			//if (LastRunCommandId != 0)
+			//{
+			//	var command = _windowsVoiceCommand.GetCommandById(LastRunCommandId);
+			//	if (command != null)
+			//	{
+			//		commandIdParameter = $"/{LastRunCommandId}";
+			//	}
+			//}
+			var uri = $"http://localhost:5000/launchersfavourites";
 			psi = new System.Diagnostics.ProcessStartInfo();
 			psi.UseShellExecute = true;
 			psi.FileName = uri;
